@@ -87,9 +87,76 @@ As this integral is being done over a closed volume, the last integral can be ex
 \begin{equation}
 \bm{I} = \int_{\mathcal{V}} (\rho_0 \bm{u}) d\bm{r} + 
 \frac{1}{2}\int_{\mathcal{S}} d\bm{S}(\bm{r}\cdot(\rho_0 \bm{u})) - d\bm{S} \cdot(\bm{r}(\rho_0\bm{u})).
+\label{eqn:surface_impulse}
 \end{equation}
 
+\subsection{Time derivative of the impulse}
+The time derivative of the impulse is \citep{shivamoggi2010},
+\begin{equation}
+\frac{\partial \bm{I}}{\partial t} = \int_{\mathcal{V}}\frac{\partial}{\partial t}(\rho_0 \bm{u}) d\bm{r}.
+\end{equation}
+I'm not totally convinced this is right. There's not much explanation of this in the paper. In an unbounded
+fluid (which I think is what he's using this expression for), it makes sense that the surface terms
+in Eqn.~\ref{eqn:surface_impulse} drop out. I'm not entirely sure why $d/dt \rightarrow \partial/\partial t$
+inside of the derivative. Given a fairly standard combination of an ideal 
+momentum equation and continuity equation,
+$$
+\frac{\partial}{\partial t}{\rho_0 \bm{u}} + \grad\cdot(\rho_0\bm{u}\bm{u}) = -\grad P - (\rho_0 + \rho_1) g \hat{z}.
+$$
+Now technically this whole $\rho_1$ term doesn't jive with the anelastic approximation (where $\rho$ can't change),
+but I'm hesitant to put the equations into a $\varpi$ and $S_1$ formulation, because I don't think they accurately describe
+the thermal's evolution. Subtracting out hydrostatic balance, we have something like
+$$
+\frac{\partial}{\partial t}{\rho_0 \bm{u}} = - \grad\cdot(\rho_0\bm{u}\bm{u}) - \grad P_1 - \rho_1 g \hat{z}.
+$$
+and thus the change in impulse over time is
+\begin{equation}
+\frac{\partial \bm{I}}{\partial t} = 
+\int_{\mathcal{V}}\left(
+- \grad\cdot(\rho_0\bm{u}\bm{u}) - \grad P_1 - \rho_1 g \hat{z}
+\right)d\bm{r}
+= -\int_{\mathcal{V}}\rho_1 g\hat{z} d\bm{r} -
+\int_{\mathcal{S}} [d\bm{S}\cdot(\rho_0\bm{u}\bm{u}) + d\bm{S}P_1].
+\end{equation}
+Generally (in \citet{shivamoggi2010} and I think other thermal work), the
+surface terms here are said to be zero (at least, under appropriate boundary
+conditions), and so we're left with
+\begin{equation}
+\boxed{
+\frac{d\bm{I}}{dt} = -gM_1 \hat{z}, \qquad M_1 \equiv \int_{\mathcal{V}}\rho_1 dV
+}.
+\end{equation}
+Or, your change in impulse over time is directly proportional to the excess mass
+in the thermal.
 
+\subsection{Approximate expression for the impulse}
+Going back to Eqn.~\ref{eqn:impulse}, we can see that the impulse contains two expressions:
+\begin{equation}
+\bm{I} = \frac{1}{2}\int_{\mathcal{V}}\bm{r}\times(\grad\times(\rho_0\bm{u}))d\bm{r} 
+= \frac{1}{2} \int_{\mathcal{V}} \left(\rho_0 \bm{r}\times \bm{\omega} + \bm{r} \times(\grad\rho_0 \times \bm{u}) \right) d\bm{r},
+\end{equation}
+where $\bm{\omega} = \grad\times\bm{u}$ is the vorticity.  The first term is identical to the term that shows up
+in boussinesq flows, and is basically \citep{saffman1970}
+$$
+\frac{1}{2} \int_{\mathcal{V}} \rho_0 \bm{r}\times \bm{\omega} = \rho_0 c R^2 \Gamma \hat{z},
+$$
+where $R$ is the radius of the vortex ring, $\Gamma$ is its circulation, and $c$ is some constant describing its
+aspect ratio. The second term here is
+$$
+\bm{r}\times(\grad\rho_0 \times\bm{u}) = (\bm{r}\cdot\bm{u})\grad\rho_0 - (\bm{r}\cdot\grad\rho_0)\bm{u}).
+$$
+Assuming that $\grad \rho_0 = \partial_z \rho_0 \hat{z}$, this becomes
+$$
+\bm{r}\times(\grad\rho_0 \times\bm{u}) = (-uz\hat{x} - vz\hat{y} + (xu + yv)\hat{z}).
+$$
+We don't care about the $x$ and $y$ terms here, because the main impulse of the thermal is vertical. We're essentially left with
+$$
+I_z = \rho_0 c R^2 \Gamma + \frac{1}{2}\int_{\mathcal{V}} u_{\perp} r_{\perp} \frac{\partial \rho_0}{\partial z} \bm{r}.
+$$
+If the thermal is small, and $\partial \rho_0 /\partial z$ is constant across the thermal, the last term drops out
+($u_{\perp} r_{\perp}$ at the bottom of the thermal cancels out with $u_{\perp} r_{\perp}$ at the top of the thermal).
+If the thermal is large and the stratification of the background varies across the thermal's size, then we need to worry
+about that second term.
 
 \bibliography{biblio.bib}
 \end{document}
