@@ -1,0 +1,95 @@
+\documentclass[onecolumn, amsmath, amsfonts, amssymb]{aastex62}
+\usepackage{mathtools}
+\usepackage{natbib}
+\usepackage{bm}
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand\aastex{AAS\TeX}
+\newcommand\latex{La\TeX}
+
+
+\newcommand{\Div}[1]{\ensuremath{\nabla\cdot\left( #1\right)}}
+\newcommand{\DivU}{\ensuremath{\nabla\cdot\bm{u}}}
+\newcommand{\angles}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+\newcommand{\KS}[1]{\ensuremath{\text{KS}(#1)}}
+\newcommand{\KSstat}[1]{\ensuremath{\overline{\text{KS}(#1)}}}
+\newcommand{\grad}{\ensuremath{\nabla}}
+\newcommand{\RB}{Rayleigh-B\'{e}nard }
+\newcommand{\stressT}{\ensuremath{\bm{\bar{\bar{\Pi}}}}}
+\newcommand{\lilstressT}{\ensuremath{\bm{\bar{\bar{\sigma}}}}}
+\newcommand{\nrho}{\ensuremath{n_{\rho}}}
+\newcommand{\approptoinn}[2]{\mathrel{\vcenter{
+	\offinterlineskip\halign{\hfil$##$\cr
+	#1\propto\cr\noalign{\kern2pt}#1\sim\cr\noalign{\kern-2pt}}}}}
+
+\newcommand{\appropto}{\mathpalette\approptoinn\relax}
+\newcommand{\pro}{\ensuremath{\text{Ro}_{\text{p}}}}
+\newcommand{\con}{\ensuremath{\text{Ro}_{\text{c}}}}
+
+\usepackage{color}
+\newcommand{\gv}[1]{{\color{blue} #1}}
+
+%% Tells LaTeX to search for image files in the 
+%% current directory as well as in the figures/ folder.
+\graphicspath{{./}{figs/}}
+
+\begin{document}
+\section{Hydrodynamic Impulse}
+The theory that we're going to use to describe thermals relies on hydrodynamic impulse,
+and since we happen to be looking at \emph{stratified} domains, we're lucky that
+\citet{shivamoggi2010} went through the work of deriving impulse in anelastic atmospheres.
+He finds that for an anelastic fluid (e.g., one where $\Div{\rho_0\bm{u}} = 0$ for 
+a constant $\rho_0(z)$), the impulse is
+\begin{equation}
+\bm{I} = \frac{1}{2}\int_{\mathcal{V}} \bm{r}\times(\nabla\times(\rho_0\bm{u}))d\bm{r},
+\label{eqn:impulse}
+\end{equation}
+where $\bm{r} \equiv x\hat{x} + y\hat{y} + z\hat{z}$ is the position vector and $\mathcal{V}$ is a closed volume.
+Basically our theory will consist of two parts:
+\begin{enumerate}
+\item An expectation for the time-derivative of the impulse of the thermal based on its
+density excess (and/or other thermodynamic properties)
+\item The time-derivative of an approximate expression for the thermal's impulse when it is
+in its evolved vortex-ring state.
+\end{enumerate}
+Our expectation is that these two things will be approximately equal, and will tell us something
+about the size of the thermal as it descends and thus its entrainment.
+
+\subsection{Volumetric \& Surface terms of the impulse}
+For the first part of our theory we'll need to find the time-derivative of the impulse. Before we do that, 
+we need to break apart the impulse expression into surface terms and volumetric terms (as Daniel did in an email
+on 9/4/2018). First, the component of the impulse in the $i$th direction for $i$ in $(x,y,z)$ is
+$$
+[\bm{r}\times(\grad\times(\rho_0\bm{u}))]_i = 
+\grad_i(\rho_0\bm{u}) \cdot \bm{r}- (\bm{r}\cdot\grad)(\rho_0 u)_i = 
+r_j\frac{\partial}{\partial x_i}(\rho_0 u)_j - r_j \frac{\partial}{\partial x_j}(\rho_0 u)_i.
+$$
+By definition, each of the RHS terms can be further expanded as
+$$
+r_j\frac{\partial}{\partial x_i}(\rho_0 u)_j =
+\frac{\partial}{\partial x_i}(r_j(\rho_0 u)_j) - \delta_{ij}(\rho_0 u)_j,\qquad\text{and}
+\qquad
+r_j \frac{\partial}{\partial x_j}(\rho_0 u)_i =
+\frac{\partial}{\partial x_j}(r_j(\rho_0 u)_i) - 3(\rho_0 u)_i.
+$$
+Plugging these expanded expressions in, we find that
+$$
+[\bm{r}\times(\grad\times(\rho_0\bm{u}))]_i = 
+\frac{\partial}{\partial x_i}(r_j(\rho_0 u)_j) -
+\frac{\partial}{\partial x_j}(r_j(\rho_0 u)_i) +
+2(\rho_0 u)_i.
+$$
+Plugging back in to the full impulse defn in Eqn.~\ref{eqn:impulse}, we find
+\begin{equation}
+\bm{I} = \int_{\mathcal{V}} (\rho_0 \bm{u}) d\bm{r} + 
+\frac{1}{2}\int_{\mathcal{V}} [\grad (\bm{r}\cdot(\rho_0 \bm{u})) - \grad \cdot(\bm{r}(\rho_0\bm{u}))] d\bm{r}.
+\end{equation}
+As this integral is being done over a closed volume, the last integral can be expressed in terms of surface terms,
+\begin{equation}
+\bm{I} = \int_{\mathcal{V}} (\rho_0 \bm{u}) d\bm{r} + 
+\frac{1}{2}\int_{\mathcal{S}} d\bm{S}(\bm{r}\cdot(\rho_0 \bm{u})) - d\bm{S} \cdot(\bm{r}(\rho_0\bm{u})).
+\end{equation}
+
+
+
+\bibliography{biblio.bib}
+\end{document}
