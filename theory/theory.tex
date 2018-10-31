@@ -90,60 +90,85 @@ As this integral is being done over a closed volume, the last integral can be ex
 \label{eqn:surface_impulse}
 \end{equation}
 
-\subsection{Time derivative of the impulse}
-The time derivative of the impulse is \citep{shivamoggi2010},
+\section{Time derivative of the impulse}
+The time derivative of the impulse is found from taking a time derivative of 
+Eqn.~\ref{eqn:surface_impulse} and assuming that the fluid we're studying is unbounded
+so that the surface terms don't change in time \citep[as in][]{shivamoggi2010},
 \begin{equation}
-\frac{\partial \bm{I}}{\partial t} = \int_{\mathcal{V}}\frac{\partial}{\partial t}(\rho_0 \bm{u}) d\bm{r}.
+\frac{d \bm{I}}{d t} = \int_{\mathcal{V}}\frac{\partial}{\partial t}(\rho_0 \bm{u}) d\bm{r}.
 \end{equation}
-I'm not totally convinced this is right. There's not much explanation of this in the paper. In an unbounded
-fluid (which I think is what he's using this expression for), it makes sense that the surface terms
-in Eqn.~\ref{eqn:surface_impulse} drop out. I'm not entirely sure why $d/dt \rightarrow \partial/\partial t$
-inside of the derivative. Given a fairly standard combination of an ideal 
-momentum equation and continuity equation,
+(Aside: the unbounded assumption / the assumption that the surface integrals don't matter
+seems a little sketchy to me for our sims, but it's common practice. Let's try it.
+Also, I'm not entirely sure why $d/dt \rightarrow \partial/\partial t$
+inside of the derivative, but oh well). 
+
+By combining the non-viscous momentum and and anelastic continuity equations,
+\begin{equation}
+\begin{split}
+\Div{\rho_0 \bm{u}} = 0, \\
+\rho_0\frac{\partial \bm{u}}{\partial t} + \rho_0(\bm{u}\cdot\grad)\bm{u} =
+-\grad P - \rho g \hat{z},
+\end{split}
+\end{equation}
+where here I'm keeping the full $\rho$ on the buoyant term, we can find an 
+equation for the expression in our impulse time derivative,
 $$
 \frac{\partial}{\partial t}{\rho_0 \bm{u}} + \grad\cdot(\rho_0\bm{u}\bm{u}) = -\grad P - (\rho_0 + \rho_1) g \hat{z}.
 $$
-Now technically this whole $\rho_1$ term doesn't jive with the anelastic approximation (where $\rho$ can't change),
-but I'm hesitant to put the equations into a $\varpi$ and $S_1$ formulation, because I don't think they accurately describe
-the thermal's evolution. Subtracting out hydrostatic balance, we have something like
+Subtracting out hydrostatic balance, we have something like
 $$
 \frac{\partial}{\partial t}{\rho_0 \bm{u}} = - \grad\cdot(\rho_0\bm{u}\bm{u}) - \grad P_1 - \rho_1 g \hat{z}.
 $$
 and thus the change in impulse over time is
 \begin{equation}
 \frac{\partial \bm{I}}{\partial t} = 
-\int_{\mathcal{V}}\left(
-- \grad\cdot(\rho_0\bm{u}\bm{u}) - \grad P_1 - \rho_1 g \hat{z}
+-\int_{\mathcal{V}}\left(
+\grad\cdot(\rho_0\bm{u}\bm{u}) + \grad P_1 + \rho_1 g \hat{z}
 \right)d\bm{r}
 = -\int_{\mathcal{V}}\rho_1 g\hat{z} d\bm{r} -
 \int_{\mathcal{S}} [d\bm{S}\cdot(\rho_0\bm{u}\bm{u}) + d\bm{S}P_1].
 \end{equation}
-Generally (in \citet{shivamoggi2010} and I think other thermal work), the
+Generally \citep[in][and I think in other thermal work]{shivamoggi2010}, the
 surface terms here are said to be zero (at least, under appropriate boundary
 conditions), and so we're left with
 \begin{equation}
 \boxed{
 \frac{d\bm{I}}{dt} = -gM_1 \hat{z}, \qquad M_1 \equiv \int_{\mathcal{V}}\rho_1 dV
 }.
+\label{eqn:dI_dt}
 \end{equation}
 Or, your change in impulse over time is directly proportional to the excess mass
-in the thermal.
+in the thermal, or the integrated buoyant force over your thermal. 
 
-\subsection{Approximate expression for the impulse}
-Going back to Eqn.~\ref{eqn:impulse}, we can see that the impulse contains two expressions:
+\paragraph{Rough Estimate of $M_1$ size} 
+For a thermal whose entropy perturbation is $\epsilon$, the temperature perturbation
+is $T_{1, therm} = T_0(e^{\epsilon/c_P} - 1) \approx T_0\epsilon/c_P$, and the associated
+density perturbation to maintain pressure equilibrium is 
+$\rho_1 = P_0 / (T_0 + T_{1, therm}) - \rho_0$ where $\rho = \rho_0 + \rho_1$. For
+$P_0 = \rho_0T_0$, this is $\rho_1 = \rho_0( [1 + T_{1, therm}]^{-1} - 1) \approx -\rho_0 \epsilon / c_P$.
+So for positive $\epsilon$ (a hot thermal), we have a low density region, and for a falling
+cold thermal (with negative $\epsilon$), we have a density excess. The total mass excess in the
+thermal to start with is something like $M_1 \approx -\pi r_{therm}^2 \epsilon \rho_{0, therm} / c_P$,
+assuming the density is fairly constant across the thermal. I'll do this calculation more
+exactly at some point in the future, but this is a good rough estimate.
+
+\section{Approximate expression for the impulse}
+Going back to Eqn.~\ref{eqn:impulse}, we can see that the impulse can be simply expanded
+into two expressions:
 \begin{equation}
 \bm{I} = \frac{1}{2}\int_{\mathcal{V}}\bm{r}\times(\grad\times(\rho_0\bm{u}))d\bm{r} 
 = \frac{1}{2} \int_{\mathcal{V}} \left(\rho_0 \bm{r}\times \bm{\omega} + \bm{r} \times(\grad\rho_0 \times \bm{u}) \right) d\bm{r},
 \end{equation}
 where $\bm{\omega} = \grad\times\bm{u}$ is the vorticity.  The first term is identical to the term that shows up
-in boussinesq flows, and is basically \citep{saffman1970}
+in boussinesq flows, and \emph{under the assumption that $\rho$ is constant across the
+thermal's depth} becomes \citep{saffman1970}
 $$
-\frac{1}{2} \int_{\mathcal{V}} \rho_0 \bm{r}\times \bm{\omega} = \rho_0 c R^2 \Gamma \hat{z},
+\frac{1}{2} \int_{\mathcal{V}} \rho_0 \bm{r}\times \bm{\omega} d\bm{r} = \rho_0 c R^2 \Gamma \hat{z},
 $$
 where $R$ is the radius of the vortex ring, $\Gamma$ is its circulation, and $c$ is some constant describing its
 aspect ratio. The second term here is
 $$
-\bm{r}\times(\grad\rho_0 \times\bm{u}) = (\bm{r}\cdot\bm{u})\grad\rho_0 - (\bm{r}\cdot\grad\rho_0)\bm{u}).
+\bm{r}\times(\grad\rho_0 \times\bm{u}) = (\bm{r}\cdot\bm{u})\grad\rho_0 - (\bm{r}\cdot\grad\rho_0)\bm{u}.
 $$
 Assuming that $\grad \rho_0 = \partial_z \rho_0 \hat{z}$, this becomes
 $$
@@ -151,12 +176,42 @@ $$
 $$
 We don't care about the $x$ and $y$ terms here, because the main impulse of the thermal is vertical. We're essentially left with
 $$
-I_z = \rho_0 c R^2 \Gamma + \frac{1}{2}\int_{\mathcal{V}} u_{\perp} r_{\perp} \frac{\partial \rho_0}{\partial z} \bm{r}.
+I_z = \rho_0 c R^2 \Gamma + \frac{1}{2}\int_{\mathcal{V}} u_{\perp} r_{\perp} \frac{\partial \rho_0}{\partial z} \,d\bm{r}.
 $$
-If the thermal is small, and $\partial \rho_0 /\partial z$ is constant across the thermal, the last term drops out
-($u_{\perp} r_{\perp}$ at the bottom of the thermal cancels out with $u_{\perp} r_{\perp}$ at the top of the thermal).
+If the thermal is small, as we assumed in evaluating the first part, then
+$\partial \rho_0 /\partial z$ is constant across the thermal, and the last term drops out
+($u_{\perp} r_{\perp}$ at the bottom of the thermal cancels out with $u_{\perp} r_{\perp}$ at the top of the thermal
+where it's oppositely signed).
 If the thermal is large and the stratification of the background varies across the thermal's size, then we need to worry
 about that second term.
+
+For now, dropping the last term, we can say that for a small thermal, the time derivative of
+the impulse should be roughly (assuming constant $c$)
+$$
+\frac{d I_z}{dt} = \frac{d}{dt}\left(\rho_0 c R^2 \Gamma\right) 
+= c\left(R^2 \Gamma \frac{d\rho_0}{dt} + 2\Gamma \rho_0 R \frac{d R}{dt} + \rho_0 R^2 \frac{d\Gamma}{dt}\right)
+$$
+Note that $d\rho_0/dt = d\rho_0/dz \cdot dz/dt = w d\rho_0/dz$, and so
+\begin{equation}
+\boxed{
+\frac{d I_z}{dt} = c\left(\Gamma R^2 w \frac{\partial \rho_0}{\partial z}\bigg|_{z=z_{th}}
++ 2 \rho_0 \Gamma R \frac{dR}{dt} + \rho_0 R^2 \frac{d\Gamma}{dt}\right)
+}
+\label{eqn:dIz_dt}
+\end{equation}
+
+
+\section{Putting it together: Theory for a small, anelastic thermal}
+Basically the theory comes down to this: If this impulse framework is good for understanding
+thermals, then Eqns.~\ref{eqn:dI_dt} \& \ref{eqn:dIz_dt} should be equal to each other.
+In other words, we expect
+\begin{equation}
+-g M_1 \approx c\left(\Gamma R^2 w \frac{\partial \rho_0}{\partial z}\bigg|_{z=z_{th}}
++ 2 \rho_0 \Gamma R \frac{dR}{dt} + \rho_0 R^2 \frac{d\Gamma}{dt}\right).
+\end{equation}
+This expression is slightly different from our first take at this theory. On the left,
+we have mass instead of entropy. On the right, we're not assuming that the circulation
+is constant.
 
 \bibliography{biblio.bib}
 \end{document}
