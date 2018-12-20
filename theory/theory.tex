@@ -208,10 +208,89 @@ In other words, we expect
 \begin{equation}
 -g M_1 \approx c\left(\Gamma R^2 w \frac{\partial \rho_0}{\partial z}\bigg|_{z=z_{th}}
 + 2 \rho_0 \Gamma R \frac{dR}{dt} + \rho_0 R^2 \frac{d\Gamma}{dt}\right).
+\label{eqn:theory_result}
 \end{equation}
 This expression is slightly different from our first take at this theory. On the left,
 we have mass instead of entropy. On the right, we're not assuming that the circulation
 is constant.
+
+\subsection{Thermal Growth predictions}
+Now we're going to take the theory we derived above in Eqn.~\ref{eqn:theory_result}
+and make it practical  We're going to make the following four assumptions:
+\begin{enumerate}
+\item \textbf{Assumption 1:} Circulation is constant in time, $\Gamma \neq \Gamma(t)$.
+\item \textbf{Assumption 2:} The integrated mass anomaly (or entropy, depending on how the equations
+are framed) is constant in time, $M_1 \neq M_1(t)$.
+\item \textbf{Assumption 3:} The depth of the thermal follows a power-law in time,
+$d(t) = L_z - z(t) \approx d_0 t^{\alpha}$. This also means that vertical velocity is defined
+$w = \partial z / \partial t = - \partial d / \partial t = - d_0 \alpha t^{\alpha - 1}$.
+\item \textbf{Assumption 4:} The radius of the thermal follows a different power-law in time,
+$R(t) \approx R_0 t^{\beta}$.
+\end{enumerate}
+Under these assumptions, Eqn.~\ref{eqn:theory_result} becomes, after some rearranging,
+\begin{equation}
+C_1 \equiv -\frac{g M_1}{c \Gamma R_0^2}  = 
+t^{2\beta - 1}\left(-d_0 t^{\alpha} \frac{\partial \rho_0}{\partial z} + 2 \rho_0 \right)
+=
+\rho_0 t^{2\beta - 1}\left(-d_0 t^{\alpha} \frac{\partial \ln \rho_0}{\partial z} + 2 \right)
+\label{eqn:simple_theory}
+\end{equation}
+Now, for an adiabatic polytrope with adiabatic index $m_{ad} = (\gamma - 1)^{-1} = 1.5$ if $\gamma = 5/3$,
+the local density of the thermal varies as
+$$
+\rho_0(t) = (1 + L_z - z(t))^{m_{ad}} = (1 + d(t))^{m_{ad}}, \qquad
+\frac{\partial \ln \rho_0}{\partial z} = -m_{ad}\frac{1}{1 + d(t)}
+$$
+
+Let's look at this in two limits -- large stratification ($d \gg 1$) and small stratification ($d \rightarrow 0$). 
+First, we examine large stratification. 
+In this regime, it's more instructive to use the $\ln \rho_0$ form of
+eqn. \ref{eqn:simple_theory}, where
+\begin{equation}
+\rho_0(t) \approx 
+d(t)^{m_{ad}} \approx d_0^{m_{ad}} t^{m_{ad}\alpha},
+\qquad
+\frac{\partial \ln \rho_0}{\partial z} \approx 
+-m_{ad} h^{-1}(t) \approx -(m_{ad}/d_0) t^{-\alpha}.
+\end{equation}
+Plugging these approximations in, we find
+$$
+C_1 \approx d_0^{m_{ad}} t^{m_{ad}\alpha + 2\beta - 1}(2 - m_{ad}).
+$$
+In order for this equation to be true, we need the time dependence to fall out of the
+equation, so
+\begin{equation}
+m_{ad}\alpha + 2\beta - 1 = 0\,\,\rightarrow\,\, \beta = 0.5 - m_{ad} \alpha / 2.
+\end{equation}
+Thus, in the large stratification limit, we have a relation for how quickly the
+radius scales compared to the depth.
+
+For small stratification, the situation is muddier, but it's easier to use the $\rho_0$
+and $\partial \rho_0 / \partial z$ form of eqn.~\ref{eqn:simple_theory}. Taylor expanding
+$\rho_0$ around $d = 0$, we find
+$$
+\rho_0 \approx 1 + m_{ad} d + \cdots, \qquad 
+\frac{\partial \rho_0}{\partial z} = -\frac{\partial \rho_0}{\partial d} \approx -(m_{ad} + \cdots) .
+$$
+After plugging in these approximations, we find
+$$
+C_1 \approx t^{2\beta - 1 + \alpha}(2 + 3m_{ad} d_0).
+$$
+Thus, in order for time dependence to fall out of this equation, we require
+\begin{equation}
+\alpha + 2\beta - 1 = 0\,\,\rightarrow\,\, \beta = 0.5 (1 -  \alpha).
+\end{equation}
+Which is interesting. In the boussinesq case, $\alpha = \beta = 0.5$, but here we see
+that in the slightly (but importantly) stratified case, if $\alpha = 0.5$, $\beta = 0.25$.
+
+ 
+One interesting result is that in both cases we find that
+$$
+\beta = 0.5 - X \alpha / 2,
+$$
+where $X = m_{ad}$ for the highly stratified case, and where maybe $X = 1$ for the minimally
+stratified case. Regardless, the inclusion of stratification makes the scaling of the radius with
+time less strong, and that scaling can be negative.
 
 \bibliography{biblio.bib}
 \end{document}
