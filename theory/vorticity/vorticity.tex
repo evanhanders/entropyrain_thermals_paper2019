@@ -1,0 +1,142 @@
+\documentclass[onecolumn, amsmath, amsfonts, amssymb]{aastex62}
+\usepackage{mathtools}
+\usepackage{natbib}
+\usepackage{bm}
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand\aastex{AAS\TeX}
+\newcommand\latex{La\TeX}
+
+
+\newcommand{\Div}[1]{\ensuremath{\nabla\cdot\left( #1\right)}}
+\newcommand{\DivU}{\ensuremath{\nabla\cdot\bm{u}}}
+\newcommand{\angles}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+\newcommand{\KS}[1]{\ensuremath{\text{KS}(#1)}}
+\newcommand{\KSstat}[1]{\ensuremath{\overline{\text{KS}(#1)}}}
+\newcommand{\grad}{\ensuremath{\nabla}}
+\newcommand{\RB}{Rayleigh-B\'{e}nard }
+\newcommand{\stressT}{\ensuremath{\bm{\bar{\bar{\Pi}}}}}
+\newcommand{\lilstressT}{\ensuremath{\bm{\bar{\bar{\sigma}}}}}
+\newcommand{\nrho}{\ensuremath{n_{\rho}}}
+\newcommand{\approptoinn}[2]{\mathrel{\vcenter{
+	\offinterlineskip\halign{\hfil$##$\cr
+	#1\propto\cr\noalign{\kern2pt}#1\sim\cr\noalign{\kern-2pt}}}}}
+
+\newcommand{\appropto}{\mathpalette\approptoinn\relax}
+\newcommand{\pro}{\ensuremath{\text{Ro}_{\text{p}}}}
+\newcommand{\con}{\ensuremath{\text{Ro}_{\text{c}}}}
+
+\usepackage{color}
+\newcommand{\gv}[1]{{\color{blue} #1}}
+
+%% Tells LaTeX to search for image files in the 
+%% current directory as well as in the figures/ folder.
+\graphicspath{{./}{figs/}}
+
+\begin{document}
+\section{Vorticity arguments for entrainment}
+\subsection{Quick Boussinesq argument}
+The arguments in this section were inspired by Brett's paper draft, which Nadir sent me
+around DFD time. Specifically, his arguments around "expansion by the creation of baroclinicity"
+section.  He argues (in different terms, but mathematically the same)
+that, for a boussinesq system with this momentum equation,
+$$
+\partial_t \bm{u}  + \grad\varpi - T_1 \hat{z} + \mathcal{R}\grad\times\bm{\omega} = -\bm{u}\times\bm{\omega},
+$$
+the system has a vorticity equation of the form,
+\begin{equation}
+\frac{D\bm{\omega}}{Dt} = -\frac{\partial T_1}{\partial r} + (\bm{\omega}\cdot\grad)\bm{u} + \mathcal{R}\grad^2\bm{\omega}.
+\end{equation}
+If we think of an azimuthally-symmetric thermal with no velocity in the $\hat{\phi}$ direction
+and with vorticity only in the $\hat{\phi}$ direction, then we get, essentially,
+\begin{equation}
+\frac{D\omega_\phi}{Dt} = -\frac{\partial T_1}{\partial r} + \frac{u_r \omega_\phi}{r} + \mathcal{R}\grad^2\omega_\phi.
+\end{equation}
+Just based on some right-hand-rule arguments, $\omega_\phi$ will be positive in the vortex ring
+core for an upflow (hot) thermal, and it will be negative for a downflow (cold) thermal.
+In a upflow thermal, $\partial_r T_1$ is positive in the thermal center and negative at radii
+larger than the vortex core's radius. In a downflow thermal, these signs are switched. This means
+that $(-\partial_r T_1)$ \emph{destroys} vorticity for $r < r_{th}$ and \emph{creates} vorticity
+for $r > r_{th}$ for both upflows and downflows. Thus, buoyancy creates entrainment through
+the destruction of vorticity in the vortex core (and the creation of it further out).
+
+\subsection{Expansion to stratification}
+So that's the argument for the Boussinesq case. Which is great. What about the stratified
+case?  The fully compressible momentum equation that we solve takes the form
+$$
+\frac{\partial\bm{u}}{\partial t} + \bm{u}\cdot\grad\bm{u} =
+- \grad T - T \grad\ln\rho + \bm{g} + \text{viscous terms}.
+$$
+I'm going to drop the viscous terms for this analysis. Assuming $\bm{g} \equiv -\grad\phi$
+for some potential $\phi$, if we take the curl of this equation to retrieve the vorticity equation,
+we retrieve
+$$
+\frac{D\bm{\omega}}{D t} = % + (\bm{u}\cdot\grad)\bm{\omega} = 
+(\bm{\omega}\cdot\grad)\bm{u} - \bm{\omega}(\grad\cdot\bm{u}) - \grad T \times \grad\ln\rho.
+$$
+So here we have a different-looking buoyancy term, and we've added back in the
+$\bm{\omega}(\grad\cdot\bm{u})$ term because we're no longer incompressible. If we make the
+same assumptions as above in the boussinesq case (azimuthally symmetric vortex ring), we find
+$$
+\frac{D\omega_\phi}{D t} = 
+\frac{u_r\omega_\phi}{r} - \omega_\phi(\grad\cdot\bm{u}) - \grad T \times \grad\ln\rho.
+$$
+In the anelastic limit ($\partial_t \ln\rho = 0$, so $\ln_rho_1 = 0$), the continuity
+equation can be expressed as $\grad\cdot\bm{u} = -\bm{u}\cdot\grad\ln\rho$. And, since the
+density field isn't allowed to evolve and $\grad\ln\rho_0$ only varies in the $z$ direction
+(the direction of stratification, we wind up with
+$$
+\frac{D\omega_\phi}{D t} = 
+\frac{u_r\omega_\phi}{r} + u_z\omega_\phi\frac{\partial \ln\rho_0}{\partial z} - \grad T \times \grad\ln\rho.
+$$
+Assuming no variation in the phi direction, and assuming that $\grad\ln\rho = \grad\ln\rho_0$
+and only has a z-component, the buoyancy term can be easily reduced to
+$\grad T \times \grad\ln\rho_0 = -(\grad_r T_1)(\grad_z\ln\rho_0)\hat{\phi}$. Thus, the
+ideal vorticity equation is
+\begin{equation}
+\frac{D \omega_\phi}{D t} = \frac{\partial T_1}{\partial r}\frac{\partial\ln\rho_0}{\partial z}
++ \frac{u_r\omega_\phi}{r} + u_z \omega_\phi \frac{\partial\ln\rho_0}{\partial z}.
+\end{equation}
+Since $\partial\ln\rho_0/\partial z$ is always negative, we can see that the first term, the
+buoyancy term, has the same effect as in the Boussinesq case -- it causes entrainment by
+destroying vorticity in the center of the thermal and adding it to the outside. The new term,
+$u_z \omega_\phi (\partial\ln\rho_0/\partial z)$, however, requires some examination. We know
+that the vertical velocity can be broken up into the velocity of the thermal frame
+(let's call it $w_{th}$), and fluctuations around that, $u_z = w_{th} + w'$. Thus, we find
+$$
+u_z\omega_\phi = \omega_\phi w_{th} + \omega_\phi w'.
+$$
+For a downflowing (cold) thermal, $w_{th}$ and $\omega_\phi$ are both negative, so their
+product is positive. For a upflowing thermal, both are positive and so is their product, so
+the first term is positive definite. For a down (up) thermal, $w'$ is negative (positive) in the
+thermal core, and positive (negative) outside of it. Thus, the second term is positive-definite
+in the thermal core and negative-definite outside of it. To obtain the full stratification
+term, we must multiply by $\partial_z\ln\rho_0$, which is negative everywhere.
+
+We can thus re-write this equation as
+\begin{equation}
+\frac{D \omega_\phi}{D t} = -\frac{\partial T_1}{\partial r}\bigg|\frac{\partial\ln\rho_0}{\partial z}\bigg|
++ \frac{u_r\omega_\phi}{r} - \bigg| w_{th} \omega_\phi \frac{\partial\ln\rho_0}{\partial z}\bigg|
+- w' \omega_\phi \bigg|\frac{\partial\ln\rho_0}{\partial z}\bigg|.
+\end{equation}
+
+\begin{table}
+\label{table:signs}
+\begin{center}
+\begin{tabular}{ c c c }
+\hline																	
+Term	& Inside Thermal (cold / hot) 	& Outside Thermal (cold / hot)\\
+\hline
+$-\frac{\partial T_1}{\partial r}\bigg|\frac{\partial\ln\rho_0}{\partial z}\bigg|$ 	& + / - & - / + \\
+$-\bigg| w_{th} \omega_\phi \frac{\partial\ln\rho_0}{\partial z}\bigg|$ 			& - / - & - / - \\
+$-w' \omega_\phi \bigg|\frac{\partial\ln\rho_0}{\partial z}\bigg|$					& - / - & + / + \\	
+\hline																	
+\end{tabular}
+\end{center}
+\end{table}
+
+So we can see that the third term is acting in an anti-buoyant manner for the cold thermal,
+and a buoyant manner for the hot thermal. Cool.
+
+
+\bibliography{biblio.bib}
+\end{document}
