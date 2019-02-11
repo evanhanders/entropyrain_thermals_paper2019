@@ -57,7 +57,7 @@ In a upflow thermal, $\partial_r T_1$ is positive in the thermal center and nega
 larger than the vortex core's radius. In a downflow thermal, these signs are switched. This means
 that $(-\partial_r T_1)$ \emph{destroys} vorticity for $r < r_{th}$ and \emph{creates} vorticity
 for $r > r_{th}$ for both upflows and downflows. Thus, buoyancy creates entrainment through
-the destruction of vorticity in the vortex core (and the creation of it further out).
+the destruction of vorticity for $r < r_{th}$ (and the creation of it further out).
 
 \subsection{Expansion to stratification}
 So that's the argument for the Boussinesq case. Which is great. What about the stratified
@@ -80,9 +80,9 @@ $$
 \frac{D\omega_\phi}{D t} = 
 \frac{u_r\omega_\phi}{r} - \omega_\phi(\grad\cdot\bm{u}) - \grad T \times \grad\ln\rho.
 $$
-In the anelastic limit ($\partial_t \ln\rho = 0$, so $\ln_rho_1 = 0$), the continuity
+In the anelastic limit ($\partial_t \ln\rho = 0$, so $\ln{\rho_1} = 0$), the continuity
 equation can be expressed as $\grad\cdot\bm{u} = -\bm{u}\cdot\grad\ln\rho$. And, since the
-density field isn't allowed to evolve and $\grad\ln\rho_0$ only varies in the $z$ direction
+density field isn't allowed to evolve and $\grad\ln\rho$ only varies in the $z$ direction
 (the direction of stratification, we wind up with
 $$
 \frac{D\omega_\phi}{D t} = 
@@ -117,9 +117,21 @@ We can thus re-write this equation as
 \frac{D \omega_\phi}{D t} = -\frac{\partial T_1}{\partial r}\bigg|\frac{\partial\ln\rho_0}{\partial z}\bigg|
 + \frac{u_r\omega_\phi}{r} - \bigg| w_{th} \omega_\phi \frac{\partial\ln\rho_0}{\partial z}\bigg|
 - w' \omega_\phi \bigg|\frac{\partial\ln\rho_0}{\partial z}\bigg|.
+\label{eqn:stratified_vorticity}
 \end{equation}
+So we have one buoyancy term and ``two'' new stratification-related terms in the vorticity
+equation. We examine their signs in Table \ref{table:signs}, and we see that, for a downflowing
+thermal, the last term in Eqn.~\ref{eqn:stratified_vorticity} acts in an anti-buoyant manner
+and should reduce entrainment. The implications of these new terms on circulation should be examined
+(but I ran out of time to do that carefully here).
 
-\begin{table}
+\begin{table}[h!]
+\caption{An examination of the signs of the terms in Eqn.~\ref{eqn:stratified_vorticity}.
+Signs are given for the terms at radii smaller than the vorticity peak ($r < r_{th}$,
+``inside thermal'') and
+also radii larger than that peak ($r > r_{th}$, ``outside thermal''). The sign of the
+term is given first for a cold thermal, then for a hot thermal (e.g., ``+/-'' means that
+the term is positive for a cold thermal and negative for a hot one).}
 \label{table:signs}
 \begin{center}
 \begin{tabular}{ c c c }
@@ -134,8 +146,91 @@ $-w' \omega_\phi \bigg|\frac{\partial\ln\rho_0}{\partial z}\bigg|$					& - / - &
 \end{center}
 \end{table}
 
-So we can see that the third term is acting in an anti-buoyant manner for the cold thermal,
-and a buoyant manner for the hot thermal. Cool.
+\section{Circulation Equation}
+So we've seen that the \emph{vorticity} equation gains a new term that can help
+phenomenologically explain the effects of stratification on a thermal. Now we turn to
+the circulation equation. To get there, we go through the normal steps of Kelvin's
+circulation theorem. We start off with the definition of the time derivative of circulation
+\begin{equation}
+\frac{d\Gamma}{dt} = \frac{d}{dt} \oint \bm{u}\cdot d\bm{x} 
+= \oint \frac{d \bm{u}}{dt}\cdot d\bm{x} + \oint \bm{u}\cdot\frac{d}{dt}d\bm{x}.
+\end{equation}
+In the last term in the above equation, if we think about a piece of a line element
+$d\bm{x}$ connecting two fluid parcels, the edges of the line are stretched by the
+difference in velocity at its two endpoints, $d( d\bm{x})dt = d\bm{u}$. Plugging this
+into the above integral (in the limit $d\bm{x} \rightarrow 0$),
+$$
+\oint\bm{u}\cdot\frac{d}{dt}d\bm{x} = \oint \bm{u}\cdot d\bm{u}
+= \oint d|\bm{u}|^2 / 2 = 0,
+$$
+and this integral is zero along a closed path. Thus, the change in time of circulation
+is simply
+\begin{equation}
+\frac{d\Gamma}{dt} = \oint \frac{d\bm{u}}{dt} \cdot d\bm{x}.
+\end{equation}
+At this point we specify that the velocity we care about, $\bm{u}$, is the velocity
+in the inertial frame, and so
+\begin{equation}
+\frac{d \bm{u}}{dt} = \frac{\partial \bm{u}}{\partial t} + \bm{u}\cdot\grad\bm{u}
+= -\grad T - T \grad\ln\rho + \bm{g} + \grad\cdot\stressT.
+\end{equation}
+In other words, the RHS of the moment equation gets substituted directly into the integral,
+$$
+\frac{d\Gamma}{dt} = \oint \left[\left( - T \grad\ln\rho + \grad\cdot\stressT\right) -
+\left(\grad T - \grad \phi\right)\right] \cdot d\bm{x},
+$$
+where $\bm{g} \equiv -\grad\phi$ is defined by its potential. The last two terms in this 
+integral are conservative forces, and their integral around a closed loop is zero. Thus,
+we have
+\begin{equation}
+\frac{d\Gamma}{dt} = -\oint\left[T_0\grad\ln\rho_0 + T_1\grad\ln\rho_0 + T_0\grad\ln\rho_1 +
+T_1\grad\ln\rho_1\right]\cdot d\bm{x}
++ \oint (\grad\cdot\stressT)\cdot d\bm{x},
+\end{equation}
+Let's go ahead and ignore the stress tensor for now and use
+Stokes' theorem, and make some of the assumptions we did earlier (azimuthal symmetry,
+only velocity in $(\hat{r}, \hat{z})$ directions, background is only stratified in 
+$\hat{z}$ direction). We arrive at
+\begin{equation}
+\frac{d\Gamma}{dt} = \iint\left( \frac{\partial T_1}{\partial r}\frac{\partial\ln\rho_0}{\partial z}
++ \frac{\partial T_0}{\partial z}\frac{\partial \ln\rho_1}{\partial r} 
++ \frac{\partial T_1}{\partial z}\frac{\partial \ln\rho_1}{\partial r} 
+- \frac{\partial T_1}{\partial r}\frac{\partial \ln\rho_1}{\partial z}\right)
+\cdot d\bm{A}
+\end{equation}
+In our non-dimensionalized system, $\partial_z T_0 = -1$, and 
+$\partial_z \ln\rho_0 = -m_{ad}/T_0$, so we can rewrite
+\begin{equation}
+\frac{d\Gamma}{dt} = -\iint\left( \frac{m_{ad}}{T_0}\frac{\partial T_1}{\partial r}
++ \frac{\partial \ln\rho_1}{\partial r} 
++ \frac{\partial T_1}{\partial z}\frac{\partial \ln\rho_1}{\partial r} 
+- \frac{\partial T_1}{\partial r}\frac{\partial \ln\rho_1}{\partial z}\right)
+\cdot d\bm{A}.
+\end{equation}
+For a cold thermal, $\ln\rho_1 > 0$ and $T_1 < 0$, so the signs of their r-derivatives will be
+opposite one another, and the two terms in the integral will work against one another. Furthermore,
+the r-derivatives will have different signs near the axis of symmetry and far from it, so likely
+\emph{both of the first two terms cancel out entirely}. We're left with
+\begin{equation}
+\frac{d\Gamma}{dt} = -\iint\left( 
+\frac{\partial T_1}{\partial z}\frac{\partial \ln\rho_1}{\partial r} 
+- \frac{\partial T_1}{\partial r}\frac{\partial \ln\rho_1}{\partial z}\right)
+\cdot d\bm{A}.
+\end{equation}
+I think for similar reasons that the first two terms disappeared, these terms will also
+disappear. If you break up the thermal into four ``quadrants'' (upper left, upper right,
+lower left, lower right) and examine the sign of these terms in each of those, we also see
+that they work against one another. If buoyancy isn't important, 
+we'll be left with just the viscous terms,
+\begin{equation}
+\frac{d\Gamma}{dt} = \oint(\grad\cdot\stressT)\cdot d\bm{x},
+\end{equation}
+But *maybe* those buoyancy
+terms aren't as perfectly symmetric as we think, and they should be measured.
+
+\textbf{What we've learned:} The buoyancy term shows up in a more complex manner in the
+equation for $d\Gamma/dt$, but it probably goes away due to symmetry arguments. I'll need
+to take some measurements from the DNS to know for sure.
 
 
 \bibliography{biblio.bib}
