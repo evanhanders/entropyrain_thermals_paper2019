@@ -76,20 +76,76 @@
 \label{sec:experiment}
 
 We perform direct numerical simulations of the evolution of dry thermals
-by solving the fully compressible Navier-Stokes equations,
+in an ideal gas whose pressure ($P$), temperature ($T$), and density ($\rho$)
+follow a nondimensional ideal gas law of $P = \rho T$.
+We evolving the temperature, log density ($\ln\rho$), and velocity vector
+($\bm{u} = u\hat{x} + v\hat{y} + z\hat{z}$) according to the fully compressible Navier-Stokes equations,
 \begin{gather}
 \frac{D \ln\rho}{Dt} = -\Div{\bm{u}}
 	\label{eqn:continuity}
 \\
-\frac{D \bm{u}}{D t} =
--\frac{1}{\rho}\grad P + \bm{g} + \Div{\stressT}, 
-	\label{eqn:dim_bouss_momentum}
+\begin{align}
+&\frac{D \bm{u}}{D t} =
+-\grad T - T \grad\ln\rho + \bm{g} + \Div{\stressT}, 
+\end{align}
+	\label{eqn:full_momentum}
 \\
-\frac{D T}{D t} + (\gamma - 1)T\Div{\bm{u}} + \frac{1}{\rho c_V}\Div{-\rho\chi\grad T} = 
-\frac{1}{\rho c_V}(\stressT \cdot \grad)\cdot \bm{u},
-	\label{eqn:dim_bouss_energy}
+\begin{align}
+\frac{D T}{D t} + (\gamma - 1)T\Div{\bm{u}} + \frac{1}{\rho c_V}\Div{-\rho\chi\grad T} =\\
+\frac{1}{\rho c_V}(\stressT \cdot \grad)\cdot \bm{u}, \nonumber
+\end{align}
+	\label{eqn:full_energy}
 \end{gather}
+where $\chi$ is the thermal diffusivity and with the viscous stress tensor given by
+\begin{equation}
+\Pi_{ij} \equiv \mu\left(\frac{\partial u_i}{\partial x_j} + 
+\frac{\partial u_j}{\partial x_i} - \frac{2}{3}\delta_{ij}\grad\cdot\bm{u}\right),
+	\label{eqn:stress_tensor}
+\end{equation}
+where $\delta_{ij}$ is the Kronecker delta and with $\mu = \rho\nu$ is the
+dynamic viscosity and $\nu$ is the kinematic viscosity.
+We split our thermodynamics into a time-stationary adiabatic background component
+and a time-evolving fluctuation away from that background as
+$T = T_0(z) + T_1(x, y, z, t)$ and $\ln\rho = \ln\rho_0(z) + \ln\rho_1(x, y, z, t)$.
+We specify the background atmosphere as an adiabatic polytrope, as in
+\cite{anders&brown2017}, so that
+\begin{equation}
+T_0(z) = (1 + L_z - z), \qquad \ln\rho_0(z) = m_{ad}\ln(T_0),
+\end{equation}
+where $L_z$ is the domain depth, and $m_{ad} = 1/(\gamma-1) = 1.5$ is the
+adiabatic polytropic index. In the construction of these atmospheres, 
+we assume that gravity $\bm{g} = -g\hat{z}$ is everywhere constant and that the
+background atmosphere is in hydrostatic equilibrium such that
+$\partial_z T_0 + T_0 \partial_z\ln\rho_0 - g = 0$. 
 
+
+We assume a Pradtl number of
+unity, $\text{Pr} = \nu/\chi = 1$, everywhere in the domain. We furthermore assume
+that $\nu$ and $\chi$ are uniform everywhere in the domain, and that a negligibly
+small diffusivity, $\chi_B = 0$ acts on the pure background terms in the thermal flux
+such that
+$$
+\frac{1}{\rho_0 c_V}\grad\cdot(-\rho \chi_B \grad T) = 0.
+$$
+Under all of these assumptions, the equations we solve become
+\begin{gather}
+\frac{D \ln\rho_1}{Dt} = -\Div{\bm{u}} - w\partial_z\ln\rho_0
+	\label{eqn:solved_continuity}
+\\
+\begin{align}
+&\frac{D \bm{u}}{D t} =
+-\grad T_1 - T_0 \grad\ln\rho_1 - T_1\partial_z\rho_0\hat{z} - T_1\grad\ln\rho_1 + \Div{\stressT}, 
+\end{align}
+	\label{eqn:solved_momentum}
+\\
+\begin{align}
+&\frac{D T_1}{D t} + w\partial_z T_0 +  (\gamma - 1)(T_0 + T_1)\Div{\bm{u}} 
+\\&- \frac{1}{c_V}\left\{\chi\left(\grad^2 T_1 + \partial_z\ln\rho_0\partial_z T_1 
++ \partial_z\ln\rho_1\partial_z T_0 + \grad\ln\rho_1 \cdot\grad T_1\right)  \right\}=\nonumber\\
+&\frac{1}{\rho c_V}(\stressT \cdot \grad)\cdot \bm{u}, \nonumber
+\end{align}
+	\label{eqn:solved_energy}
+\end{gather}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

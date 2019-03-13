@@ -1,0 +1,88 @@
+\documentclass[onecolumn, amsmath, amsfonts, amssymb]{aastex62}
+\usepackage{mathtools}
+\usepackage{natbib}
+\usepackage{bm}
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand\aastex{AAS\TeX}
+\newcommand\latex{La\TeX}
+
+
+\newcommand{\Div}[1]{\ensuremath{\nabla\cdot\left( #1\right)}}
+\newcommand{\DivU}{\ensuremath{\nabla\cdot\bm{u}}}
+\newcommand{\angles}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+\newcommand{\KS}[1]{\ensuremath{\text{KS}(#1)}}
+\newcommand{\KSstat}[1]{\ensuremath{\overline{\text{KS}(#1)}}}
+\newcommand{\grad}{\ensuremath{\nabla}}
+\newcommand{\RB}{Rayleigh-B\'{e}nard }
+\newcommand{\stressT}{\ensuremath{\bm{\bar{\bar{\Pi}}}}}
+\newcommand{\lilstressT}{\ensuremath{\bm{\bar{\bar{\sigma}}}}}
+\newcommand{\nrho}{\ensuremath{n_{\rho}}}
+\newcommand{\approptoinn}[2]{\mathrel{\vcenter{
+	\offinterlineskip\halign{\hfil$##$\cr
+	#1\propto\cr\noalign{\kern2pt}#1\sim\cr\noalign{\kern-2pt}}}}}
+
+\newcommand{\appropto}{\mathpalette\approptoinn\relax}
+\newcommand{\pro}{\ensuremath{\text{Ro}_{\text{p}}}}
+\newcommand{\con}{\ensuremath{\text{Ro}_{\text{c}}}}
+
+\usepackage{color}
+\newcommand{\gv}[1]{{\color{blue} #1}}
+
+%% Tells LaTeX to search for image files in the 
+%% current directory as well as in the figures/ folder.
+\graphicspath{{./}{figs/}}
+
+\begin{document}
+\section{What we know}
+From the simulations we've done so far, when viscous heating is neglected, we have the
+following understanding of thermals:
+\begin{enumerate}
+\item The \emph{total entropy} of the thermal, $\rho s_1$, is conserved in the absence of
+viscous heating.
+\item For a low-$\epsilon$, low-Mach-number thermal, in which the total entropy is conserved
+and the anelastic approximation is appropriate, we have two more pieces of knowledge:
+\begin{enumerate}
+\item From simple momentum equation arguments, the thermal's momentum increases linearly due
+to the constant buoyant force, $\int \rho w dV \sim \rho w V = \rho s_1 g / c_p t = B t$.
+\item From an anelastic-like impulse formulation with $\rho_1/\rho_0 \ll 1$, we also
+know that the impulse linearly increases, $\rho \pi R^2 \Gamma = Bt$
+\citep[][eqn 36 modified to buoyant vortex ring]{shivamoggi2010}.
+\end{enumerate}
+\item The thermal can be approximated as an ellipsoid whose principal semi-axes have lengths
+$a = b = R$ and $c = h/2$, where $R$ is the radius of the thermal and $h/2$ is half the height
+of the thermal volume. In other words, its horizontal cross-sections are circles and it's a bit
+squished, so it's not quite a sphere. We can probably assume that $h \propto R$, and so
+the volume of the thermal can be written $V = m R^3$ for some constant $m$.
+\item The depth of the thermal follows a power law in time, $d = d_0t^\alpha$.
+\item The circulation in the thermal, $\Gamma$, is constant.
+\end{enumerate}
+
+\section{Putting the pieces together}
+From piece of knowledge 2 above, we see that $\rho V w \sim \rho R^2 \Gamma$. Plugging in
+piece of knowledge 3, we find $R w \sim \Gamma / m$. Since $w$, the thermal downward velocity,
+is the derivative of its depth, $w = \partial_t (d_0 t^\alpha) = \alpha d_0 t^{\alpha-1}$, 
+we see that
+\begin{equation}
+R \sim \frac{\Gamma}{\alpha d_0 m} t^{1 - \alpha}.
+\label{eqn:R_scale}
+\end{equation}
+
+With that figured out, we can go back to piece of knowledge numbers 2 and 3 above, and see
+that $\rho V w \sim m \rho R^3 w \sim B t$, or that $(\Gamma/[\alpha d_0])^3 m^{-2} t^{3(1-\alpha) - (1-\alpha)}\rho = Bt$.
+Dividing both sides by $t$ and rearranging a bit, we find
+$$
+\rho t^{1 - 2\alpha} = m^2 B \left(\frac{\alpha d_0}{\Gamma}\right)^3 = \text{const.}
+$$
+Taking a time-derivative, and rearranging, we find
+\begin{equation}
+\frac{\partial \ln \rho}{\partial t} = \frac{2\alpha - 1}{t}.
+\end{equation}
+So a simple $1 / t$ fit to $\partial \ln\rho / \partial t$, or perhaps even better, a moving
+average of $t \partial_t \ln\rho$ (not what I'm doing right now), gives us the value of $\alpha$! 
+
+
+
+
+
+\bibliography{biblio.bib}
+\end{document}
