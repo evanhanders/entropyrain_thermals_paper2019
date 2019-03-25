@@ -44,35 +44,50 @@ In these thermal simulations, as far as I can tell, we have \emph{eight} variabl
 \item $z$, the height of the thermal
 \item $\Gamma$, the circulation of the vortex ring
 \item $\rho$, the local density at the height of the thermal.
-\item $t$, time.
 \end{enumerate}
 From the simulations we've done so far, when viscous heating is neglected, we have the
 following understanding of thermals:
 \begin{enumerate}
 \item $B = \text{const} \propto \rho s_1$
-\item $h = A R$, where $A$ is a constant.
-\item $V = (4/3)\pi h R^2 = (4/3)\pi A R^3 = m R^3$.
-\item $w = \frac{\partial z}{\partial t}$
-\item $\rho = (1 + L_z - z)^{1.5}$ (for our polytropes)
+\item $h = A R$, where $A$ is a constant [this assumption may not be true at high stratification].
+\item $V = (4/3)\pi h R^2 = (4/3)\pi A R^3 = V_0 R^3$.
+\item $w = \frac{\partial z}{\partial t} = -\frac{\partial d}{\partial t}$ (with depth $d \equiv L_z - z$)
+\item $\rho = (1 + L_z - z)^{m_{ad}} = (1 + d)^{m_{ad}}$, with $m_{ad} = (\gamma-1)^{-1} = 1.5$ (for our polytropes)
 \item $\rho V w \sim B t$ (momentum linearly increases)
 \item $\rho \pi R^2 \Gamma \sim B t$ \citep[e.g., eqn 36 of ][]{shivamoggi2010}.
 \end{enumerate}
-That's 9 unknowns, and 7 equations. There's two pieces of the puzzle we're missing.
-Ideally, $\Gamma = \text{const}$, and then we're left with one more equation, but we
-can't even be sure that's the case. 
+That's 8 unknowns, and 7 equations. There's one piece of the puzzle we're missing:
+what happens with $\Gamma$ over time?
+Ideally, $\Gamma = \text{const}$, but we can't be sure that's the case. 
 
-\section{Putting the pieces together in the Boussinesq-y limit}
-In the boussinesq limit, we can make two more assumptions:
+\section{Low stratification limit}
+In the limit of a lightly stratified thermal, we make one more assumption:
 \begin{enumerate}
-\item $\Gamma = \text{const}$
-\item $\rho = \text{const}$.
+\item $\Gamma = \text{const}$ (our eqn \# 8)
 \end{enumerate}
-By these assumptions, eqn 7 above gives us $R \propto t^{1/2}$. Plugging that in to 
-eqn 6 gives $w \propto t^{-1/2}$, and thus $z(t) \propto t^{1/2}$. 
+We also know that, under this assumption, and also in this regime where eqn 2 is valid,
+from dividing eqn 6 by 7, 
+$$
+w R \sim \frac{\pi\Gamma}{V_0}.
+$$
+In general, this suggests that $w \propto t^{-\alpha}$ and $R \propto t^{\alpha}$, such that
+when multiplied together they return a constant. With this, we return to eqn 6 or 7, and get
+\begin{equation}
+\rho R^2 = \frac{B}{\pi \Gamma} t
+\label{eqn:theory_eqn_6_and_7}
+\end{equation}
+With our ansatz of $R \propto t^{\alpha}$, we know that $\rho \sim t^{1 - 2\alpha}$.
+But we also know from the stratification of our domain that 
+$\rho = (1 + d)^{m_{ad}} \sim t^{1 - 2\alpha}$, and that $d \sim -t^{1-\alpha}$ (from
+theory equation 4, definitionally). If we neglect the `1' in the $\rho$ definition for now,
+we thus get $m_{ad}(1 - \alpha) = (1 - 2\alpha)$, or
+$$
+\alpha = \frac{1 - m_{ad}}{2 - m_{ad}} = -1
+$$
+><
 
 \section{What do we need to do in the stratified limit?}
-Come up with two more constraints. We need to understand how and why $\Gamma$ changes with
-time, and we need to understand how $w$, or $r$, or $z$ varies with time.
+Figure out what happens to the circulation.
 
 
 \bibliography{biblio.bib}

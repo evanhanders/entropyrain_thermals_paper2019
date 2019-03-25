@@ -1,0 +1,115 @@
+\documentclass[onecolumn, amsmath, amsfonts, amssymb]{aastex62}
+\usepackage{mathtools}
+\usepackage{natbib}
+\usepackage{bm}
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand\aastex{AAS\TeX}
+\newcommand\latex{La\TeX}
+
+
+\newcommand{\Div}[1]{\ensuremath{\nabla\cdot\left( #1\right)}}
+\newcommand{\DivU}{\ensuremath{\nabla\cdot\bm{u}}}
+\newcommand{\angles}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+\newcommand{\KS}[1]{\ensuremath{\text{KS}(#1)}}
+\newcommand{\KSstat}[1]{\ensuremath{\overline{\text{KS}(#1)}}}
+\newcommand{\grad}{\ensuremath{\nabla}}
+\newcommand{\RB}{Rayleigh-B\'{e}nard }
+\newcommand{\stressT}{\ensuremath{\bm{\bar{\bar{\Pi}}}}}
+\newcommand{\lilstressT}{\ensuremath{\bm{\bar{\bar{\sigma}}}}}
+\newcommand{\nrho}{\ensuremath{n_{\rho}}}
+\newcommand{\approptoinn}[2]{\mathrel{\vcenter{
+	\offinterlineskip\halign{\hfil$##$\cr
+	#1\propto\cr\noalign{\kern2pt}#1\sim\cr\noalign{\kern-2pt}}}}}
+
+\newcommand{\appropto}{\mathpalette\approptoinn\relax}
+\newcommand{\pro}{\ensuremath{\text{Ro}_{\text{p}}}}
+\newcommand{\con}{\ensuremath{\text{Ro}_{\text{c}}}}
+
+\usepackage{color}
+\newcommand{\gv}[1]{{\color{blue} #1}}
+
+%% Tells LaTeX to search for image files in the 
+%% current directory as well as in the figures/ folder.
+\graphicspath{{./}{figs/}}
+
+\begin{document}
+\title{Circulation in an anelastic system}
+\section{Momentum and Vorticity equations}
+The anelastic momentum equation takes the form of eqn 27 in \cite{lecoanet&all2014},
+\begin{equation}
+\frac{\partial \bm{u}}{\partial t} + \bm{u}\cdot\grad\bm{u}
+= -\grad \varpi + \frac{g}{c_P} S_1 \hat{z} + \Div{\stressT}.
+\label{eqn:momentum}
+\end{equation}
+Taking the curl of Eqn.~\ref{eqn:momentum}, we can retrieve the vorticity equation in two
+forms:
+\begin{gather}
+\frac{\partial \bm{\omega}}{\partial t}
+= \nabla \times \left[ \bm{u}\times\bm{\omega} + \frac{g}{c_P} S_1 \hat{z} + \Div{\stressT}  \right]
+\label{eqn:vorticity_1}
+\\
+\frac{\partial \bm{\omega}}{\partial t} + \bm{u}\cdot\grad\bm{\omega}
+= -\bm{\omega}\DivU + \bm{\omega}\cdot\grad\bm{u} 
++ \nabla \times \left[ \frac{g}{c_P} S_1 \hat{z} + \Div{\stressT}  \right]
+\label{eqn:vorticity_2}
+\end{gather}
+
+\section{Integral identities}
+As circulation is defined as the path-integral of velocity (or the surface integral of
+vorticity), it is useful to know a vector identity for each of these types of integrals.
+For an arbitrary vector field, $\bm{Q}$, the langrangian derivative
+($D/Dt = \partial/\partial t + \bm{u}\cdot\grad$) of its line integral around contour $C$ is
+\begin{equation}
+\frac{D}{Dt}\oint_C \bm{Q}\cdot d\bm{x} 
+= \oint_C\frac{D \bm{Q}}{D t}\cdot d\bm{x} + \oint_C\bm{Q} \cdot d\bm{u}.
+\label{eqn:line_integral}
+\end{equation}
+The lagrangian derivative of a surface integral along a surface $A$ is
+\citep[Eqn.~4.45 of][]{choudhuri1998},
+\begin{equation}
+\frac{D}{Dt}\iint_A d\bm{S}\cdot\bm{Q}
+= \iint_A d\bm{S}\cdot\left[\frac{\partial \bm{Q}}{\partial t} - \grad\times(\bm{u}\times\bm{Q})\right].
+\label{eqn:area_integral}
+\end{equation}
+
+\section{Circulation from the momentum equation}
+Starting with Eqn.~\ref{eqn:momentum} and using Eqn.~\ref{eqn:line_integral} with $\bm{Q} = \bm{u}$,
+we acknowledge that the second term in Eqn.~\ref{eqn:line_integral} is
+\begin{equation}
+\oint_C \bm{u}\cdot d\bm{u} = \frac{1}{2} \oint_C d|\bm{u}^2| = 0,
+\end{equation}
+as it is a closed loop integral of a perfect differential. Thus, we have
+\begin{equation}
+\frac{D \Gamma}{D t} = \frac{D}{Dt} \oint_C \bm{u}\cdot d\bm{x} = \oint_C \frac{D\bm{u}}{Dt}\cdot d\bm{x}
+= \oint_C \left[-\grad\varpi + \frac{g}{c_P} S_1 \hat{z} + \Div{\stressT}  \right]\cdot d\bm{x}
+\end{equation}
+Since the closed loop integral conservative force (e.g., $-\grad\varpi$) is zero, we are left
+with
+\begin{equation}
+\frac{D \Gamma}{D t} 
+= \oint_C \left[\frac{g}{c_P} S_1 \hat{z} + \Div{\stressT}  \right]\cdot d\bm{x}
+\label{eqn:circulation_momentum}
+\end{equation}
+
+\section{Circulation from the vorticity equation}
+Starting with Eqn.~\ref{eqn:vorticity_1} and using Eqn.~\ref{eqn:area_integral} with
+$\bm{Q} = \bm{\omega}$, we rather simply retrieve
+\begin{equation}
+\frac{D \Gamma}{Dt} = \frac{D}{Dt}\iint_A d\bm{S}\cdot\bm{\omega}
+= \iint_A d\bm{S} \cdot\left[\frac{\partial \bm{\omega}}{\partial t} - \grad\times(\bm{u}\times\bm{\omega})\right]
+= \iint_A d\bm{S} \cdot\grad\times\left[\bm{u}\times\bm{\omega} + \frac{g}{c_P}S_1 \hat{z} + \Div{\stressT} - \bm{u}\times\bm{\omega}\right].
+\end{equation}
+Or, simplifying,
+\begin{equation}
+\frac{D \Gamma}{Dt} 
+= \iint_A d\bm{S} \cdot\grad\times\left[\frac{g}{c_P}S_1 \hat{z} + \Div{\stressT}\right].
+\label{eqn:circulation_vorticity}
+\end{equation}
+Assuming that Stokes' theorem holds for the contour $C$ around area $A$, the definitions
+of circulation for Eqns.~\ref{eqn:circulation_momentum} and \ref{eqn:circulation_vorticity}
+are equivalent, and only buoyant and viscous terms should have any effect on the circulation
+in the thermal.
+
+
+\bibliography{biblio.bib}
+\end{document}
