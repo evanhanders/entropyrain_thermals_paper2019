@@ -1,0 +1,121 @@
+\documentclass[onecolumn, amsmath, amsfonts, amssymb]{aastex62}
+\usepackage{mathtools}
+\usepackage{natbib}
+\usepackage{bm}
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand\aastex{AAS\TeX}
+\newcommand\latex{La\TeX}
+
+
+\newcommand{\Div}[1]{\ensuremath{\nabla\cdot\left( #1\right)}}
+\newcommand{\DivU}{\ensuremath{\nabla\cdot\bm{u}}}
+\newcommand{\angles}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+\newcommand{\KS}[1]{\ensuremath{\text{KS}(#1)}}
+\newcommand{\KSstat}[1]{\ensuremath{\overline{\text{KS}(#1)}}}
+\newcommand{\grad}{\ensuremath{\nabla}}
+\newcommand{\RB}{Rayleigh-B\'{e}nard }
+\newcommand{\stressT}{\ensuremath{\bm{\bar{\bar{\Pi}}}}}
+\newcommand{\lilstressT}{\ensuremath{\bm{\bar{\bar{\sigma}}}}}
+\newcommand{\nrho}{\ensuremath{n_{\rho}}}
+\newcommand{\approptoinn}[2]{\mathrel{\vcenter{
+	\offinterlineskip\halign{\hfil$##$\cr
+	#1\propto\cr\noalign{\kern2pt}#1\sim\cr\noalign{\kern-2pt}}}}}
+
+\newcommand{\appropto}{\mathpalette\approptoinn\relax}
+\newcommand{\pro}{\ensuremath{\text{Ro}_{\text{p}}}}
+\newcommand{\con}{\ensuremath{\text{Ro}_{\text{c}}}}
+
+\usepackage{color}
+\newcommand{\gv}[1]{{\color{blue} #1}}
+
+%% Tells LaTeX to search for image files in the 
+%% current directory as well as in the figures/ folder.
+\graphicspath{{./}{figs/}}
+
+\begin{document}
+\section{Description of stratified thermals}
+In the thermal simulations, we have nine variables, although many of them are geometric and
+likely intrinsically linked. These variables are:
+\begin{enumerate}
+\item $B$, the integrated total entropy leading to buoyancy
+\item $V$, the thermal volume
+\item $R$, the radius of the thermal
+\item $r$, the radius (from axis of symmetry) of the thermal's vortex torus.
+\item $R_z$, the thermal's radius in the z-direction (we assume it is an oblate spheroid)
+\item $w$, the thermal bulk vertical velocity
+\item $z$, the height of the thermal
+\item $\Gamma$, the circulation of the vortex ring
+\item $\rho$, the local density at the height of the thermal.
+\end{enumerate}
+From the simulations we've done so far, when viscous heating and detrainment are neglected, and the
+diffusivities are sufficiently low (Re is sufficiently high) such that diffusive terms are not dominant, the following
+equations seem to govern the thermal evolution:
+\begin{gather}
+B = \int \rho s_1 dV = \text{const}, \\
+R_z = R/A,\qquad \text{ where $A$ is a constant aspect ratio },\\
+r = f R, \qquad \text{ where $f$ is a constant fraction }, \\
+V = (4/3)\pi h R^2 = (4/3)\pi R^3/A = V_0 R^3 = (V_0/f^3) r^3, \\
+w = \frac{\partial z}{\partial t},\\
+\rho = [1 + (\grad T)_{ad}(z - F^{-1})]^{m_{ad}} = T^{m_{ad}}, \text{(where $F = L_{thermal}/L_{box}$)}\\
+\rho V w = B t + M_0,  \label{eqn:momentum} \\
+\frac{1}{2}\rho r^2 \Gamma = B t + I_0, \label{eqn:impulse} \\
+\Gamma \sim \text{const.}
+\end{gather}
+Note that all of these equations are azimuthal averages, I think. You'd probably have to
+multiply by $2\pi$ to retrieve the ``full'' values in a 3D sim.
+
+\section{Solve it out}
+One thing that we have here that we didn't have a month ago is the constant offsets in
+the impulse and momentum: $I_0$ and $M_0$.  They make it so that plugging the two together
+is less straightforward that we had once thought, but it's still possible. From 
+Eqn.~\ref{eqn:impulse}, we solve for
+\begin{equation}
+r = \sqrt{2\frac{B t + I_0}{\rho\Gamma}}.
+\end{equation}
+Plugging this in to Eqn.~\ref{eqn:momentum}, we get
+\begin{equation}
+\rho V w = \left(\frac{V_0}{f^3}\right)\rho r^3 w
+= \left(\frac{V_0}{f^3}\right)\rho w \left(2\frac{B t + I_0}{\rho\Gamma}\right)^{3/2} = Bt + M_0,
+\end{equation}
+or, with $w = dz/dt$,
+\begin{equation}
+\rho^{-1/2}dz = \left(\frac{f^3 \Gamma^{3/2}}{2^{3/2}}\right)\frac{Bt + M_0}{(Bt + I_0)^{3/2}}dt
+\end{equation}
+But we know that $\rho = T^{m_{ad}},$ with $T$ the temperature, and $dT = (\grad T)_{ad} dz$,
+and we can define $\tau = Bt + I_0$, with $d\tau = B dt$. Substituting these in, we retrieve
+\begin{equation}
+T^{-m_{ad}/2}dT 
+= \left(\frac{f^3 \Gamma^{3/2}(\grad T)_{ad}}{2^{3/2} B}\right)\frac{\tau + M_0 - I_0}{\tau^{3/2}}d\tau.
+\end{equation}
+Defining a constant $C \equiv [f^3 \Gamma(\grad T)_{ad}]/[2^{3/2} B]$, we can write this more simply,
+\begin{equation}
+T^{-m_{ad}/2}dT = C\sqrt{\Gamma}\left(\frac{d\tau}{\tau^{1/2}} + \frac{M_0 - I_0}{\tau^{3/2}}d\tau\right).
+\end{equation}
+The choice to leave $\sqrt{\Gamma}$ outside of $C$ occurs because the value of $\tau$ is likely
+negative for a downward thermal, and combining the $\sqrt{\Gamma}$ with $\tau$ keeps the 
+numbers finite. On the bright side, these are all just power-law integrals, and with our choice 
+of $m_{ad} = 3/2$, we retrieve
+\begin{equation}
+4 T\bigg|_{T(t=0)}^{T} 
+= 2C\sqrt{\Gamma}\left(\tau^{1/2} - \frac{M_0 - I_0}{\tau^{1/2}}\right)\bigg|_{\tau(t=0)}^{\tau}
+\end{equation}
+Plugging things in and rearranging, our final equation for the evolution of temperature with time
+is
+\begin{equation}
+T(t) = \left[\frac{C\sqrt{\Gamma}}{2}
+\left(\sqrt{Bt + I_0} + \frac{I_0 - M_0}{\sqrt{Bt + I_0}} - 2\sqrt{I_0} + \frac{M_0}{\sqrt{I_0}}\right)
++ T(t=0)^{1/4}\right]^{4},
+\end{equation}
+where the thermal velocity can be simply retrieved as just
+\begin{equation}
+w = (\grad T)_{ad}^{-1}\frac{\partial T}{\partial t},
+\end{equation}
+where, for completeness, we solve out
+\begin{equation}
+\frac{\partial T}{\partial t} 
+= B C \sqrt{\Gamma}( T^{3/4} ) \left(\frac{1}{(B t + I_0)^{1/2}} + \frac{M_0 - I_0}{(B t + I_0)^{3/2}}\right).
+\end{equation}
+
+
+\bibliography{biblio.bib}
+\end{document}
