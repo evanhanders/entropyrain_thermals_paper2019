@@ -57,7 +57,7 @@ r = f R, \qquad \text{ where $f$ is a constant fraction }, \\
 V = (4/3)\pi h R^2 = (4/3)\pi R^3/A = V_0 R^3 = (V_0/f^3) r^3, \\
 w = \frac{\partial z}{\partial t},\\
 \rho = [1 + (\grad T)_{ad}(z - F^{-1})]^{m_{ad}} = T^{m_{ad}}, \text{(where $F = L_{thermal}/L_{box}$)}\\
-\rho V w = B t + M_0,  \label{eqn:momentum} \\
+\rho V w = \beta B t + M_0,  \label{eqn:momentum} \\
 \frac{1}{2}\rho r^2 \Gamma = B t + I_0, \label{eqn:impulse} \\
 \Gamma \sim \text{const.}
 \end{gather}
@@ -75,36 +75,38 @@ r = \sqrt{2\frac{B t + I_0}{\rho\Gamma}}.
 Plugging this in to Eqn.~\ref{eqn:momentum}, we get
 \begin{equation}
 \rho V w = \left(\frac{V_0}{f^3}\right)\rho r^3 w
-= \left(\frac{V_0}{f^3}\right)\rho w \left(2\frac{B t + I_0}{\rho\Gamma}\right)^{3/2} = Bt + M_0,
+= \left(\frac{V_0}{f^3}\right)\rho w \left(2\frac{B t + I_0}{\rho\Gamma}\right)^{3/2} = \beta Bt + M_0,
 \end{equation}
 or, with $w = dz/dt$,
 \begin{equation}
-\rho^{-1/2}dz = \left(\frac{f^3 \Gamma^{3/2}}{2^{3/2}}\right)\frac{Bt + M_0}{(Bt + I_0)^{3/2}}dt
+\rho^{-1/2}dz = \left(\frac{f^3 \Gamma^{3/2}}{2^{3/2}V_0}\right)\frac{\beta Bt + M_0}{(Bt + I_0)^{3/2}}dt
 \end{equation}
 But we know that $\rho = T^{m_{ad}},$ with $T$ the temperature, and $dT = (\grad T)_{ad} dz$,
-and we can define $\tau = Bt + I_0$, with $d\tau = B dt$. Substituting these in, we retrieve
+and we can define $\tau = (Bt + I_0)/\Gamma$, with $d\tau = (B/\Gamma) dt$ (these choice of constants
+ensure that $\tau$ is positive definite and monotonically increases). Substituting these in, we retrieve
 \begin{equation}
 T^{-m_{ad}/2}dT 
-= \left(\frac{f^3 \Gamma^{3/2}(\grad T)_{ad}}{2^{3/2} B}\right)\frac{\tau + M_0 - I_0}{\tau^{3/2}}d\tau.
+= \left(\frac{f^3 \Gamma^{3/2}(\grad T)_{ad}}{2^{3/2}V_0 B}\right)\frac{\beta \tau + M_0 - \beta I_0}{\tau^{3/2}}d\tau.
 \end{equation}
-Defining a constant $C \equiv [f^3 \Gamma(\grad T)_{ad}]/[2^{3/2} B]$, we can write this more simply,
+Defining a constant $C \equiv [f^3 \Gamma(\grad T)_{ad}]/[2^{3/2} V_0]$, we can write this more simply,
 \begin{equation}
-T^{-m_{ad}/2}dT = C\sqrt{\Gamma}\left(\frac{d\tau}{\tau^{1/2}} + \frac{M_0 - I_0}{\tau^{3/2}}d\tau\right).
+T^{-m_{ad}/2}dT = C\left(\beta \frac{\Gamma}{B}\tau^{-1/2}d\tau + \frac{M_0 - \beta I_0}{B}\tau^{-3/2}d\tau\right).
 \end{equation}
-The choice to leave $\sqrt{\Gamma}$ outside of $C$ occurs because the value of $\tau$ is likely
-negative for a downward thermal, and combining the $\sqrt{\Gamma}$ with $\tau$ keeps the 
-numbers finite. On the bright side, these are all just power-law integrals, and with our choice 
-of $m_{ad} = 3/2$, we retrieve
+These are all just power-law integrals, and so long as
+we avoid the special case where $m_{ad} = 2$ (the left-hand integral is a log then), we retrieve
 \begin{equation}
-4 T\bigg|_{T(t=0)}^{T} 
-= 2C\sqrt{\Gamma}\left(\tau^{1/2} - \frac{M_0 - I_0}{\tau^{1/2}}\right)\bigg|_{\tau(t=0)}^{\tau}
+\frac{1}{1 - m_{ad}/2} T^{1 - m_{ad}/2}\bigg|_{T(t=0)}^{T} 
+= 2C\left(\beta\frac{\Gamma}{B} \tau^{1/2} - \frac{M_0 - \beta I_0}{B}\tau^{-1/2}\right)\bigg|_{\tau(t=0)}^{\tau}
 \end{equation}
+For simplicity of writing, I define
+$$
+F(\tau) = \beta\frac{\Gamma}{B} \tau^{1/2} - \frac{M_0 - \beta I_0}{B}\tau^{-1/2}.
+$$
 Plugging things in and rearranging, our final equation for the evolution of temperature with time
 is
 \begin{equation}
-T(t) = \left[\frac{C\sqrt{\Gamma}}{2}
-\left(\sqrt{Bt + I_0} + \frac{I_0 - M_0}{\sqrt{Bt + I_0}} - 2\sqrt{I_0} + \frac{M_0}{\sqrt{I_0}}\right)
-+ T(t=0)^{1/4}\right]^{4},
+T(t) = \left[2(1 - m_{ad}/2)C\{F[\tau] - F[\tau(t=0)]\}
++ T(t=0)^{1-m_{ad}/2}\right]^{1/(1 - m_{ad}/2)},
 \end{equation}
 where the thermal velocity can be simply retrieved as just
 \begin{equation}
@@ -113,8 +115,9 @@ w = (\grad T)_{ad}^{-1}\frac{\partial T}{\partial t},
 where, for completeness, we solve out
 \begin{equation}
 \frac{\partial T}{\partial t} 
-= B C \sqrt{\Gamma}( T^{3/4} ) \left(\frac{1}{(B t + I_0)^{1/2}} + \frac{M_0 - I_0}{(B t + I_0)^{3/2}}\right).
+= C ( T^{m_{ad}/2} ) \left(\beta\tau^{-1/2} + \frac{M_0 - \beta I_0}{\Gamma}\tau^{-3/2}\right).
 \end{equation}
+In our simulations where $m_{ad} = 3/2$, we get the solution where $1 - m_{ad}/2 = 1/4$.
 
 
 \bibliography{biblio.bib}
