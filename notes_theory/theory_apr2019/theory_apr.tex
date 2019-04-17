@@ -49,12 +49,14 @@ likely intrinsically linked. These variables are:
 \end{enumerate}
 From the simulations we've done so far, when viscous heating and detrainment are neglected, and the
 diffusivities are sufficiently low (Re is sufficiently high) such that diffusive terms are not dominant, the following
-equations seem to govern the thermal evolution:
+equations seem to govern the thermal evolution (note that these equations are azimuthally averaged,
+so the quantities here are divided by $2\pi$ compared to their full ``true'' volume averaged
+quantities):
 \begin{gather}
 B = \int \rho s_1 dV = \text{const}, \\
 R_z = R/A,\qquad \text{ where $A$ is a constant aspect ratio },\\
 r = f R, \qquad \text{ where $f$ is a constant fraction }, \\
-V = (4/3)\pi h R^2 = (4/3)\pi R^3/A = V_0 R^3 = (V_0/f^3) r^3, \\
+V = (2/3) h R^2 = (2/3) R^3/A = V_0 R^3 = (V_0/f^3) r^3, \\
 w = \frac{\partial z}{\partial t},\\
 \rho = [1 + (\grad T)_{ad}(z - F^{-1})]^{m_{ad}} = T^{m_{ad}}, \text{(where $F = L_{thermal}/L_{box}$)}\\
 \rho V w = \beta B t + M_0,  \label{eqn:momentum} \\
@@ -64,7 +66,7 @@ w = \frac{\partial z}{\partial t},\\
 Note that all of these equations are azimuthal averages, I think. You'd probably have to
 multiply by $2\pi$ to retrieve the ``full'' values in a 3D sim.
 
-\section{Solve it out}
+\section{Solution for Temperature, height, and velocity}
 One thing that we have here that we didn't have a month ago is the constant offsets in
 the impulse and momentum: $I_0$ and $M_0$.  They make it so that plugging the two together
 is less straightforward that we had once thought, but it's still possible. From 
@@ -86,38 +88,89 @@ and we can define $\tau = (Bt + I_0)/\Gamma$, with $d\tau = (B/\Gamma) dt$ (thes
 ensure that $\tau$ is positive definite and monotonically increases). Substituting these in, we retrieve
 \begin{equation}
 T^{-m_{ad}/2}dT 
-= \left(\frac{f^3 \Gamma^{3/2}(\grad T)_{ad}}{2^{3/2}V_0 B}\right)\frac{\beta \tau + M_0 - \beta I_0}{\tau^{3/2}}d\tau.
+= \left(\frac{f^3 \Gamma(\grad T)_{ad}}{2^{3/2}V_0 B}\right)\frac{\beta\Gamma \tau + M_0 - \beta I_0}{\tau^{3/2}}d\tau.
 \end{equation}
-Defining a constant $C \equiv [f^3 \Gamma(\grad T)_{ad}]/[2^{3/2} V_0]$, we can write this more simply,
+Defining a constant $C \equiv [f^3 \Gamma(\grad T)_{ad}]/[2^{3/2} V_0 B]$, we can write this more simply,
 \begin{equation}
-T^{-m_{ad}/2}dT = C\left(\beta \frac{\Gamma}{B}\tau^{-1/2}d\tau + \frac{M_0 - \beta I_0}{B}\tau^{-3/2}d\tau\right).
+T^{-m_{ad}/2}dT = C\left(\beta \Gamma\tau^{-1/2}d\tau + (M_0 - \beta I_0)\tau^{-3/2}d\tau\right).
+\label{eqn:integrand}
 \end{equation}
 These are all just power-law integrals, and so long as
 we avoid the special case where $m_{ad} = 2$ (the left-hand integral is a log then), we retrieve
 \begin{equation}
-\frac{1}{1 - m_{ad}/2} T^{1 - m_{ad}/2}\bigg|_{T(t=0)}^{T} 
-= 2C\left(\beta\frac{\Gamma}{B} \tau^{1/2} - \frac{M_0 - \beta I_0}{B}\tau^{-1/2}\right)\bigg|_{\tau(t=0)}^{\tau}
+\frac{1}{1 - m_{ad}/2} T^{1 - m_{ad}/2}\bigg|_{T_0}^{T} 
+= 2C\left(\beta\Gamma \tau^{1/2} - (M_0 - \beta I_0)\tau^{-1/2}\right)\bigg|_{\tau_0}^{\tau}
 \end{equation}
-For simplicity of writing, I define
+For simplicity of writing, I define $\alpha^{-1} =  1 - m_{ad}/2$ and 
 $$
-F(\tau) = \beta\frac{\Gamma}{B} \tau^{1/2} - \frac{M_0 - \beta I_0}{B}\tau^{-1/2}.
+\xi(\tau) = \beta\Gamma \tau^{1/2} - (M_0 - \beta I_0)\tau^{-1/2}.
 $$
 Plugging things in and rearranging, our final equation for the evolution of temperature with time
 is
 \begin{equation}
-T(t) = \left[2(1 - m_{ad}/2)C\{F[\tau] - F[\tau(t=0)]\}
-+ T(t=0)^{1-m_{ad}/2}\right]^{1/(1 - m_{ad}/2)},
+T(t) = \left[\frac{2C}{\alpha}(\xi[\tau] - \xi[\tau_0])
++ T_0^{1/\alpha}\right]^{\alpha},
 \end{equation}
-where the thermal velocity can be simply retrieved as just
+where the thermal velocity and height can be simply retrieved as just
 \begin{equation}
-w = (\grad T)_{ad}^{-1}\frac{\partial T}{\partial t},
+w = (\grad T)_{ad}^{-1}\frac{\partial T}{\partial t}, \qquad z = (\grad T)_{ad}^{-1}(T - 1) + F^{-1}
 \end{equation}
 where, for completeness, we solve out
 \begin{equation}
 \frac{\partial T}{\partial t} 
-= C ( T^{m_{ad}/2} ) \left(\beta\tau^{-1/2} + \frac{M_0 - \beta I_0}{\Gamma}\tau^{-3/2}\right).
+= C \frac{B}{\Gamma}( T^{m_{ad}/2} ) \left(\beta\Gamma\tau^{-1/2} + (M_0 - \beta I_0)\tau^{-3/2}\right)
+.
 \end{equation}
-In our simulations where $m_{ad} = 3/2$, we get the solution where $1 - m_{ad}/2 = 1/4$.
+In our simulations where $m_{ad} = 3/2$, we get the solution where $\alpha = 4$.
+
+\section{Density solution}
+It's pretty straight-forward to find the solution for density now that we have the solution
+for temperature. Returning to Eqn.~\ref{eqn:integrand}, we substitute $T = \rho^{1/m_{ad}}$ and
+$dT = (1/m_{ad})\rho^{m_{ad}^{-1} - 1} d\rho$ to get
+\begin{equation}
+\frac{1}{m_{ad}}\rho^{-3/2 + m_{ad}^{-1}}d\rho = C\left(\beta \Gamma\tau^{-1/2}d\tau + (M_0 - \beta I_0)\tau^{-3/2}d\tau\right).
+\end{equation}
+In the limiting case where $m_{ad} = 2$, the LHS is $\rho^{-1}$ and is a log integral. For
+cases where $m_{ad} < 2$, We integrate to get
+\begin{equation}
+(m_{ad}^{-1} - 0.5)^{-1}m_{ad}\rho^{m_{ad}^{-1} - 1/2}\bigg|_{\rho_0}^{\rho} = 2 C \xi(\tau)\bigg|_{\tau_0}^{\tau}
+\end{equation}
+I'll now define $\chi^{-1} = m_{ad}^{-1} - 0.5$, rearrange, and find
+\begin{equation}
+\rho = \left[\frac{2 C}{m_{ad}\chi}(\xi[\tau] - \xi[\tau_0]) + \rho_0^{1/\chi}\right]^\chi,
+\end{equation}
+and $\chi = 6$ for our $m_{ad} = 3/2$ solutions.
+
+\section{Leading order evolution}
+What we eventually find from all of our derivations here is that, to leading order in $\tau$,
+\begin{gather}
+\rho = \left(\frac{2 C\beta\Gamma}{m_{ad}\chi}\right)^{\chi} \tau^{\chi/2} \\
+T    = \left(\frac{2 C \beta \Gamma}{\alpha}\right)^{\alpha} \tau^{\alpha/2} \\
+w    = \frac{C B \beta}{(\grad T)_{ad}}\left(\frac{2 C}{\alpha}\right)^{\alpha - 1} \tau^{\alpha/2 - 1},
+\end{gather}
+where $\alpha = 2$ and $\chi = 3$ for $m_{ad} = 3/2$.
+
+%\section{Entrainment rate}
+%As in \cite{lecoanet&jeevanjee2018}, we want to know what the entrainment rate is, or
+%\begin{equation}
+%\epsilon = \frac{d \ln V}{dz} \sim 3 \frac{d\ln r}{dz}.
+%\end{equation}
+%We also know that
+%\begin{equation}
+%r = \sqrt{2 \tau / \rho} \sim \sqrt{2\left(\frac{m_{ad}\chi}{2 C \beta \Gamma}\right)^{\chi} \tau^{1-\chi/2}},
+%\end{equation}
+%so
+%\begin{equation}
+%\epsilon \sim \frac{3}{2}(1 - \chi/2)\frac{d\ln \tau}{dz} 
+%= \frac{3}{2}(1 - \chi / 2) \frac{d \ln \tau}{d\tau}\frac{d\tau}{dt}\frac{dt}{dz}
+%= \frac{3}{2}\frac{B}{\Gamma}(1 - \chi/2)\frac{1}{\tau w}
+%\end{equation}
+%For $\chi = 6$, $\alpha = 4$, this becomes
+%\begin{equation}
+%\epsilon \propto \tau^{-2}
+%\end{equation}
+
+
 
 
 \bibliography{biblio.bib}
