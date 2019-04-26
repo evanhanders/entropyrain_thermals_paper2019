@@ -16,7 +16,7 @@ Usage:
     AN_2D_thermal.py [options]
 
 Options:
-    --n_rho=<n_rho>       number of density scale heights [default: 4]
+    --n_rho=<n_rho>       number of density scale heights [default: 0.5]
     --Reynolds=<Re>       Reynolds number [default: 6e2]
     --Prandtl=<Pr>        Prandtl number [default: 1]
     --nz=<n>              Number of z coefficients [default: 256]
@@ -228,7 +228,7 @@ out_dt = 0.08*t_b
 slices   = solver.evaluator.add_file_handler('{:s}/slices'.format(data_dir),   sim_dt=out_dt, max_writes=20, mode='overwrite')
 profiles = solver.evaluator.add_file_handler('{:s}/profiles'.format(data_dir), sim_dt=out_dt, max_writes=20, mode='overwrite')
 scalars  = solver.evaluator.add_file_handler('{:s}/scalars'.format(data_dir),   sim_dt=out_dt, max_writes=1e4, mode='overwrite')
-for f in ['S1', 'S1r', 'u', 'ur', 'w', 'wr' 'V', 'Vr', 'p']:
+for f in ['S1', 'S1r', 'u', 'ur', 'w', 'wr', 'V', 'Vr', 'p']:
     slices.add_task(f, name=f, layout='g')
     profiles.add_task('integ({}, "z")/Lz'.format(f), name='{}_z_avg'.format(f), layout='g')
     profiles.add_task('integ(r*({}), "r")/Lr'.format(f), name='{}_r_avg'.format(f), layout='g')
