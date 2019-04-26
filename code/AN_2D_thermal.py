@@ -72,7 +72,7 @@ m_ad      = 1/(gamma-1)
 Cp        = gamma*m_ad
 Cv        = Cp/gamma
 grad_T_ad = -(np.exp(n_rho/m_ad) - 1)/Lz #adiabatic temperature gradient
-g         = -grad_T_ad * (1 + m_ad)      #gravity
+g         = (1 + m_ad) #* -grad_T_ad     #gravity
 t_b       = np.sqrt(Lz)                  #atmospheric buoyancy time
 
 Lr        = aspect*Lz
@@ -165,7 +165,8 @@ problem.substitutions['t_phir']             = '(u_phir - u_phi/r)'
 problem.substitutions['visc_L_u']      = '((xi_L/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
 problem.substitutions['visc_L_w']      = '((xi_L/Re)*(Lap(w, wr)   + (1./3)*dz(DivU)))'
 problem.substitutions['visc_R_u']      = '((xi_R/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
-problem.substitutions['visc_R_w']      = '((xi_R/Re)*(Lap(w, wr)   + (1./3)*dz(DivU)))'# Sometimes old formulation was stable with this on RHS:- (1./3)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)))'
+#problem.substitutions['visc_R_w']      = '((xi_R/Re)*(Lap(w, wr)   + (1./3)*dz(DivU)))'# Sometimes old formulation was stable with this on RHS:- (1./3)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)))'
+problem.substitutions['visc_R_w']      = '((xi_R/Re)*(Lap(w, wr)   - (1./3)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)))'
 
 #Energy equation diffusivity substitutions
 problem.substitutions['diff_L']        = '( (xi_L/(Re*Pr*Cv))*Lap(S1, S1r) )'
@@ -173,7 +174,7 @@ if kappa_mu:
     problem.substitutions['diff_R']    = '( ((Re*Pr*Cv)**(-1))*(xi*ln_T0_z*dz(S1) + xi_R*Lap(S1, S1r)) )'
 else:
     problem.substitutions['diff_R']    = '( xi*((Re*Pr*Cv)**(-1))*(ln_T0_z+ln_rho0_z)*dz(S1) )'
-problem.substitutions['visc_heat']     = '(g*Lnondim*xi*(((Re*T0)**(-1))*(t_rr*dr(u) + t_rz*dz(u) + t_phir*u_phir + t_phiz*dz(u_phi) + t_rz*dr(w) + t_zz*dz(w))))'
+problem.substitutions['visc_heat']     = '(g*Lnondim*xi*(((Cp*Re*T0)**(-1))*(t_rr*dr(u) + t_rz*dz(u) + t_phir*u_phir + t_phiz*dz(u_phi) + t_rz*dr(w) + t_zz*dz(w))))'
 
 #Equation scaling, vorticity substitution
 problem.substitutions['scale_m']       = '(r**2)'
