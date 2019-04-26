@@ -49,22 +49,18 @@ likely intrinsically linked. These variables are:
 \end{enumerate}
 From the simulations we've done so far, when viscous heating and detrainment are neglected, and the
 diffusivities are sufficiently low (Re is sufficiently high) such that diffusive terms are not dominant, the following
-equations seem to govern the thermal evolution (note that these equations are azimuthally averaged,
-so the quantities here are divided by $2\pi$ compared to their full ``true'' volume averaged
-quantities):
+equations seem to govern the thermal evolution:
 \begin{gather}
-B = \int \rho s_1 dV = \text{const}, \\
+B = \int \rho s_1 dV = 2\pi \iint \rho s_1 r dr dz = \text{const}, \\
 R_z = R/A,\qquad \text{ where $A$ is a constant aspect ratio },\\
 r = f R, \qquad \text{ where $f$ is a constant fraction }, \\
-V = (2/3) h R^2 = (2/3) R^3/A = V_0 R^3 = (V_0/f^3) r^3, \\
+V = (4/3)\pi h R^2 = (4/3)\pi R^3/A = V_0 R^3 = (V_0/f^3) r^3, \\
 w = \frac{\partial z}{\partial t},\\
 \rho = [1 + (\grad T)_{ad}(z - F^{-1})]^{m_{ad}} = T^{m_{ad}}, \text{(where $F = L_{thermal}/L_{box}$)}\\
 \rho V w = \beta B t + M_0,  \label{eqn:momentum} \\
-\frac{1}{2}\rho r^2 \Gamma = B t + I_0, \label{eqn:impulse} \\
+\pi\rho r^2 \Gamma = B t + I_0, \label{eqn:impulse} \\
 \Gamma \sim \text{const.}
 \end{gather}
-Note that all of these equations are azimuthal averages, I think. You'd probably have to
-multiply by $2\pi$ to retrieve the ``full'' values in a 3D sim.
 
 \section{Solution for Temperature, height, and velocity}
 One thing that we have here that we didn't have a month ago is the constant offsets in
@@ -72,25 +68,25 @@ the impulse and momentum: $I_0$ and $M_0$.  They make it so that plugging the tw
 is less straightforward that we had once thought, but it's still possible. From 
 Eqn.~\ref{eqn:impulse}, we solve for
 \begin{equation}
-r = \sqrt{2\frac{B t + I_0}{\rho\Gamma}}.
+r = \sqrt{\frac{B t + I_0}{\pi\rho\Gamma}}.
 \end{equation}
 Plugging this in to Eqn.~\ref{eqn:momentum}, we get
 \begin{equation}
 \rho V w = \left(\frac{V_0}{f^3}\right)\rho r^3 w
-= \left(\frac{V_0}{f^3}\right)\rho w \left(2\frac{B t + I_0}{\rho\Gamma}\right)^{3/2} = \beta Bt + M_0,
+= \left(\frac{V_0}{f^3}\right)\rho w \left(\frac{B t + I_0}{\pi\rho\Gamma}\right)^{3/2} = \beta Bt + M_0,
 \end{equation}
 or, with $w = dz/dt$,
 \begin{equation}
-\rho^{-1/2}dz = \left(\frac{f^3 \Gamma^{3/2}}{2^{3/2}V_0}\right)\frac{\beta Bt + M_0}{(Bt + I_0)^{3/2}}dt
+\rho^{-1/2}dz = \left(\frac{f^3 (\pi\Gamma)^{3/2}}{V_0}\right)\frac{\beta Bt + M_0}{(Bt + I_0)^{3/2}}dt
 \end{equation}
 But we know that $\rho = T^{m_{ad}},$ with $T$ the temperature, and $dT = (\grad T)_{ad} dz$,
 and we can define $\tau = (Bt + I_0)/\Gamma$, with $d\tau = (B/\Gamma) dt$ (these choice of constants
 ensure that $\tau$ is positive definite and monotonically increases). Substituting these in, we retrieve
 \begin{equation}
 T^{-m_{ad}/2}dT 
-= \left(\frac{f^3 \Gamma(\grad T)_{ad}}{2^{3/2}V_0 B}\right)\frac{\beta\Gamma \tau + M_0 - \beta I_0}{\tau^{3/2}}d\tau.
+= \left(\frac{\pi^{3/2}f^3 \Gamma(\grad T)_{ad}}{V_0 B}\right)\frac{\beta\Gamma \tau + M_0 - \beta I_0}{\tau^{3/2}}d\tau.
 \end{equation}
-Defining a constant $C \equiv [f^3 \Gamma(\grad T)_{ad}]/[2^{3/2} V_0 B]$, we can write this more simply,
+Defining a constant $C \equiv [\pi^{3/2} f^3 \Gamma(\grad T)_{ad}]/[V_0 B]$, we can write this more simply,
 \begin{equation}
 T^{-m_{ad}/2}dT = C\left(\beta \Gamma\tau^{-1/2}d\tau + (M_0 - \beta I_0)\tau^{-3/2}d\tau\right).
 \label{eqn:integrand}
