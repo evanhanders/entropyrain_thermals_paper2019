@@ -1,0 +1,135 @@
+\documentclass[onecolumn, amsmath, amsfonts, amssymb]{aastex62}
+\usepackage{mathtools}
+\usepackage{natbib}
+\usepackage{bm}
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand\aastex{AAS\TeX}
+\newcommand\latex{La\TeX}
+
+
+\newcommand{\Div}[1]{\ensuremath{\nabla\cdot\left( #1\right)}}
+\newcommand{\DivU}{\ensuremath{\nabla\cdot\bm{u}}}
+\newcommand{\angles}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+\newcommand{\KS}[1]{\ensuremath{\text{KS}(#1)}}
+\newcommand{\KSstat}[1]{\ensuremath{\overline{\text{KS}(#1)}}}
+\newcommand{\grad}{\ensuremath{\nabla}}
+\newcommand{\RB}{Rayleigh-B\'{e}nard }
+\newcommand{\stressT}{\ensuremath{\bm{\bar{\bar{\Pi}}}}}
+\newcommand{\lilstressT}{\ensuremath{\bm{\bar{\bar{\sigma}}}}}
+\newcommand{\nrho}{\ensuremath{n_{\rho}}}
+\newcommand{\approptoinn}[2]{\mathrel{\vcenter{
+	\offinterlineskip\halign{\hfil$##$\cr
+	#1\propto\cr\noalign{\kern2pt}#1\sim\cr\noalign{\kern-2pt}}}}}
+
+\newcommand{\appropto}{\mathpalette\approptoinn\relax}
+\newcommand{\pro}{\ensuremath{\text{Ro}_{\text{p}}}}
+\newcommand{\con}{\ensuremath{\text{Ro}_{\text{c}}}}
+
+\usepackage{color}
+\newcommand{\gv}[1]{{\color{blue} #1}}
+
+%% Tells LaTeX to search for image files in the 
+%% current directory as well as in the figures/ folder.
+\graphicspath{{./}{figs/}}
+
+\begin{document}
+\section{The anelastic equations}
+We write the anelastic equations under a constant dynamic diffusivity formulation 
+($\mu = \rho\nu = \text{const}$, $\kappa = \rho\chi = \text{const}$)
+as in \citet{lecoanet&all2014}, eqns.~27-29,
+\begin{gather}
+\DivU = -w\partial_z\ln\rho = \frac{w}{H_\rho(z)} 
+\label{eqn:dim_continuity}\\
+\partial_t \bm{u} + \bm{u}\cdot\grad\bm{u} + \grad \varpi = -\bm{g}\frac{S_1}{c_P} 
++ \frac{\mu}{\rho_0}\left[\grad^2 \bm{u} + \frac{1}{3}\grad(\DivU)\right]
+\label{eqn:dim_momentum}\\
+\partial_t S_1 + \bm{u}\cdot\grad S_1 = 
++\frac{\kappa}{\rho c_V}\left[\grad^2 S_1 + \partial_z\ln T_0\cdot\partial_z S_1\right]
++ \frac{\mu}{\rho T}\sigma_{ij}\partial_{x_i}u_j,
+\label{eqn:dim_entropy}
+\end{gather}
+with the modified stress tensor
+\begin{equation}
+\sigma_{ij} = \left(\partial_{x_i}u_j + \partial_{x_j}u_i - \frac{2}{3}\delta_{ij}\DivU\right).
+\end{equation}
+Here, the $c_V^{-1}$ shows up in the diffusion term because we're aiming for as close of a
+one-to-one comparison with the FC temperature equation as possible. There, we had
+$F = -\kappa \grad T_1 \approx -\kappa c_v^{-1} T_0 \grad S_1$ in the anelastic limit.
+
+\subsection{Nondimensional anelastic equations}
+We then nondimensionalize as in \citet{lecoanet&jeevanjee2018}, (where all of the terms from the
+previous, dimension-ful equations now have $\sim$ over them):
+\begin{equation}
+\begin{split}
+\tilde{\grad}\rightarrow(\tilde{L}_{th}^{-1})\grad, \qquad&
+\tilde{S}_1 \rightarrow(\Delta\tilde{S})S_1,\\
+\tilde{\bm{u}} \rightarrow (\tilde{u}_{th})\bm{u}, \qquad&
+\tilde{\varpi} \rightarrow (\tilde{u}_{th}^2)\varpi,\\
+\partial_{\tilde{t}} \rightarrow (\tilde{u}_{th}/\tilde{L}_{th})\partial_t,\qquad&
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\tilde{u}_{th}^2 = \frac{g \tilde{L}_{th} \Delta \tilde{s}}{c_P}, \qquad
+\text{Re}_{\text{ff}} = \frac{\tilde{u}_{th} \tilde{L}_{th}}{\nu}, \qquad
+\text{Pr}_{\text{ff}} = \frac{\tilde{u}_{th} \tilde{L}_{th}}{\chi}.
+\end{equation}
+Here we acknowledge that $\mu = \nu$ and $\chi = \kappa$ when $\rho = 1$ (at the top
+of the domain), so these values are specified at the upper boundary, but will increase
+with depth.
+
+Under these assumptions, eqns.~\ref{eqn:dim_momentum} \& \ref{eqn:dim_entropy} become
+(with $\bm{g} = - g \hat{z}$),
+\begin{gather}
+\partial_t \bm{u} + \bm{u}\cdot\grad\bm{u} + \grad \varpi = S_1\hat{z} 
++ \frac{1}{\text{Re}_{\text{ff}}}\left[\grad^2 \bm{u} + \frac{1}{3}\grad(\DivU)\right] \\
+\partial_t S_1 + \bm{u}\cdot\grad S_1 = 
+\frac{1}{\text{Re}_{\text{ff}}}\left(\frac{1}{\text{Pr}_{\text{ff}}\rho_0c_V }[\grad^2 S_1 + \partial_z\ln T_0 \cdot\partial_z S_1]
++ \frac{g \tilde{L}_{th}}{\rho_0 T_0 c_P}\sigma_{ij}\partial_{x_i}u_j \right),
+\end{gather}
+The viscous heating term is a bit ugly, but it's truly not too bad.
+This formulation is great in that we can set up experiments in boxes
+which are exactly the same size as in \citet{lecoanet&jeevanjee2018} (e.g., 10 x 20), with
+a thermal whose diameter is 1 length unit, and then we can evolve for some tens of time units
+to get it to the bottom of the domain.
+
+\subsection{Nondimensional atmosphere}
+In order to make these equations work, it's important that the atmosphere also be scaled 
+appropriately. In a normal polytrope, we have
+\begin{gather}
+T_0= (1 + \tilde{L}_z - \tilde{z}), \\
+\rho_0 = T^m,
+\end{gather}
+with $\tilde{L}_z = e^{n_\rho/m} - 1$ and the adiabatic temperature gradient
+$\partial_{\tilde{z}} T_{ad} = -g/c_P = -1$, so $g = c_P$. We want to maintain the stratification
+of these fields, as that's already nondimensionalized ($\rho_0 = T_0= 1$ at the top of the atmosphere),
+but we need to rescale the length scales. Thus, let's acknowledge that the true stratification
+here is $T_0= 1 + (\partial_{\tilde{z}} T_{ad})(\tilde{z} - \tilde{L}_z)$. If we take out the
+dimensionality of $\tilde{z} = \tilde{L}_{th} z$ and $\tilde{L}_z = \tilde{L}_{th} L_z$, then
+we get $T_0= 1 + (\tilde{L}_{th}\partial_{\tilde{z}} T_{ad})(z - Lz)$. Thus, in these domains,
+$\partial_z T_{ad} = (\tilde{L}_{th}\partial_{\tilde{z}} T_{ad})$.
+
+So, what is $\tilde{L}_{th}$? Well, if we have a dimensional polytrope whose depth is
+$\tilde{L}_z = (e^{n_\rho/m} - 1)$, and we want 20 thermals to fit in that depth, then
+$\tilde{L}_{th} = \tilde{L}_z / 20$, or since 20 is the nondimensional $L_z$, 
+$\tilde{L}_{th} = ((e^{n_\rho/m} - 1))/L_z$.
+
+The resulting stratification is just a more careful specification of where we started,
+\begin{gather}
+T_0 = 1 + \partial_z T_{ad} (z - L_{exp}) \\
+\rho_0 = T^m,
+\end{gather}
+with $\partial_z T_{ad} = (\tilde{L}_{th}\partial_{\tilde{z}} T_{ad})$ and
+$\tilde{L}_{th} = ((e^{n_\rho/m} - 1))/L_z$. These stratified terms enter the
+equations mostly in log form,
+\begin{equation}
+\begin{split}
+\partial_z \ln T_0= \frac{\partial_z T_{ad}}{T} \\
+\partial_z \ln\rho_0 = \frac{m\partial_z T_{ad}}{T}
+\end{split}
+\end{equation}
+In the case of low stratification, $\tilde{L}_{th} \rightarrow 0$, so $\partial_z T_{ad} \rightarrow 0$
+meanwhile $\rho_0 \rightarrow T_0 \rightarrow 1$, and our equations take on their boussinesq form. 
+
+\bibliography{biblio.bib}
+\end{document}
