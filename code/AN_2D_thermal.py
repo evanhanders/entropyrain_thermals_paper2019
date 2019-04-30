@@ -115,28 +115,6 @@ problem = de.IVP(domain, variables=['u', 'w', 'ur', 'wr', 'S1', 'S1r', 'p'])
 problem.meta['u', 'w', 'S1r', 'p']['r']['dirichlet'] = True
 problem.parameters['u_phi'] = problem.parameters['u_phir'] = 0
 
-
-def Smoother(*args):
-    z = args[0].data
-    Lz = args[1].value
-    dr = args[2].value
-    if len(z) > 0:
-        return window(z, Lz=Lz, dr=dr)
-    else:
-        return z
-
-def window(z, Lz=20, dr=0.2):
-    window1= (erf((z-0.025*Lz)/dr)+1)/2
-    window2= -(erf((z-0.975*Lz)/dr)-1)/2
-    return window1*window2
-
-def de_smoother(*args, domain=domain, F=Smoother):
-    return de.operators.GeneralFunction(domain, layout='g', func=F, args=args)
-
-de.operators.parseables['S'] = de_smoother
-problem.substitutions['window'] = '(S(z,Lz,Lz/100))'
-problem.substitutions['edges'] = '(1 - window)'
-
 problem.parameters['pi']         = np.pi
 problem.parameters['Lz']         = Lz
 problem.parameters['Lr']         = Lr
@@ -150,11 +128,11 @@ problem.parameters['Pr']         = Pr
 problem.parameters['Lnondim']    = -grad_T_ad #scaling factor from unscaled polytropes -- for viscous heating term.
 
 problem.substitutions['T']            = '(1 + grad_T_ad*(z - Lz))'
-problem.substitutions['T0']           = '(edges + window*T)'
-problem.substitutions['rho0']         = '(edges + window*(T)**(m_ad))'              
-problem.substitutions['ln_rho0_z']    = '(edges + window*m_ad*grad_T_ad/T)'         
-problem.substitutions['ln_rho0_zz']   = '(edges - window*m_ad*grad_T_ad**2/T**2)'  
-problem.substitutions['ln_T0_z']      = '(edges + window*grad_T_ad/T)'              
+problem.substitutions['T0']           = '(T)'
+problem.substitutions['rho0']         = '((T)**(m_ad))'              
+problem.substitutions['ln_rho0_z']    = '(m_ad*grad_T_ad/T)'         
+problem.substitutions['ln_rho0_zz']   = '(-m_ad*grad_T_ad**2/T**2)'  
+problem.substitutions['ln_T0_z']      = '(grad_T_ad/T)'              
 
 #Set up the diffusivity profile if nonconstant
 if kappa_mu:
@@ -173,7 +151,8 @@ problem.substitutions['UdotGradU_phi']      = '(UdotGrad(u_phi, u_phir) - u_phi*
 problem.substitutions['Lap(A, Ar)']         = '(Ar/r + dr(Ar) + dz(dz(A)))'
 problem.substitutions['Lap_phi(A, Ar)']     = '(Lap(A, Ar) - A/r**2)'
 problem.substitutions['Lap_r(A, Ar)']       = '(Lap(A, Ar) - A/r**2)'
-problem.substitutions['DivU']               = '(u/r + ur + dz(w))'
+problem.substitutions['DivU_true']          = '(u/r + ur + dz(w))'
+problem.substitutions['DivU']               = '(DivU_true)'
 problem.substitutions['DivUr']              = '(ur/r - u/r**2 + dr(ur) + dz(wr))'
 problem.substitutions['DivUz']              = '(-1)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)'
 
@@ -218,18 +197,20 @@ problem.add_equation("(S1r - dr(S1)) = 0")
 problem.add_equation("(ur  - dr(u))  = 0")
 problem.add_equation("(wr  - dr(w))  = 0")
 #Continuity
-problem.add_equation("scale_c*(DivU) = -scale_c*(w*ln_rho0_z)", tau=False)
+problem.add_equation("scale_c*(DivU_true) = -scale_c*(w*ln_rho0_z)")
 #Momentum equations
 problem.add_equation("scale_m*(dt(u) +  dr(p)      - visc_L_u) = scale_m*(-UdotGradU_r     + visc_R_u    )", tau=False)
 problem.add_equation("scale_m*(dt(w) +  dz(p) - S1 - visc_L_w) = scale_m*(-UdotGrad(w, wr) + visc_R_w    )", tau=False)
 #Entropy equation
 problem.add_equation("scale_e*(dt(S1)              - diff_L )  = scale_e*(-UdotGrad(S1, S1r) + visc_heat + diff_R)", tau=False)
 
-problem.add_bc("right(u)   = 0", condition="nz != 0") 
+#For whatever voodoo reason, these are the only BCs 
+#I've found that are stable at high stratification.
+problem.add_bc("right(V)   = 0", condition="nz != 0") 
 problem.add_bc("right(p)   = 0", condition="nz == 0") 
 problem.add_bc("right(w)   = 0") 
-#problem.add_bc("right(u_phi)= 0") 
 problem.add_bc("right(S1r) = 0")
+#problem.add_bc("right(u)   = 0") 
 
 #########################
 # Initialization of run
@@ -274,7 +255,7 @@ for f, nm in [('(rho0*w**2)', 'KE_w'), ('(rho0*u**2)', 'KE_u'), ('rho0*S1', 'tot
 
 # CFL
 dt = 1e-4*t_b
-safety_factor = 0.15
+safety_factor = 0.1
 if args['--rk443']:
     safety_factor *= 4
 CFL = flow_tools.CFL(solver, initial_dt=dt, cadence=1, safety=safety_factor,
