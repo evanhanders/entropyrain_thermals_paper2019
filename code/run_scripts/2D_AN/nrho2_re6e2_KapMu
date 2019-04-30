@@ -18,8 +18,8 @@ mpiexec_mpt -n 128 ~/.python3 AN_2D_thermal.py \
     --wall_hours=4.5 \
     --Reynolds=$RE \
     --aspect=0.175 \
-    --run_time_buoy=6.68 \
-    --label=windowed \
+    --run_time_buoy=8 \
+    --rk443 \
     > ./out.AN_thermal_2D.Re$RE.nrho$NRHO.$PBS_JOBID
 date
 
