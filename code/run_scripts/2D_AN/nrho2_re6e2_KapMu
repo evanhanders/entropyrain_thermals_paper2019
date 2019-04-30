@@ -19,6 +19,7 @@ mpiexec_mpt -n 128 ~/.python3 AN_2D_thermal.py \
     --Reynolds=$RE \
     --aspect=0.175 \
     --run_time_buoy=6.68 \
+    --label=windowed \
     > ./out.AN_thermal_2D.Re$RE.nrho$NRHO.$PBS_JOBID
 date
 

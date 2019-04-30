@@ -116,7 +116,6 @@ problem.meta['u', 'w', 'S1r', 'p']['r']['dirichlet'] = True
 problem.parameters['u_phi'] = problem.parameters['u_phir'] = 0
 
 
-
 def Smoother(*args):
     z = args[0].data
     Lz = args[1].value
@@ -134,6 +133,7 @@ def window(z, Lz=20, dr=0.2):
 def de_smoother(*args, domain=domain, F=Smoother):
     return de.operators.GeneralFunction(domain, layout='g', func=F, args=args)
 
+de.operators.parseables['S'] = de_smoother
 problem.substitutions['window'] = '(S(z,Lz,Lz/100))'
 problem.substitutions['edges'] = '(1 - window)'
 
@@ -153,7 +153,7 @@ problem.substitutions['T']            = '(1 + grad_T_ad*(z - Lz))'
 problem.substitutions['T0']           = '(edges + window*T)'
 problem.substitutions['rho0']         = '(edges + window*(T)**(m_ad))'              
 problem.substitutions['ln_rho0_z']    = '(edges + window*m_ad*grad_T_ad/T)'         
-problem.substitutions['ln_rho0_zz']   = '(egges - window*m_ad*grad_T_ad**2/T**2)'  
+problem.substitutions['ln_rho0_zz']   = '(edges - window*m_ad*grad_T_ad**2/T**2)'  
 problem.substitutions['ln_T0_z']      = '(edges + window*grad_T_ad/T)'              
 
 #Set up the diffusivity profile if nonconstant
@@ -191,15 +191,7 @@ problem.substitutions['t_phir_dr']          = '(dr(u_phir) - u_phir/r)'
 problem.substitutions['t_zz_dz_L']          = '(2*dz(dz(w)) - (2./3)*dz(DivU))'
 problem.substitutions['t_zz_dz_R']          = '(2*dz(dz(w)) - (2./3)*(DivUz))'
 
-
-
 #Momentum equation diffusivitiy substitutions
-#problem.substitutions['visc_u']        = '(t_rr_dr + t_rr/r + dz(t_rz) - t_phi2/r)'
-#problem.substitutions['visc_L_u']      = '((xi_L/Re)*(visc_u))'
-#problem.substitutions['visc_L_w']      = '((xi_L/Re)*(t_rz_dr + t_rz/r + t_zz_dz_L))'
-#problem.substitutions['visc_R_u']      = '((xi_R/Re)*(visc_u))'
-#problem.substitutions['visc_R_w']      = '((xi_R/Re)*(t_rz_dr + t_rz/r + t_zz_dz_R))'
-
 problem.substitutions['visc_L_u']      = '((xi_L/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
 problem.substitutions['visc_L_w']      = '((xi_L/Re)*(Lap(w, wr)   + (1./3)*dz(DivU)))'
 problem.substitutions['visc_R_u']      = '((xi_R/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
@@ -286,7 +278,7 @@ safety_factor = 0.15
 if args['--rk443']:
     safety_factor *= 4
 CFL = flow_tools.CFL(solver, initial_dt=dt, cadence=1, safety=safety_factor,
-                     max_change=1.5, min_change=0.5, max_dt=1e-3*t_b, threshold=0.05)
+                     max_change=1.5, min_change=0.5, max_dt=1e-2*t_b, threshold=0.05)
 #CFL.add_velocities(('u', 'w'))
 CFL.add_velocity(('w'), axis=0)
 
