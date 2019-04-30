@@ -115,6 +115,28 @@ problem = de.IVP(domain, variables=['u', 'w', 'ur', 'wr', 'S1', 'S1r', 'p'])
 problem.meta['u', 'w', 'S1r', 'p']['r']['dirichlet'] = True
 problem.parameters['u_phi'] = problem.parameters['u_phir'] = 0
 
+
+
+def Smoother(*args):
+    z = args[0].data
+    Lz = args[1].value
+    dr = args[2].value
+    if len(z) > 0:
+        return window(z, Lz=Lz, dr=dr)
+    else:
+        return z
+
+def window(z, Lz=20, dr=0.2):
+    window1= (erf((z-0.025*Lz)/dr)+1)/2
+    window2= -(erf((z-0.975*Lz)/dr)-1)/2
+    return window1*window2
+
+def de_smoother(*args, domain=domain, F=Smoother):
+    return de.operators.GeneralFunction(domain, layout='g', func=F, args=args)
+
+problem.substitutions['window'] = '(S(z,Lz,Lz/100))'
+problem.substitutions['edges'] = '(1 - window)'
+
 problem.parameters['pi']         = np.pi
 problem.parameters['Lz']         = Lz
 problem.parameters['Lr']         = Lr
@@ -127,15 +149,16 @@ problem.parameters['Re']         = Re
 problem.parameters['Pr']         = Pr
 problem.parameters['Lnondim']    = -grad_T_ad #scaling factor from unscaled polytropes -- for viscous heating term.
 
-problem.substitutions['T0']           = '(1 + grad_T_ad*(z - Lz))'
-problem.substitutions['rho0']         = '((T0)**(m_ad))'              
-problem.substitutions['ln_rho0_z']    = '(m_ad*grad_T_ad/T0)'         
-problem.substitutions['ln_rho0_zz']   = '(-m_ad*grad_T_ad**2/T0**2)'  
-problem.substitutions['ln_T0_z']      = '(grad_T_ad/T0)'              
+problem.substitutions['T']            = '(1 + grad_T_ad*(z - Lz))'
+problem.substitutions['T0']           = '(edges + window*T)'
+problem.substitutions['rho0']         = '(edges + window*(T)**(m_ad))'              
+problem.substitutions['ln_rho0_z']    = '(edges + window*m_ad*grad_T_ad/T)'         
+problem.substitutions['ln_rho0_zz']   = '(egges - window*m_ad*grad_T_ad**2/T**2)'  
+problem.substitutions['ln_T0_z']      = '(edges + window*grad_T_ad/T)'              
 
 #Set up the diffusivity profile if nonconstant
 if kappa_mu:
-    problem.substitutions['xi']     = '(1/rho0)'
+    problem.substitutions['xi']     = '(1/(T**m_ad))'
     problem.substitutions['xi_L']   =  '1'
     problem.substitutions['xi_R']   = '((xi - xi_L))'
 else:
