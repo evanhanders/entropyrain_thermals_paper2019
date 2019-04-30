@@ -33,18 +33,18 @@
 \graphicspath{{./}{figs/}{../tex/figs/}}
 
 
-\received{October 19, 2018}
+\received{\today}
 \revised{\today}
 \accepted{??}%\today}
 \submitjournal{ApJ}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% TITLE & AUTHORS
-\shorttitle{Entrainment of thermals in stratified atmospheres}
+\shorttitle{Stratified Thermals}
 \shortauthors{Anders et al.}
 
 \begin{document}
-\title{Entrainment of low Mach number thermals in stratified atmospheres}
+\title{Entrainment of low Mach number thermals in stratified domains}
 
 \correspondingauthor{Evan H. Anders}
 \email{evan.anders@colorado.edu}
@@ -69,94 +69,159 @@
 %% INTRODUCTION
 \section{Introduction}
 \label{sec:intro}
+(Para 1) Brief intro to solar convective conundrum.
+
+(Para 2) Entropy rain history and expansion by Axel
+
+(Para 3) Boussinesq thermals and their filling factor vs. depth.
+
+(Para 4) What we're doing here, how it fits into this context.
+
+(Para 5) Standard last paragraph of an intro?
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% THEORY SECTION
+\section{Theory}
+\label{sec:theory}
+The evolution of thermals as buoyant vortex rings has been well described in
+the unstratified, Boussinesq limit for decades (as early as e.g., CITE, and
+see \citet{lecoanet&jeevanjee2018} for other sources). Buoyant motions 
+in the atmospheres of stars and planets are generally large enough to feel the
+atmospheric stratification, and therefore a more thorough tratment of the
+evolution of thermals in stratified domains is required to understand the nature
+of thermal entrainment in nature.
+
+In this work, we focus on the non-dissipative, low Mach number regime, 
+in which the ideal anelastic equations are a decent approximation to the fully
+compressible equations. In this regime, the buoyancy is directly proportional to the
+specific entropy. In the absence of diffusion, or in the limit where diffusivities
+are sufficiently small, the volume-integrated total entropy is constant,
+\begin{equation}
+B \equiv \int_{\mathcal{V}} \rho\, s\, dV = \text{const},
+\end{equation}
+where $s = c_V \ln T - R \ln\rho$ is the specific entropy, with $c_V$ the
+specific heat at constant volume and $R$ the ideal gas constant.
+
+In a stratified domain, the hydrodynamic impulse is defined
+\citet{shivamoggi2010},
+\begin{equation}
+\bm{I} = \frac{1}{2}\int_{\mathcal{V}} \bm{x}\times(\grad\times(\rho\bm{u}))dV,
+\end{equation}
+where $\bm{x}$ is the position vector, $\bm{u}$ is vector velocity, $\rho$ is density,
+and $\mathcal{V}$ is the volume being integrated over. Furthermore, changes in the impulse
+can be expressed
+\begin{equation}
+\frac{\partial\bm{I}}{\partial t} = \int_{\mathcal{V}}\frac{\partial}{\partial t}(\rho \bm{u})dV
+= B\hat{z} + S,
+\end{equation}
+where $S$ is a combination of surface terms that disappears upon appropriate boundary conditions
+on $\mathcal{V}$ \citep{shivamoggi2010}. As we have assumed that the buoyancy, $B$, is constant,
+we can straightforwardly integrate
+\begin{equation}
+I_z = B t + I_0,
+\end{equation}
+for some constant $I_0$.
+
+(need to work through this section carefully).
+Assuming an adiabatically stratified atmosphere in
+hydrostatic equilibrium, the vertical momentum equation is
+\begin{equation}
+ = - \partial_z \varpi +  g\frac{S_1}{c_P},
+\label{eqn:buoyancy}
+\end{equation}
+where $w$ is vertical velocity, $S_1$ is specific entropy, $\varpi$ is the reduced pressure,
+$D/Dt = \partial_t + (\bm{u}\cdot\grad)$ is the (eulerian? lagrangian?)
+derivative, $g$ is gravity, and $c_P$ is the specific heat at constant pressure.
+In the anelastic approximation, the density stratification is constant in time. 
+OH GOD I DON'T KNOW THIS MATH WELL MAGIC MAGIC MAGIC.
+By doing magic, we arrive at
+\begin{equation}
+P_z = \beta B t + P_0.
+\end{equation}
+
+Under the assumption that the thermal develops into a thin-core 
+propagating vortex ring whose vortex core is radius $r$ away from the axis of symmetry, 
+the impulse can be approximated as $I_z \approx \pi \rho r^2 \Gamma$, where 
+$\Gamma$ is the circulation of the thermal vortex, which we assume to be constant. 
+Rearranging, we find our first result,
+\begin{equation}
+r = \sqrt{\frac{B t + I_0}{\pi\rho\Gamma}}.
+\label{eqn:r_theory}
+\end{equation}
+In the limit where $\rho \rightarrow \text{constant}$, as in the Boussinesq regime,
+we retrieve the $r \propto \sqrt{t}$ scaling found in the Boussinesq regime by
+\citet{lecoanet&jeevanjee2018}. We find that the inclusion of stratification adds the
+additional complexity of $r \propto \rho^{-1/2}$, such that downward-propogating 
+vortex rings (as studied here) will not entrain to the same degree as boussinesq thermals,
+and upward-propogating rings will entrain more.
+
+We further assume that the volume-integrated momentum, $P_z \approx \rho V w_{th}$,
+where $w_{th}$ is the vertical velocity of the thermal as a whole, and the volume
+of the fluid region propogating with the thermal is a spheroid, $V = V_0 r^3$, for
+some constant $V_0$. Plugging Eqn.~\ref{eqn:r_theory} into this approximation, we
+find that
+\begin{equation}
+\rho^{-1/2}w = \left(\frac{(\pi\Gamma)^{3/2}}{V_0}\right)\frac{\beta B t + M_0}{(B t + I_0)^{3/2}}.
+\end{equation}
+Substituting $w = dz/dt$ and $\tau \equiv (Bt + I_0)/\Gamma$, We retrieve
+\begin{equation}
+\frac{dz}{\sqrt{\rho(z)}} 
+= \left(\frac{\pi^{3/2}\Gamma}{V_0}\right)
+\left(\beta\Gamma\tau^{-1/2} + [M_0 - \beta I_0]\tau^{-3/2}\right)d\tau.
+\end{equation}
+If the atmospheric stratification in which the thermal is falling is known, this
+result can be straightforwardly integrated with $\rho(z)$ plugged in in order to
+find the position of the thermal versus time. While we will leave this result
+general for now, we will plug in our polytropic stratification at the end of
+section \ref{sec:experiment}, and show that the resulting expression does a
+good job of explaining the evolution of thermals in these atmospheres in
+section \ref{sec:results}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% EXPERIMENT SECTION
 \section{Experiment} 
 \label{sec:experiment}
+blah blah blah polytrope blah blah blah (do it with a general length scale).
 
-We perform direct numerical simulations of the evolution of dry thermals
-in an ideal gas whose pressure ($P$), temperature ($T$), and density ($\rho$)
-follow a nondimensional ideal gas law of $P = \rho T$.
-We evolving the temperature, log density ($\ln\rho$), and velocity vector
-($\bm{u} = u\hat{x} + v\hat{y} + z\hat{z}$) according to the fully compressible Navier-Stokes equations,
-\begin{gather}
-\frac{D \ln\rho}{Dt} = -\Div{\bm{u}}
-	\label{eqn:continuity}
-\\
-\begin{align}
-&\frac{D \bm{u}}{D t} =
--\grad T - T \grad\ln\rho + \bm{g} + \Div{\stressT}, 
-\end{align}
-	\label{eqn:full_momentum}
-\\
-\begin{align}
-\frac{D T}{D t} + (\gamma - 1)T\Div{\bm{u}} + \frac{1}{\rho c_V}\Div{-\rho\chi\grad T} =\\
-\frac{1}{\rho c_V}(\stressT \cdot \grad)\cdot \bm{u}, \nonumber
-\end{align}
-	\label{eqn:full_energy}
-\end{gather}
-where $\chi$ is the thermal diffusivity and with the viscous stress tensor given by
-\begin{equation}
-\Pi_{ij} \equiv \mu\left(\frac{\partial u_i}{\partial x_j} + 
-\frac{\partial u_j}{\partial x_i} - \frac{2}{3}\delta_{ij}\grad\cdot\bm{u}\right),
-	\label{eqn:stress_tensor}
-\end{equation}
-where $\delta_{ij}$ is the Kronecker delta and with $\mu = \rho\nu$ is the
-dynamic viscosity and $\nu$ is the kinematic viscosity.
-We split our thermodynamics into a time-stationary adiabatic background component
-and a time-evolving fluctuation away from that background as
-$T = T_0(z) + T_1(x, y, z, t)$ and $\ln\rho = \ln\rho_0(z) + \ln\rho_1(x, y, z, t)$.
-We specify the background atmosphere as an adiabatic polytrope, as in
-\cite{anders&brown2017}, so that
-\begin{equation}
-T_0(z) = (1 + L_z - z), \qquad \ln\rho_0(z) = m_{ad}\ln(T_0),
-\end{equation}
-where $L_z$ is the domain depth, and $m_{ad} = 1/(\gamma-1) = 1.5$ is the
-adiabatic polytropic index. In the construction of these atmospheres, 
-we assume that gravity $\bm{g} = -g\hat{z}$ is everywhere constant and that the
-background atmosphere is in hydrostatic equilibrium such that
-$\partial_z T_0 + T_0 \partial_z\ln\rho_0 - g = 0$. 
+blah blah blah 2D anelastic blah blah blah, nondimm'd for a direct comparison with
+boussinesq.
 
+blah blah blah 3D Fully compressible blah blah blah
 
-We assume a Pradtl number of
-unity, $\text{Pr} = \nu/\chi = 1$, everywhere in the domain. We furthermore assume
-that $\nu$ and $\chi$ are uniform everywhere in the domain, and that a negligibly
-small diffusivity, $\chi_B = 0$ acts on the pure background terms in the thermal flux
-such that
-$$
-\frac{1}{\rho_0 c_V}\grad\cdot(-\rho \chi_B \grad T) = 0.
-$$
-Under all of these assumptions, the equations we solve become
-\begin{gather}
-\frac{D \ln\rho_1}{Dt} = -\Div{\bm{u}} - w\partial_z\ln\rho_0
-	\label{eqn:solved_continuity}
-\\
-\begin{align}
-&\frac{D \bm{u}}{D t} =
--\grad T_1 - T_0 \grad\ln\rho_1 - T_1\partial_z\rho_0\hat{z} - T_1\grad\ln\rho_1 + \Div{\stressT}, 
-\end{align}
-	\label{eqn:solved_momentum}
-\\
-\begin{align}
-&\frac{D T_1}{D t} + w\partial_z T_0 +  (\gamma - 1)(T_0 + T_1)\Div{\bm{u}} 
-\\&- \frac{1}{c_V}\left\{\chi\left(\grad^2 T_1 + \partial_z\ln\rho_0\partial_z T_1 
-+ \partial_z\ln\rho_1\partial_z T_0 + \grad\ln\rho_1 \cdot\grad T_1\right)  \right\}=\nonumber\\
-&\frac{1}{\rho c_V}(\stressT \cdot \grad)\cdot \bm{u}, \nonumber
-\end{align}
-	\label{eqn:solved_energy}
-\end{gather}
+blah blah blah thermal initial conditions, pressure equilibrium blah blah blah.
 
+blah blah blah comparison of 2D and 3D blah blah blah. z v t, r v z, w v z. Also side-by-side
+pictoral comparison with diff.
+
+blah blah blah T(t) and derivative blah blah blah.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RESULTS SECTION
 \section{Results}
 \label{sec:results}
+Picture of a big old grid of z v t, r v z, w v z.
+
+Pretty picture showing thermal evolution (comparing low and high stratification).
+
+Verification of theory by simulations
+
+Table of found parameters for the fits
+
+Two regimes: stalling and falling.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION SECTION
 \section{Discussion}
 \label{sec:discussion}
+Wild speculation about extensions to the solar regime. Do things on the sun shrink
+to the point where they viscously dissipate?
+
+Talk about what would happen if we were to study up-thermals.
+
+Extensions, and the fact that we trust these results will likely hold in the solar regime.
+
+
 
 \begin{acknowledgements}
 This work was supported by NASA Headquarters under the NASA Earth and Space
@@ -168,8 +233,10 @@ Advanced Supercomputing (NAS) Division at Ames Research Center on Pleiades
 with allocation GID s1647.
 \end{acknowledgements}
 
-
 \appendix
+\section{Thermal Tracking}
+\label{appendix:tracking}
+
 \section{Table of Simulations}
 \label{appendix:table}
 
