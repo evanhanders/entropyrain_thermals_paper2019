@@ -112,7 +112,7 @@ r_basis = de.Chebyshev('r', nr, interval=(0, Lr), dealias=3/2)
 domain = de.Domain([z_basis, r_basis], grid_dtype=np.float64)
 
 problem = de.IVP(domain, variables=['u', 'w', 'ur', 'wr', 'S1', 'S1r', 'p'])
-problem.meta['u', 'w', 'ur', 'wr', 'S1', 'S1r', 'p']['r']['dirichlet'] = True
+problem.meta['u', 'w', 'S1r', 'p']['r']['dirichlet'] = True
 problem.parameters['u_phi'] = problem.parameters['u_phir'] = 0
 
 problem.parameters['pi']         = np.pi
@@ -152,28 +152,43 @@ problem.substitutions['Lap_phi(A, Ar)']     = '(Lap(A, Ar) - A/r**2)'
 problem.substitutions['Lap_r(A, Ar)']       = '(Lap(A, Ar) - A/r**2)'
 problem.substitutions['DivU']               = '(u/r + ur + dz(w))'
 problem.substitutions['DivUr']              = '(ur/r - u/r**2 + dr(ur) + dz(wr))'
+problem.substitutions['DivUz']              = '(-1)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)'
 
 #Stress Tensor Components
-problem.substitutions['t_rr']               = '(2*ur    - (2/3)*DivU)'
-problem.substitutions['t_zz']               = '(2*dz(w) - (2/3)*DivU)'
-problem.substitutions['t_phi2']             = '(2*u     - (2/3)*DivU)'
+problem.substitutions['t_rr']               = '(2*ur      - (2/3)*DivU)'
+problem.substitutions['t_zz']               = '(2*dz(w)   - (2/3)*DivU)'
+problem.substitutions['t_phi2']             = '(2*u/r     - (2/3)*DivU)'
 problem.substitutions['t_rz']               = '(wr + dz(u))'
 problem.substitutions['t_phiz']             = '(dz(u_phi))'
 problem.substitutions['t_phir']             = '(u_phir - u_phi/r)'
 
+problem.substitutions['t_rr_dr']            = '(2*dr(ur)  - (2/3)*DivUr)'
+problem.substitutions['t_rz_dr']            = '(dr(wr) + dz(ur))'
+problem.substitutions['t_phir_dr']          = '(dr(u_phir) - u_phir/r)'
+problem.substitutions['t_zz_dz_L']          = '(2*dz(dz(w)) - (2./3)*dz(DivU))'
+problem.substitutions['t_zz_dz_R']          = '(2*dz(dz(w)) - (2./3)*(DivUz))'
+
+
+
 #Momentum equation diffusivitiy substitutions
+#problem.substitutions['visc_u']        = '(t_rr_dr + t_rr/r + dz(t_rz) - t_phi2/r)'
+#problem.substitutions['visc_L_u']      = '((xi_L/Re)*(visc_u))'
+#problem.substitutions['visc_L_w']      = '((xi_L/Re)*(t_rz_dr + t_rz/r + t_zz_dz_L))'
+#problem.substitutions['visc_R_u']      = '((xi_R/Re)*(visc_u))'
+#problem.substitutions['visc_R_w']      = '((xi_R/Re)*(t_rz_dr + t_rz/r + t_zz_dz_R))'
+
 problem.substitutions['visc_L_u']      = '((xi_L/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
 problem.substitutions['visc_L_w']      = '((xi_L/Re)*(Lap(w, wr)   + (1./3)*dz(DivU)))'
 problem.substitutions['visc_R_u']      = '((xi_R/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
-#problem.substitutions['visc_R_w']      = '((xi_R/Re)*(Lap(w, wr)   + (1./3)*dz(DivU)))'# Sometimes old formulation was stable with this on RHS:- (1./3)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)))'
-problem.substitutions['visc_R_w']      = '((xi_R/Re)*(Lap(w, wr)   - (1./3)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)))'
+problem.substitutions['visc_R_w']      = '((xi_R/Re)*(Lap(w, wr)   + (1./3)*DivUz))'
+
 
 #Energy equation diffusivity substitutions
-problem.substitutions['diff_L']        = '( (xi_L/(Re*Pr*Cv))*Lap(S1, S1r) )'
+problem.substitutions['diff_L']        = '( (xi_L/(Re*Pr*Cp))*Lap(S1, S1r) )'
 if kappa_mu:
-    problem.substitutions['diff_R']    = '( ((Re*Pr*Cv)**(-1))*(xi*ln_T0_z*dz(S1) + xi_R*Lap(S1, S1r)) )'
+    problem.substitutions['diff_R']    = '( ((Re*Pr*Cp)**(-1))*(xi*ln_T0_z*dz(S1) + xi_R*Lap(S1, S1r)) )'
 else:
-    problem.substitutions['diff_R']    = '( xi*((Re*Pr*Cv)**(-1))*(ln_T0_z+ln_rho0_z)*dz(S1) )'
+    problem.substitutions['diff_R']    = '( xi*((Re*Pr*Cp)**(-1))*(ln_T0_z+ln_rho0_z)*dz(S1) )'
 problem.substitutions['visc_heat']     = '(g*Lnondim*xi*(((Cp*Re*T0)**(-1))*(t_rr*dr(u) + t_rz*dz(u) + t_phir*u_phir + t_phiz*dz(u_phi) + t_rz*dr(w) + t_zz*dz(w))))'
 
 #Equation scaling, vorticity substitution
@@ -195,9 +210,10 @@ problem.add_equation("scale_m*(dt(w) +  dz(p) - S1 - visc_L_w) = scale_m*(-UdotG
 #Entropy equation
 problem.add_equation("scale_e*(dt(S1)              - diff_L )  = scale_e*(-UdotGrad(S1, S1r) + visc_heat + diff_R)", tau=False)
 
-problem.add_bc("right(V)   = 0", condition="nz != 0") 
+problem.add_bc("right(u)   = 0", condition="nz != 0") 
 problem.add_bc("right(p)   = 0", condition="nz == 0") 
 problem.add_bc("right(w)   = 0") 
+#problem.add_bc("right(u_phi)= 0") 
 problem.add_bc("right(S1r) = 0")
 
 #########################
@@ -216,7 +232,7 @@ S1 = solver.state['S1']
 S1r = solver.state['S1r']
 
 r_IC = np.sqrt((z - z0)**2 + (r - r0)**2)
-S1['g'] = -1*( erf((radius - r_IC)/delta_r) + 1 )/2
+S1['g'] = -1*(1 - erf((r_IC - radius)/delta_r))/2
 S1.differentiate('r', out=S1r)
 
 # Simulation termination parameters
@@ -243,11 +259,12 @@ for f, nm in [('(rho0*w**2)', 'KE_w'), ('(rho0*u**2)', 'KE_u'), ('rho0*S1', 'tot
 
 # CFL
 dt = 1e-4*t_b
-safety_factor = 0.05
+safety_factor = 0.15
 if args['--rk443']:
     safety_factor *= 4
 CFL = flow_tools.CFL(solver, initial_dt=dt, cadence=1, safety=safety_factor,
-                     max_change=1.5, min_change=0.5, max_dt=1e-2*t_b, threshold=0.05)
+                     max_change=1.5, min_change=0.5, max_dt=1e-3*t_b, threshold=0.05)
+#CFL.add_velocities(('u', 'w'))
 CFL.add_velocity(('w'), axis=0)
 
 # Flow properties
@@ -265,8 +282,8 @@ try:
         dt = CFL.compute_dt()
         dt = solver.step(dt)
         if (solver.iteration-1) % 1 == 0:
-            logger.info(('Iteration: %i, Time/t_b: %e, dt/t_b: %e' %(solver.iteration, solver.sim_time/t_b, dt/t_b)) +
-                        ' Max Re = {:.4e}, Circ = {:.4e}, tot_e = {:.4e}'.format(flow.max('Re'), flow.max('circ'), flow.max('tot_entropy')))
+            logger.info('Iteration: {:.2e}, Time/t_b: {:.2e}, dt/t_b: {:.2e}'.format(solver.iteration, solver.sim_time/t_b, dt/t_b) +\
+                        ' Max Re = {:.2e}, Circ = {:.2e}, tot_e = {:.2e}'.format(flow.max('Re'), flow.max('circ'), flow.max('tot_entropy')))
         if np.isnan(flow.max('v_rms')):
             logger.info('NaN, breaking.')
             break
