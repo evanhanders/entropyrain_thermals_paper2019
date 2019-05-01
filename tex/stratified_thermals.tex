@@ -10,7 +10,7 @@
 \newcommand{\Div}[1]{\ensuremath{\nabla\cdot\left( #1\right)}}
 \newcommand{\DivU}{\ensuremath{\nabla\cdot\bm{u}}}
 \newcommand{\angles}[1]{\ensuremath{\left\langle #1 \right\rangle}}
-\newcommand{\KS}[1]{\ensuremath{\text{KS}(#1)}}
+\newcommand{\td}[1]{\ensuremath{\widetilde{#1}}}
 \newcommand{\KSstat}[1]{\ensuremath{\overline{\text{KS}(#1)}}}
 \newcommand{\grad}{\ensuremath{\nabla}}
 \newcommand{\RB}{Rayleigh-B\'{e}nard }
@@ -83,6 +83,22 @@
 %% THEORY SECTION
 \section{Theory}
 \label{sec:theory}
+
+\subsection{Phenomenological description of thermal evolution}
+The initial conditions of the thermals studied in this work are spherical
+entropy perturbations with zero initial velocity, as depicted in 
+Fig.~\ref{fig:evolution_colormeshes}a. Buoyant forces cause these perturbations
+to fall and develop into vortex rings, as depicted in 
+Figs.~\ref{fig:evolution_colormeshes}c-f.
+
+\begin{figure*}[t!]
+    \includegraphics[width=\textwidth]{evolution_colormeshes.png}
+    \caption{
+    \label{fig:evolution_colormeshes} }
+\end{figure*}
+
+
+\subsection{Theoretical description of thermal evolution}
 The evolution of thermals as buoyant vortex rings has been well described in
 the unstratified, Boussinesq limit for decades (as early as e.g., CITE, and
 see \citet{lecoanet&jeevanjee2018} for other sources). Buoyant motions 
@@ -181,19 +197,94 @@ section \ref{sec:results}.
 %% EXPERIMENT SECTION
 \section{Experiment} 
 \label{sec:experiment}
-blah blah blah polytrope blah blah blah (do it with a general length scale).
 
-blah blah blah 2D anelastic blah blah blah, nondimm'd for a direct comparison with
-boussinesq.
+\subsection{Polytropic Atmospheres}
+We study an ideal gas whose equation of state is $P = \rho T$ and whose stratification
+is a perfectly adiabatic polytrope,
+\begin{gather}
+T_0 = 1 + (\grad_{\text{ad}})(z - L_z) \\
+\rho_0 = T_0^{m_{\text{ad}}},
+\end{gather}
+where $m_{\text{ad}} = (\gamma-1)^{-1}$, and where the adiabatic 
+temperature gradient is $\grad_{\text{ad}} = - g / c_P$.
 
-blah blah blah 3D Fully compressible blah blah blah
+\subsection{Anelastic Equations}
+The anelastic equations are \citep{lecoanet&all2014},
+\begin{gather}
+\td{\grad}\cdot\td{\bm{u}} = -\td{w}\partial_{\tilde{z}} \ln\rho_0 \\
+\frac{D \td{\bm{u}}}{D \td{t}} = -\td{\grad} \td{\varpi} + g\frac{\td{S_1}}{c_P}\hat{z} + \frac{1}{\rho_0}\td{\grad}\cdot\left(\mu\td{\lilstressT}\right) \\
+\frac{D \td{S_1}}{D\td{t}} = \frac{1}{\rho c_P}\td{\grad}\cdot\left(\kappa T_0 \td{\grad} \td{S_1}\right) + \frac{\mu}{\rho_0 T_0}\td{\sigma_{ij}}\partial_{\td{x_i}}\td{u_j}.
+\end{gather}
+where $D/D\td{t} = \partial/\partial \td{t} + \td{\bm{u}}\cdot\td{\grad}$ and the viscous stress tensor is
+\begin{equation}
+\td{\sigma_{ij}} = \left(\partial_{\td{x_i}}\td{u_j} + \partial_{\td{x_j}}\td{u_i} - \frac{2}{3}\delta_{ij}\td{\grad}\cdot\td{\bm{u}}\right).
+\end{equation}
 
-blah blah blah thermal initial conditions, pressure equilibrium blah blah blah.
+We nondimensionalize these equations as in \citet{lecoanet&jeevanjee2018} such that
+the length scale is the diameter of the thermal and the velocity scale is the freefall
+velocity,
+\begin{equation}
+\begin{split}
+\td{\grad}\rightarrow(\td{L}_{th}^{-1})\grad, \qquad&
+\td{S}_1 \rightarrow(\Delta\td{S})S_1,\\
+\td{\bm{u}} \rightarrow (\td{u}_{th})\bm{u}, \qquad&
+\td{\varpi} \rightarrow (\td{u}_{th}^2)\varpi,\\
+\partial_{\tilde{t}} \rightarrow (\td{u}_{th}/\td{L}_{th})\partial_t,\qquad&
+\end{split}
+\end{equation}
+with
+\begin{equation}
+\tilde{u}_{th}^2 = \frac{g \tilde{L}_{th} \Delta \tilde{s}}{c_P}, \qquad
+\text{Re}_{\text{ff}} = \frac{\tilde{u}_{th} \tilde{L}_{th}}{\nu}, \qquad
+\text{Pr}_{\text{ff}} = \frac{\tilde{u}_{th} \tilde{L}_{th}}{\chi}.
+\end{equation}
+The resulting equations are very similar to the boussinesq equations,
+\begin{gather}
+\DivU = -w \partial_z \ln\rho_0, \\
+\begin{split}
+\partial_t \bm{u} + \bm{u}\cdot\grad\bm{u} = \\
+- \grad \varpi + S_1\hat{z} 
++ \frac{1}{\text{Re}_{\text{ff}}}\left[\grad^2 \bm{u} + \frac{1}{3}\grad(\DivU)\right] 
+\end{split}\\
+\begin{split}
+\partial_t S_1 + \bm{u}\cdot\grad S_1 = \\
+\frac{1}{\text{Re}_{\text{ff}}}\left(\frac{1}{\text{Pr}_{\text{ff}}\rho_0c_P }[\grad^2 S_1 + \partial_z\ln T_0 \cdot\partial_z S_1]\right.\\\left.
++ \frac{-(\grad_{ad})}{\rho_0 T_0}\sigma_{ij}\partial_{x_i}u_j \right)
+\end{split}
+\end{gather}
 
+\subsection{Fully Compressible Equations}
+The fully compressible equations, under the same assumptions as above, are
+\begin{gather}
+\frac{D \ln\rho}{Dt} + \DivU = 0 \\
+\frac{D \bm{u}}{D t} = -\grad T - T\grad\ln\rho - g\hat{z} + \frac{1}{\rho}\grad\cdot\left(\mu\lilstressT\right) \\
+\frac{D T}{Dt} + (\gamma-1)T\DivU  = \frac{1}{\rho c_V}\grad\cdot\left(\kappa \grad T\right) + \frac{\mu}{\rho c_V}\sigma_{ij}\partial_{x_i}u_j.
+\end{gather}
+
+\subsection{Initial Conditions}
+We set the initial specific entropy perturbation as
+\begin{equation}
+S_1 = - A(1 - \text{erf}\left(\frac{r - r_{th}}{\delta}\right))/2,
+\end{equation}
+where in the FC cases $A = 10^{-4}$ and in the nondimensionalized AN cases,
+$A = 1$. Here, $r = \sqrt{x^2 + y^2 + (z - z_0)^2}$, where $z_0 = Lz - 3*r_{th}$,
+and $r_{th} = Lz/40$ is the radius of the thermal.
+
+In the fully compressible equations, it is essential that the initial conditions be in pressure
+equilibrium such that the low mach number nature of the thermal can be studied. In order to 
+achieve this pressure balance, we set
+\begin{equation}
+\ln\rho_1 = S_1/c_P, \qquad T_1 = T_0(e^{-\ln\rho_1} - 1).
+\end{equation}
+
+
+\subsection{Solution for thermal evolution in a Polytrope}
+
+
+\subsection{Verification of 2D Anelastic approximation}
 blah blah blah comparison of 2D and 3D blah blah blah. z v t, r v z, w v z. Also side-by-side
 pictoral comparison with diff.
 
-blah blah blah T(t) and derivative blah blah blah.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RESULTS SECTION
