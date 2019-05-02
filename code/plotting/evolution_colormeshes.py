@@ -5,83 +5,87 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 import h5py
 
-dirs = [    ('../AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20', (1, 0), (2, 18), (5, 17)) ,
+dirs = [    ('../apr30/AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20', (1, 0), (2, 18), (5, 17)) ,
             ('../apr30/AN_2D_thermal_nrho3_Re6e2_Pr1_aspect0.125_Lz20' , (1,0), (2, 12),  (4, 5))]
 
 
 gs = gridspec.GridSpec(1000, 1000)
 
-subplots = [    ( (50, 0),    400, 150 ),  ( (50, 150),  400, 150 ),
-                ( (50, 350),  400, 150 ),  ( (50, 500),  400, 150 ),
-                ( (50, 700),  400, 150 ),  ( (50, 850),  400, 150 ),
-                ( (550, 0),   400, 150 ),  ( (550, 150), 400, 150 ),
-                ( (550, 350), 400, 150 ),  ( (550, 500), 400, 150 ),
-                ( (550, 700), 400, 150 ),  ( (550, 850), 400, 150 )
+subplots = [    ( (100, 50),    900, 450 ),  ( (100, 550),  900, 450 )
             ]
 
-fig = plt.figure(figsize=(7.5, 5))
+fig = plt.figure(figsize=(3.25, 3))
 axs = [plt.subplot(gs.new_subplotspec(*args)) for args in subplots]
 
 plot_count = 0
 for i, ax in enumerate(axs):
-    dir_ind = int(i % 2)
-    this_dir = dirs[dir_ind][0]
-    filenum  = dirs[dir_ind][1 + (plot_count % 3)][0]
-    imgnum   = dirs[dir_ind][1 + (plot_count % 3)][1]
-    print(filenum)
-    f  = h5py.File('{:s}/slices/slices_s{}.h5'.format(this_dir, filenum), 'r')
-    cf = h5py.File('{:s}/thermal_analysis/contour_file.h5'.format(this_dir), 'r')
+    this_dir = dirs[i][0]
+    for j, info in enumerate(dirs[i][1:]):
+        filenum, imgnum = info
+        f  = h5py.File('{:s}/slices/slices_s{}.h5'.format(this_dir, filenum), 'r')
+        cf = h5py.File('{:s}/thermal_analysis/contour_file.h5'.format(this_dir), 'r')
 
-    r = f['scales']['r']['1.0'].value
-    z = f['scales']['z']['1.0'].value
-    rr, zz = np.meshgrid(r.flatten(), z.flatten())
-    t = f['scales']['sim_time'].value[imgnum]
+        r = f['scales']['r']['1.0'].value
+        z = f['scales']['z']['1.0'].value
+        rr, zz = np.meshgrid(r.flatten(), z.flatten())
+        t = f['scales']['sim_time'].value[imgnum]
 
-    contour = cf['contours'].value[20*(filenum-1)+imgnum,:]
-
-    if int(plot_count / 3) < 1:
-        field = f['tasks']['w'].value[imgnum,:]
-    else:
+        contour = cf['contours'].value[20*(filenum-1)+imgnum,:]
+        contours = cf['contours'].value 
+        
         field = f['tasks']['S1'].value[imgnum,:]
-    f.close()
-    cf.close()
+        f.close()
+        cf.close()
 
-    minval = field.min()
+        minval = field.min()
+        breaks = len(dirs[i]) - 1
+        good   = (zz > (breaks-1-j)/breaks * 20)*(zz <= (breaks-j)/breaks * 20)
+        print(good)
+        z_shape = np.sum((z > (breaks-1-j)/breaks * 20)*(z <= (breaks-j)/breaks * 20))
+        ax.pcolormesh( rr[good].reshape(z_shape, len(r)), zz[good].reshape(z_shape, len(r)), field[good].reshape(z_shape, len(r)), cmap='RdBu_r', rasterized=True, vmin=minval, vmax=-minval)
+        ax.pcolormesh(-rr[good].reshape(z_shape, len(r)), zz[good].reshape(z_shape, len(r)), field[good].reshape(z_shape, len(r)), cmap='RdBu_r', rasterized=True, vmin=minval, vmax=-minval)
+        x_max = 5
+        if j == len(dirs[i])-2:
+            max_contours = contours.max(axis=1)
+            max_contours = max_contours
+            max_contours_args = contours.argmax(axis=1)
+            good_a = (max_contours > 0)
+            last = np.diff(max_contours_args).argmax()
+            good_a[last:] = False
 
-    ax.pcolormesh( rr, zz, field, cmap='RdBu_r', rasterized=True, vmin=minval, vmax=-minval)
-    ax.pcolormesh(-rr, zz, field, cmap='RdBu_r', rasterized=True, vmin=minval, vmax=-minval)
-    good = contour > 0
-    if np.sum(good) > 0:
-        ax.plot( contour[good], z.flatten()[good],  c='k', lw=0.5)
-        ax.plot(-contour[good], z.flatten()[good],  c='k', lw=0.5)
-        connectors_x1 = [contour[good][0], -contour[good][0]]
-        connectors_y1 = [z.flatten()[good][0], z.flatten()[good][0]]
-        connectors_x2 = [contour[good][-1], -contour[good][-1]]
-        connectors_y2 = [z.flatten()[good][-1], z.flatten()[good][-1]]
-        ax.plot(connectors_x1, connectors_y1,  c='k', lw=0.5)
-        ax.plot(connectors_x2, connectors_y2,  c='k', lw=0.5)
+            max_contours = max_contours[good_a]
+            max_contours_args = max_contours_args[good_a]
+            zs_contours = [z.flatten()[ind] for ind in max_contours_args]
+            ax.plot(max_contours, zs_contours, c='k', lw=0.25)
+            ax.plot(-max_contours, zs_contours, c='k', lw=0.25)
+
+            for j in range(4):
+                base = int((j+1)*np.floor(len(max_contours-2)/5))
+                dx = max_contours[base + 2] - max_contours[base]
+                dy =  zs_contours[base + 2] - zs_contours[base]
+                ax.arrow( max_contours[base], zs_contours[base],   dx,  dy, shape='full', lw=0, length_includes_head=True, head_width=0.25, color='black')
+                ax.arrow(-max_contours[base], zs_contours[base], -(dx), dy, shape='full', lw=0, length_includes_head=True, head_width=0.25, color='black')
+        good_c = contour > 0
+        if np.sum(good_c) > 0:
+            ax.plot( contour[good_c], z.flatten()[good_c],  c='k', lw=0.25)
+            ax.plot(-contour[good_c], z.flatten()[good_c],  c='k', lw=0.25)
+            connectors_x1 = [contour[good_c][0], -contour[good_c][0]]
+            connectors_y1 = [z.flatten()[good_c][0], z.flatten()[good_c][0]]
+            connectors_x2 = [contour[good_c][-1], -contour[good_c][-1]]
+            connectors_y2 = [z.flatten()[good_c][-1], z.flatten()[good_c][-1]]
+            ax.plot(connectors_x1, connectors_y1,  c='k', lw=0.25)
+            ax.plot(connectors_x2, connectors_y2,  c='k', lw=0.25)
 
 
-    x_max = 5
-    ax.text(-0.93*x_max, 0.5, r'$t = {:.1f}$'.format(t))
-    if plot_count < 3:
-        ax.text(2*x_max/3, 18, r'$w$')
-    else:
-        ax.text(2*x_max/3, 18, r'$\frac{s_1}{c_P}$')
-    if plot_count == 0 or plot_count == 3:
-        if dir_ind == 1:
-            ax.text(-0.93*x_max, 2.5, r'$n_\rho = 3$')
+        if i == 1:
+            ax.set_xlim(-x_max, x_max)
+            ax.set_yticklabels([])
+            ax.set_xticks((0, x_max))
+            ax.text(-0.97*x_max, 18.7, r'$n_\rho = 3$', size=9)
         else:
-            ax.text(-0.93*x_max, 2.5, r'$n_\rho = 0.5$')
-    if dir_ind == 1:
-        ax.set_xlim(-x_max, x_max)
-        ax.set_yticklabels([])
-        ax.set_xticks((0, x_max))
-        plot_count += 1
-    else:
-        ax.set_xlim(-x_max, x_max)
-        ax.set_xticks((-x_max, 0, x_max))
-        ax.set_yticks((0, 5, 10, 15, 20))
-
+            ax.set_xlim(-x_max, x_max)
+            ax.set_xticks((-x_max, 0, x_max))
+            ax.set_yticks((0, 5, 10, 15, 20))
+            ax.text(-0.97*x_max, 18.7, r'$n_\rho = \frac{1}{2}$', size=9)
 
 fig.savefig('evolution_colormeshes.png', dpi=300)
