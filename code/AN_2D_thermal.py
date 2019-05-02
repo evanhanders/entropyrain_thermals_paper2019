@@ -33,6 +33,10 @@ Options:
     --Lz=<L>              The depth of the domain, in thermal diameters [default: 20]
 
     --chi_nu              If true, use a constant diffusivity (rather than constant dynamic diffusivity) eqn formulation
+    --safety=<s>          Safety factor base [default: 25]
+    --out_cadence=<o>     Time cadence of output saves in buoyancy times [default: 0.08]  
+
+    --restart=<file>      Name of file to restart from, if starting from checkpoint
 
 """
 import os
@@ -51,6 +55,8 @@ logger = logging.getLogger(__name__)
 
 from docopt import docopt
 args = docopt(__doc__)
+
+from logic.checkpointing import Checkpoint
 
 ################
 # Read in args
@@ -197,7 +203,7 @@ problem.add_equation("(S1r - dr(S1)) = 0")
 problem.add_equation("(ur  - dr(u))  = 0")
 problem.add_equation("(wr  - dr(w))  = 0")
 #Continuity
-problem.add_equation("scale_c*(DivU_true) = -scale_c*(w*ln_rho0_z)")
+problem.add_equation("scale_c*(DivU_true) = -scale_c*(w*ln_rho0_z)", tau=False)
 #Momentum equations
 problem.add_equation("scale_m*(dt(u) +  dr(p)      - visc_L_u) = scale_m*(-UdotGradU_r     + visc_R_u    )", tau=False)
 problem.add_equation("scale_m*(dt(w) +  dz(p) - S1 - visc_L_w) = scale_m*(-UdotGrad(w, wr) + visc_R_w    )", tau=False)
@@ -227,9 +233,22 @@ z = domain.grid(0)
 S1 = solver.state['S1']
 S1r = solver.state['S1r']
 
-r_IC = np.sqrt((z - z0)**2 + (r - r0)**2)
-S1['g'] = -1*(1 - erf((r_IC - radius)/delta_r))/2
-S1.differentiate('r', out=S1r)
+logger.info('checkpointing in {}'.format(data_dir))
+checkpoint = Checkpoint(data_dir)
+mode = 'overwrite'
+restart = args['--restart']
+#initial conditions
+if restart is None:
+    r_IC = np.sqrt((z - z0)**2 + (r - r0)**2)
+    S1['g'] = -1*(1 - erf((r_IC - radius)/delta_r))/2
+    S1.differentiate('r', out=S1r)
+    # Initial timestep
+    start_dt = 1e-4*t_b
+else:
+    logger.info("restarting from {}".format(restart))
+    start_dt = checkpoint.restart(restart, solver)
+    mode = 'append'
+checkpoint.set_checkpoint(solver, sim_dt=1, mode=mode)
 
 # Simulation termination parameters
 solver.stop_sim_time = t_b * float(args['--run_time_buoy']) + solver.sim_time
@@ -237,7 +256,7 @@ solver.stop_wall_time = 60 * 60. * float(args['--wall_hours'])
 solver.stop_iteration = np.inf
 
 # Analysis & outputs
-out_dt = 0.08*t_b
+out_dt = float(args['--out_cadence'])*t_b
 slices   = solver.evaluator.add_file_handler('{:s}/slices'.format(data_dir),   sim_dt=out_dt, max_writes=20, mode='overwrite')
 profiles = solver.evaluator.add_file_handler('{:s}/profiles'.format(data_dir), sim_dt=out_dt, max_writes=20, mode='overwrite')
 scalars  = solver.evaluator.add_file_handler('{:s}/scalars'.format(data_dir),   sim_dt=out_dt, max_writes=1e4, mode='overwrite')
@@ -254,14 +273,13 @@ for f, nm in [('(rho0*w**2)', 'KE_w'), ('(rho0*u**2)', 'KE_u'), ('rho0*S1', 'tot
     scalars.add_task('integ(2*pi*r*{})'.format(f), name='{}'.format(nm), layout='g')
 
 # CFL
-dt = 1e-4*t_b
-safety_factor = 0.1
+safety_factor = float(args['--safety'])
 if args['--rk443']:
     safety_factor *= 4
-CFL = flow_tools.CFL(solver, initial_dt=dt, cadence=1, safety=safety_factor,
+CFL = flow_tools.CFL(solver, initial_dt=start_dt, cadence=1, safety=safety_factor,
                      max_change=1.5, min_change=0.5, max_dt=1e-2*t_b, threshold=0.05)
-#CFL.add_velocities(('u', 'w'))
-CFL.add_velocity(('w'), axis=0)
+CFL.add_velocities(('u', 'w'))
+#CFL.add_velocity(('w'), axis=0)
 
 # Flow properties
 flow = flow_tools.GlobalFlowProperty(solver, cadence=1)
@@ -270,6 +288,7 @@ flow.add_property("sqrt(u**2 + u_phi**2 + w**2)*Re/xi", name='Re')
 flow.add_property("integ(r*rho0*S1)", name='tot_entropy')
 flow.add_property("integ(V)", name='circ')
 
+dt = start_dt
 # Main loop
 try:
     logger.info('Starting loop')
@@ -287,6 +306,11 @@ except:
     logger.error('Exception raised, triggering end of main loop.')
     raise
 finally:
+    final_checkpoint = Checkpoint(data_dir, checkpoint_name='final_checkpoint')
+    final_checkpoint.set_checkpoint(solver, wall_dt=1, mode="append")
+    solver.step(dt) #clean this up in the future...works for now.
+    for t in [checkpoint, final_checkpoint]:
+        post.merge_process_files(t.checkpoint_dir, cleanup=False)
     for t in [slices, profiles, scalars]:
         post.merge_process_files(t.base_path, cleanup=False)
     end_time = time.time()
