@@ -452,58 +452,57 @@ with allocation GID s1647.
 \appendix
 \section{Thermal Tracking}
 \label{appendix:tracking}
+We use a thermal tracking algorithm very similar to the one used in 
+\citet{lecoanet&jeevanjee2018} and inspired by the work of 
+\citet{romps&all2015}. 
+
+We begin by measuring the thermal's height versus
+time. To do so, we average the domain's entropy profile in radius and azimuth
+to create an average profile of entropy with height, and then we use
+scipy's brentq function on the derivative of that profile to find its maximum.
+
+Next, we find the best fit of the thermal's height vs. time according to our theory
+and derive that fit according to Eqn.~\ref{eqn:theory_velocity} to find the bulk
+vertical velocity of the thermal, $w_b$. We then calculate the streamfunction of
+the velocity field as in \citet{romps&all2015},
+\begin{equation}
+\frac{\partial \psi}{\partial r} = 2\pi \rho r (w - w_b),
+\end{equation}
+with the boundary condition that $\psi = 0$ at $r = 0$. The contour defined by $\psi = 0$
+from this solution is taken to be the outline of the thermal, and the volume of the thermal
+is taken to be the volume radially inward from that contour.
+
 
 \section{Table of Simulations}
 \label{appendix:table}
 
-%\begin{deluxetable*}{c c c c c c c c c c c c c c c}
-%\tabletypesize{\footnotesize}
-%\caption{Table of simulation information
-%\label{table:simulation_info}
-%}
-%\tablehead{																																															
-%\colhead{Ra$_{\text{top}}$}	&	\colhead{Ta$_{\text{top}}$}	&	\colhead{Ro$_{\text{p, top}}$}	&	\colhead{Ra$_{\text{mid}}$}	&	\colhead{Ta$_{\text{mid}}$}	&	\colhead{Ro$_{\text{p, mid}}$}	&	\colhead{\con}	&	\colhead{$\mathcal{S}$}	&	\colhead{$L_x/L_z$}	&	\colhead{(nz,	nx,	ny)}	&					\colhead{Ro}      	&	\colhead{Re$_{\parallel}$} 	&	\colhead{Re$_{\perp}$}	&	\colhead{Nu}      	}														
-%\startdata																																															
-%\multicolumn{3}{l}{\textbf{Constant \pro$\,$, path III}}\\
-%1.8	$\times 10^{	5	}$	&	4.1	$\times 10^{	7	}$	&	0.60	&	1.4	$\times 10^{	7	}$	&	3.0	$\times 10^{	9	}$	&	1.03	&	0.067	&	1.1	&	0.51	&	(256,		32,		32)	&	0.015	&	19.4	&	2.5	&	1.2	\\				
-%1.2	$\times 10^{	9	}$	&	5.2	$\times 10^{	12	}$	&	0.60	&	9.2	$\times 10^{	10	}$	&	3.8	$\times 10^{	14	}$	&	1.03	&	0.015	&	3.0	&	0.07	&	(2048,		64,		64)	&	0.026	&	1771	&	32.0	&	15.4	\\				
-%5.2	$\times 10^{	2	}$	&	4.6	$\times 10^{	3	}$	&	0.96	&	3.8	$\times 10^{	4	}$	&	3.4	$\times 10^{	5	}$	&	1.64	&	0.333	&	1.13	&	2.28	&	(64,		64,		64)	&	0.074	&	4.2	&	2.5	&	1.2	\\				
-%3.8	$\times 10^{	8	}$	&	3.1	$\times 10^{	11	}$	&	0.96	&	2.8	$\times 10^{	10	}$	&	2.3	$\times 10^{	13	}$	&	1.64	&	0.035	&	6.0	&	0.12	&	(2048,		64,		64)	&	0.129	&	3906	&	113	&	66.9	\\				
-%7.9	$\times 10^{	1	}$	&	1.0	$\times 10^{	2	}$	&	1.58	&	5.8	$\times 10^{	3	}$	&	7.4	$\times 10^{	3	}$	&	2.70	&	0.888	&	1.56	&	4.44	&	(64,		64,		64)	&	0.303	&	4.4	&	4.9	&	1.7	\\				
-%1.4	$\times 10^{	7	}$	&	9.7	$\times 10^{	8	}$	&	1.58	&	1.0	$\times 10^{	9	}$	&	7.2	$\times 10^{	10	}$	&	2.70	&	0.119	&	10.0	&	0.30	&	(512,		128,		128)	&	0.376	&	1257	&	94.9	&	40.1	\\				
-%\hline																																															
-%\multicolumn{3}{l}{\textbf{Constant \con$\,$, path II}}\\
-%8.6	$\times 10^{	4	}$	&	8.6	$\times 10^{	6	}$	&	0.74	&	6.3	$\times 10^{	6	}$	&	6.3	$\times 10^{	8	}$	&	1.26	&	0.1	&	1.47	&	0.68	&	(128,		128,		128)	&	0.051	&	40.2	&	6.7	&	2.2	\\				
-%2.6	$\times 10^{	6	}$	&	2.6	$\times 10^{	8	}$	&	1.13	&	1.9	$\times 10^{	8	}$	&	1.9	$\times 10^{	10	}$	&	1.93	&	0.1	&	4.64	&	0.39	&	(256,		512,		512)	&	0.27	&	565	&	53.2	&	33.3	\\				
-%1.4	$\times 10^{	3	}$	&	1.6	$\times 10^{	4	}$	&	1.01	&	1.1	$\times 10^{	5	}$	&	1.2	$\times 10^{	6	}$	&	1.72	&	0.3	&	1.47	&	1.90	&	(64,		128,		128)	&	0.124	&	11.3	&	5.4	&	1.8	\\				
-%1.1	$\times 10^{	6	}$	&	1.2	$\times 10^{	7	}$	&	2.29	&	7.8	$\times 10^{	7	}$	&	8.6	$\times 10^{	8	}$	&	3.93	&	0.3	&	14.7	&	0.65	&	(192,		384,		384)	&	0.808	&	529	&	83.5	&	27.3	\\				
-%5.5	$\times 10^{	1	}$	&	5.5	$\times 10^{	1	}$	&	1.65	&	4.0	$\times 10^{	3	}$	&	4.0	$\times 10^{	3	}$	&	2.82	&	1.0	&	1.47	&	4.84	&	(64,		128,		128)	&	0.303	&	3.6	&	4.4	&	1.5	\\				
-%2.8	$\times 10^{	6	}$	&	2.8	$\times 10^{	6	}$	&	6.39	&	2.0	$\times 10^{	8	}$	&	2.0	$\times 10^{	8	}$	&	10.93	&	1.0	&	100	&	0.82	&	(256,		512,		512)	&	3.357	&	1099	&	220	&	46.6	\\				
-%\hline																																															
-%\multicolumn{3}{l}{\textbf{Constant $\mathcal{S}$, path I}}\\
-%1.9	$\times 10^{	1	}$	&	1.1	$\times 10^{	-1	}$	&	10.00	&	1.4	$\times 10^{	3	}$	&	7.9	$\times 10^{		}$	&	17.12	&	13.2	&	2.0	&	9.91	&	(64,		64,		64)	&	3.668	&	3.0	&	10.2	&	1.7	\\				
-%3.0	$\times 10^{	6	}$	&	1.1	$\times 10^{	9	}$	&	0.70	&	2.2	$\times 10^{	8	}$	&	8.1	$\times 10^{	10	}$	&	1.20	&	0.052	&	2.0	&	0.30	&	(512,		128,		128)	&	0.053	&	242	&	17.9	&	6.0	\\				
-%3.0	$\times 10^{	1	}$	&	2.0	$\times 10^{	-1	}$	&	10.00	&	2.2	$\times 10^{	3	}$	&	1.5	$\times 10^{	1	}$	&	17.12	&	12.2	&	3.0	&	9.48	&	(64,		64,		64)	&	4.418	&	5.0	&	15.5	&	2.1	\\				
-%1.3	$\times 10^{	7	}$	&	5.6	$\times 10^{	9	}$	&	0.80	&	9.7	$\times 10^{	8	}$	&	4.2	$\times 10^{	11	}$	&	1.37	&	0.048	&	3.0	&	0.23	&	(512,		128,		128)	&	0.08	&	592	&	33.4	&	13.6	\\				
-%\enddata																																															
-%\tablecomments{
-%Input parameters and output parameters for select simulations are shown. For each of
-%the eight paths in Fig. \ref{fig:parameter_space}b, we show information for the lowest and
-%highest (Ra, Ta) point on that path. The first six rows show information for constant
-%$\pro\,$ paths, the next six for constant \con$\,$ paths, and the last four for constant $\mathcal{S}$ paths.
-%We show the input Ra, Ta, and \pro$\,$ at the top of the atmosphere, as well as their
-%stratification-weighted values at the midplane of the atmosphere, which provide a more direct
-%comparison to Boussinesq values \citep{unnoetall1960}. We also provide the input \con$\,$ at the
-%top of the atmosphere, $\mathcal{S}$, aspect ratio ($L_x/L_z$), and coefficient resolution
-%(nz, nx, ny). Each dimension of the physical grid is 3/2 the size of the coefficient grid 
-%for adequate dealiasing of quadratic nonlinear terms.
-%Output values of Ro, Re$_{\parallel}$, Re$_{\perp}$, and Nu are also provided.
-%This table in its entirety is published as a supplemental \texttt{.csv} file with this
-%manuscript and also online in a Zenodo repository \citep{supp_andersetall2019}.
-%}
-%\end{deluxetable*}
-%
-
+\begin{deluxetable*}{c c c c c c}
+\tabletypesize{\footnotesize}
+\caption{Table of simulation information
+\label{table:simulation_info}
+}
+\tablehead{																																															
+\colhead{$n_\rho$} & \colhead{$L_{thermal}/H_\rho$} & \colhead{nr or nx = ny} & \colhead{nz} & \colhead{$t_{evolution}$} & \colhead{safety}	}	
+\startdata																																															
+\multicolumn{3}{l}{\textbf{2D Anelastic Simulations}}\\
+0.1 	& 					&	128			& 512			& 45 	&	100	\\
+0.5 	& 					&	128			& 512			& 45 	&	100	\\
+1	 	& 					&	128			& 512			& 45 	&	100	\\
+2	 	& 					&	256			& 512			& 30 	&	100	\\
+3	 	& 					&	512			& 1024			& 30 	&	100	\\
+4	 	& 					&	1024		& 1024			& 30 	&	100	\\
+5	 	& 					&			& 			&  	&		\\
+6	 	& 					&			& 			&  	&		\\
+7	 	& 					&			& 			&  	&		\\
+\multicolumn{3}{l}{\textbf{3D Fully Compressible Simulations}}\\
+0.5 	& 					&	256			& 512			& 45 	&	0.6	\\
+1	 	& 					&	256			& 512			& 45 	&	0.6	\\
+2	 	& 					&	256			& 1024			& 45 	&	0.6	\\
+3	 	& 					&	256			& 2048			& 45 	&	0.6	\\
+\enddata																																															
+\tablecomments{
+}
+\end{deluxetable*}
 
 \bibliography{../tex/biblio.bib}
 
