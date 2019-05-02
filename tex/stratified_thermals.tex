@@ -69,15 +69,60 @@
 %% INTRODUCTION
 \section{Introduction}
 \label{sec:intro}
-(Para 1) Brief intro to solar convective conundrum.
+Recent observations of solar convection have revealed a convective conundrum.
+Power spectra have revealed weaker flows than anticipated at large length scales,
+calling into question the existence of so-called ``giant cells'' driven by deep
+convection which would manifest as powerful, large-scale motions at the solar
+surface. This discrepancy between theory and observations has called into question
+our fundamental understanding of convection, sparking fruitful investigations into
+the nature of convection in the Sun.
 
-(Para 2) Entropy rain history and expansion by Axel
+\cite{spruit1997} hypothesized that convective motions may be driven entirely by
+cool downflows at the surface of the Sun, and \citet{brandenburg2016} expanded
+upon this ``entropy rain'' hypothesis. Brandenburg's work includes a careful
+expansion of mixing length theory to incorporate flux contributions from nonlocal
+convective motions, and handles this theory in a horizontally-averaged sense.
+He includes some discussion of possible flow morphologies which could be manifestations
+of this entropy rain, and even includes some brief simulations of propogating
+Hill vortices. However, these simulations and discussions did not include 
+include a fundamental piece of entropy rain: it is buoyant, and has an entropy
+deviation from the background atmosphere.
 
-(Para 3) Boussinesq thermals and their filling factor vs. depth.
+If entropy rain does evolve into downward propagating buoyant vortex rings, it is
+important to understand how buoyancy effects the filling factor of these basic
+convective elements. In the context of Earth's atmosphere, so-called ``thermals''
+are thought to be the nucleus of cloud formation. Thermals are buoyant areas
+of fluid which evolve into propagating buoyant vortex rings, and their
+evolution in the Boussinesq limit have been well studied in the laboratory
+for decades (see e.g., CITE), and more recently have been studied through
+Direct Numerical Simulation (DNS) in the laminar and turbulent regime
+\citep{lecoanet&jeevanjee2018}. One fundamental result of these studies of
+thermals is that they experience a large degree of entrainment: their size expands
+with height and their propagation velocity slows despite their buoyant nature.
+However, we do not know of a study in which the propagation of these thermals,
+and thus the nature of their entrainment, is affected by a 
+significant atmospheric stratification.
 
-(Para 4) What we're doing here, how it fits into this context.
+In the absence of buoyantly-induced entrainment, \citet{brandenburg2016}
+suggests that the filling factor, $f$, of vortex rings should decrease like
+$f \propto \rho^{\alpha}$ for horizontal compression and $f \propto \rho^{\alpha}$ for 
+spherical compression. On the other hand, the filling factor of Boussinesq
+thermals \emph{increases} like $f \propto d$, where $d$ is the depth propagated.
+In this work, we extend the study of \citet{lecoanet&jeevanjee2018} to study
+the propagation of low-Mach number, cold thermals in stratified domains, and how
+buoyant entrainment affects the scaling of their filling factor with depth. If
+buoyant entrainment is a dominant effect, it is possible that these buoyant vortex rings
+would simply grow too large and stall before reaching the bottom of the solar convection zone.
+On the other hand, if the compression effects suggested by \citet{brandenburg2016} are the
+dominant effect, then it is possible that these thermals could propagate to the bottom of the solar
+convection zone, or potentially shrink to a sufficiently small size where thermal dissipation is
+significant.
 
-(Para 5) Standard last paragraph of an intro?
+We lay out our work as follows. In section \ref{sec:theory}, we develop a theoretical description
+of thermals in a stratified domain. In section \ref{sec:experiment}, we describe and verify
+the experiments conducted in this work. In section \ref{sec:results}, we compare the results
+of our experiments to the theory developed in section \ref{sec:theory}. Finally, in section
+\ref{sec:discussion}, we discuss what our results imply for the entropy rain hypothesis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% THEORY SECTION
@@ -85,14 +130,22 @@
 \label{sec:theory}
 
 \subsection{Phenomenological description of thermal evolution}
-The initial conditions of the thermals studied in this work are spherical
-entropy perturbations with zero initial velocity, as depicted in 
-Fig.~\ref{fig:evolution_colormeshes}a. Buoyant forces cause these perturbations
-to fall and develop into vortex rings, as depicted in 
-Figs.~\ref{fig:evolution_colormeshes}c-f.
+We show pictorally the evolution of a cold thermal from rest in 
+Fig.~\ref{fig:evolution_colormeshes}. In Fig.~\ref{fig:evolution_colormeshes}a,
+the evolution of a thermal in a weakly stratified domain with
+$n_\rho = 0.5$ density scale heights is shown. In Fig.~\ref{fig:evolution_colormeshes}b,
+the evolution of a thermal in an appreciably stratified domain with
+$n_\rho = 3$ density scale heights is shown. While the initial conditions are
+identical in both domains (spherical specific entropy perturbations of the
+same magnitude whose diameters are 5\% of the domain depth), and while in both cases
+the thermal quickly evolves into a propagating buoyant vortex ring, we find that the
+$n_\rho = 0.5$ case entrains and grows with depth, similarly to the Boussinesq regime.
+On the other hand, the $n_\rho = 3$ case has a radius which remains approximately constant
+over time, and it reaches the bottom of the domain in many fewer nondimensional freefall
+time units.
 
 \begin{figure*}[t!]
-    \includegraphics[width=\textwidth]{evolution_colormeshes.png}
+    \includegraphics[width=\columnwidth]{evolution_colormeshes.png}
     \caption{
     \label{fig:evolution_colormeshes} }
 \end{figure*}
@@ -184,6 +237,7 @@ Substituting $w = dz/dt$ and $\tau \equiv (Bt + I_0)/\Gamma$, We retrieve
 \frac{dz}{\sqrt{\rho(z)}} 
 = \left(\frac{\pi^{3/2}\Gamma}{V_0}\right)
 \left(\beta\Gamma\tau^{-1/2} + [M_0 - \beta I_0]\tau^{-3/2}\right)d\tau.
+\label{eqn:general_theory}
 \end{equation}
 If the atmospheric stratification in which the thermal is falling is known, this
 result can be straightforwardly integrated with $\rho(z)$ plugged in in order to
@@ -198,31 +252,43 @@ section \ref{sec:results}.
 \section{Experiment} 
 \label{sec:experiment}
 
-\subsection{Polytropic Atmospheres}
-We study an ideal gas whose equation of state is $P = \rho T$ and whose stratification
-is a perfectly adiabatic polytrope,
-\begin{gather}
-T_0 = 1 + (\grad_{\text{ad}})(z - L_z) \\
-\rho_0 = T_0^{m_{\text{ad}}},
-\end{gather}
-where $m_{\text{ad}} = (\gamma-1)^{-1}$, and where the adiabatic 
-temperature gradient is $\grad_{\text{ad}} = - g / c_P$.
 
-\subsection{Anelastic Equations}
-The anelastic equations are \citep{lecoanet&all2014},
+\subsection{Anelastic Simulations}
+In this work, we primarily study the evolution of 2D, azimuthally symmetric, anelastic
+thermals in cylindrical coordinates. 
+We later verify that these simulations produce the same results a 3D fully compressible
+simulations in 3D cartesian domains (see sec. REF). 
+The LBR anelastic equations are \citep{lecoanet&all2014},
 \begin{gather}
 \td{\grad}\cdot\td{\bm{u}} = -\td{w}\partial_{\tilde{z}} \ln\rho_0 \\
 \frac{D \td{\bm{u}}}{D \td{t}} = -\td{\grad} \td{\varpi} + g\frac{\td{S_1}}{c_P}\hat{z} + \frac{1}{\rho_0}\td{\grad}\cdot\left(\mu\td{\lilstressT}\right) \\
 \frac{D \td{S_1}}{D\td{t}} = \frac{1}{\rho c_P}\td{\grad}\cdot\left(\kappa T_0 \td{\grad} \td{S_1}\right) + \frac{\mu}{\rho_0 T_0}\td{\sigma_{ij}}\partial_{\td{x_i}}\td{u_j}.
 \end{gather}
-where $D/D\td{t} = \partial/\partial \td{t} + \td{\bm{u}}\cdot\td{\grad}$ and the viscous stress tensor is
+where terms with tildes are dimensional, and where
+$D/D\td{t} = \partial/\partial \td{t} + \td{\bm{u}}\cdot\td{\grad}$. In our azimuthally symetric
+domain, we assume that $\partial_\phi = 0$; as the initial conditions of our simulations are at rest and have
+no azimuthal velocity, $u_\phi$, we assume that $u_\phi = 0$; therefore $\bm{u} = u_r \hat{r} + w\hat{z}$. 
+Under this approximation, the components of the stress tensor are
 \begin{equation}
-\td{\sigma_{ij}} = \left(\partial_{\td{x_i}}\td{u_j} + \partial_{\td{x_j}}\td{u_i} - \frac{2}{3}\delta_{ij}\td{\grad}\cdot\td{\bm{u}}\right).
+\begin{split}
+&\td{\sigma}_{rr} = 2\frac{\partial \td{u_r}}{\partial \td{r}} - \frac{2}{3}\td{\grad}\cdot\td{\bm{u}},\,\,\,\,\,\,
+\td{\sigma}_{rz}     = \td{\sigma}_{zr} = \frac{\partial \td{w}}{\partial \td{r}} + \frac{\partial \td{u_r}}{\partial \td{z}}, \\
+&\td{\sigma}_{\phi\phi} = 2\frac{\td{u_r}}{\td{r}} - \frac{2}{3}\td{\grad}\cdot\td{\bm{u}},\,\,\,\,\,\,\,
+\td{\sigma}_{r\phi}  = \td{\sigma}_{\phi r}  = 0, \\
+&\td{\sigma}_{zz}       = 2\frac{\partial \td{w}}{\partial \td{z}} - \frac{2}{3}\td{\grad}\cdot\td{\bm{u}}, \,\,\,\,\,\,
+\td{\sigma}_{\phi z} = \td{\sigma}_{z \phi}  = 0,\qquad
+\end{split}
 \end{equation}
+Furthermore, we assume that the dynamic viscosity, $\mu = \rho \nu$, and the
+thermal conductivity, $\kappa = \rho \chi$, are both uniform throughout the domain.
+The diffusivities
+$\nu$ and $\chi$ therefore scale inversely with the density.
 
-We nondimensionalize these equations as in \citet{lecoanet&jeevanjee2018} such that
-the length scale is the diameter of the thermal and the velocity scale is the freefall
-velocity,
+We nondimensionalize these equations in the same manner as in
+\citet{lecoanet&jeevanjee2018} such that
+the length scale is the diameter of the initial thermal perturbation
+and the velocity scale is the freefall velocity. The timescale is thus
+the freefall crossing time of this unit length. Mathematically,
 \begin{equation}
 \begin{split}
 \td{\grad}\rightarrow(\td{L}_{th}^{-1})\grad, \qquad&
@@ -238,53 +304,112 @@ with
 \text{Re}_{\text{ff}} = \frac{\tilde{u}_{th} \tilde{L}_{th}}{\nu}, \qquad
 \text{Pr}_{\text{ff}} = \frac{\tilde{u}_{th} \tilde{L}_{th}}{\chi}.
 \end{equation}
-The resulting equations are very similar to the boussinesq equations,
+As the diffusivities scale with depth, Re$_{\text{ff}}$ is specified at the
+thermal's initial depth.
+The resulting equations are,
 \begin{gather}
 \DivU = -w \partial_z \ln\rho_0, \\
 \begin{split}
-\partial_t \bm{u} + \bm{u}\cdot\grad\bm{u} = \\
-- \grad \varpi + S_1\hat{z} 
+\partial_t \bm{u} + \bm{u}\cdot\grad\bm{u} =& \\
+- \grad \varpi + S_1\hat{z} &
 + \frac{1}{\text{Re}_{\text{ff}}}\left[\grad^2 \bm{u} + \frac{1}{3}\grad(\DivU)\right] 
 \end{split}\\
 \begin{split}
-\partial_t S_1 + \bm{u}\cdot\grad S_1 = \\
-\frac{1}{\text{Re}_{\text{ff}}}\left(\frac{1}{\text{Pr}_{\text{ff}}\rho_0c_P }[\grad^2 S_1 + \partial_z\ln T_0 \cdot\partial_z S_1]\right.\\\left.
-+ \frac{-(\grad_{ad})}{\rho_0 T_0}\sigma_{ij}\partial_{x_i}u_j \right)
+\partial_t S_1 + \bm{u}\cdot\grad S_1 =& \\
+\frac{1}{\text{Re}_{\text{ff}}}\left(\frac{1}{\text{Pr}_{\text{ff}}\rho_0c_P }\right.&[\grad^2 S_1 + \partial_z\ln T_0 \cdot\partial_z S_1]\\
+&+ \left.\frac{-(\grad_{ad})}{\rho_0 T_0}\sigma_{ij}\partial_{x_i}u_j \right)
 \end{split}
 \end{gather}
+where in this nondimensionalization, the adiabatic temperature gradient is defined
+in the next subsection.
 
-\subsection{Fully Compressible Equations}
-The fully compressible equations, under the same assumptions as above, are
+\subsection{Atmosphere \& Initial conditions}
+We study an ideal gas whose equation of state is $P = \rho T$ and whose stratification
+is a perfectly adiabatic polytrope,
+\begin{gather}
+T_0 = 1 + (\grad_{\text{ad}})(z - L_z) \\
+\rho_0 = T_0^{m_{\text{ad}}},
+\end{gather}
+where $m_{\text{ad}} = (\gamma-1)^{-1}$, and the adiabatic temperature 
+gradient in these nondimensional atmospheres is
+$$
+\grad_{\text{ad}} = -\frac{(e^{n_\rho/m_{ad}} - 1)}{L_z}\frac{m_{ad} + 1}{c_P},
+$$
+where $L_z$ is the atmospheric depth in units of thermal diameters.
+ 
+To initialize the simulation, we specify a spherical initial specific entropy perturbation,
+\begin{equation}
+S_1 = - A(1 - \text{erf}\left(\frac{r' - r_{th}}{\delta}\right))/2,
+\label{eqn:thermal_IC}
+\end{equation}
+where $A = 1$ for our scaled equations.
+Here, $r' = \sqrt{r^2 + (z - z_0)^2}$, where $z_0 = L_z - 3*r_{th}$,
+with the thermal radius set as $r_{th} = 0.5$, and a smoothing width, $\delta = 0.1$.
+
+
+
+\subsection{Fully Compressible Simulations}
+In order to verify the validity of our 2D Anelastic simulations, we evolve select
+thermals according to the 3D Navier Stokes equations in a cartesian domain. We use
+the $(T, \ln\rho)$ formulation of the equations in which we have previously studied fully compressible
+convection at low and high Mach number \citep{anders&brown2017, lecoanet&all2014},
 \begin{gather}
 \frac{D \ln\rho}{Dt} + \DivU = 0 \\
 \frac{D \bm{u}}{D t} = -\grad T - T\grad\ln\rho - g\hat{z} + \frac{1}{\rho}\grad\cdot\left(\mu\lilstressT\right) \\
 \frac{D T}{Dt} + (\gamma-1)T\DivU  = \frac{1}{\rho c_V}\grad\cdot\left(\kappa \grad T\right) + \frac{\mu}{\rho c_V}\sigma_{ij}\partial_{x_i}u_j.
 \end{gather}
-
-\subsection{Initial Conditions}
-We set the initial specific entropy perturbation as
+where the viscous stress tensor is defined as
 \begin{equation}
-S_1 = - A(1 - \text{erf}\left(\frac{r - r_{th}}{\delta}\right))/2,
+\sigma_{ij} = \left(\partial_{x_i}u_j + \partial_{x_j}u_i - \frac{2}{3}\delta_{ij}\grad\cdot\bm{u}\right).
 \end{equation}
-where in the FC cases $A = 10^{-4}$ and in the nondimensionalized AN cases,
-$A = 1$. Here, $r = \sqrt{x^2 + y^2 + (z - z_0)^2}$, where $z_0 = Lz - 3*r_{th}$,
-and $r_{th} = Lz/40$ is the radius of the thermal.
+These equations are nondimensionalized on the temperature gradient length scale such that
+$\grad_{\text{ad}} = -1$ and the nondimensional timescale is the sound crossing time of that
+unit length.  
 
-In the fully compressible equations, it is essential that the initial conditions be in pressure
-equilibrium such that the low mach number nature of the thermal can be studied. In order to 
-achieve this pressure balance, we set
+In setting the specific entropy, $S = c_V \ln T - R^{-1}\ln\rho$, to an equivalent condition
+to that specified in  Eqn.~\ref{eqn:thermal_IC}, we note that it is essential that the
+initial perturbation be in pressure equilibrium. The set of initial conditions that achieves this
+is
 \begin{equation}
 \ln\rho_1 = S_1/c_P, \qquad T_1 = T_0(e^{-\ln\rho_1} - 1).
 \end{equation}
+We specify the magnitude of the initial entropy perturbations as 
+$A = \epsilon = 10^{-4}$, such that the mach number of the resultant thermal is O($10^{-2}$) or less.
+
+The depth of the atmosphere in these fully compressible domains is set by the number of density
+scale heights as $L_z = e^{n_\rho/m_{ad}} - 1$, and in order to compare results from these
+simulations to our nondimensionalized thermal simulations, we rescale all length scales in
+post-processing by $\ell = 20/L_z$, all timescales by $\tau = \sqrt{\ell \epsilon}$, and
+the entropy by $s = \epsilon^{-1}$.
 
 
 \subsection{Solution for thermal evolution in a Polytrope}
+Here we take the general theory described in Eqn.~\ref{eqn:general_theory} and apply it
+to the specific case of the polytropes we study here. 
+We note that, $\rho_0 = T_0^{m_{ad}}$ and
+$dT_0 = (\grad_{\text{ad}}) dz$, such that we must solve
+\begin{equation}
+T_0^{-m_{ad}/2} dT_0 
+= \left(\frac{\pi^{3/2}\Gamma\grad_{\text{ad}}}{V_0}\right)
+\left(\beta\Gamma\tau^{-1/2} + [M_0 - \beta I_0]\tau^{-3/2}\right)d\tau.
+\label{eqn:general_theory}
+\end{equation}
+Assuming that $m_{ad} < 2$ and through the use of simple power law integrals, we
+find that
+\begin{equation}
+T_0(t) = \left(C[\xi(\tau) - \xi(\tau_0)] + T_0(t_0)^{1/\alpha}  \right)^{\alpha},
+\end{equation}
+with
+\begin{equation}
+\xi(\tau) = \beta\Gamma\tau^{1/2} - (M_0 - \beta I_0) \tau^{-1/2},
+\end{equation}
+$C \equiv (2 \pi^{3/2} \Gamma (\grad_{\text{ad}}))/(\alpha V_0 B)$
+
 
 
 \subsection{Verification of 2D Anelastic approximation}
 blah blah blah comparison of 2D and 3D blah blah blah. z v t, r v z, w v z. Also side-by-side
-pictoral comparison with diff.
-
+pictoral comparison with diff. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RESULTS SECTION
