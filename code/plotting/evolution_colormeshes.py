@@ -34,10 +34,13 @@ for i, ax in enumerate(axs):
 
         n_rho = float(this_dir.split('_nrho')[-1].split('_Re')[0])
         grad_T = -(np.exp(n_rho/1.5)-1)/20
-        rho = 1#(1 + grad_T*(zz-20))**1.5
+        rho = (1 + grad_T*(zz-20))**1.5
 
         contour = cf['contours'].value[20*(filenum-1)+imgnum,:]
         contours = cf['contours'].value 
+
+        if j > 0:
+            rho *= np.max(contour)**3
         
         field = f['tasks']['S1'].value[imgnum,:]
         f.close()

@@ -33,8 +33,8 @@ Options:
     --Lz=<L>              The depth of the domain, in thermal diameters [default: 20]
 
     --chi_nu              If true, use a constant diffusivity (rather than constant dynamic diffusivity) eqn formulation
-    --safety=<s>          Safety factor base [default: 25]
-    --out_cadence=<o>     Time cadence of output saves in buoyancy times [default: 0.08]  
+    --safety=<s>          Safety factor base [default: 0.08]
+    --out_cadence=<o>     Time cadence of output saves in buoyancy times [default: 0.2]  
 
     --restart=<file>      Name of file to restart from, if starting from checkpoint
 
@@ -243,7 +243,7 @@ if restart is None:
     S1['g'] = -1*(1 - erf((r_IC - radius)/delta_r))/2
     S1.differentiate('r', out=S1r)
     # Initial timestep
-    start_dt = 1e-4*t_b
+    start_dt = 1e-3*t_b
 else:
     logger.info("restarting from {}".format(restart))
     start_dt = checkpoint.restart(restart, solver)
@@ -277,9 +277,8 @@ safety_factor = float(args['--safety'])
 if args['--rk443']:
     safety_factor *= 4
 CFL = flow_tools.CFL(solver, initial_dt=start_dt, cadence=1, safety=safety_factor,
-                     max_change=1.5, min_change=0.5, max_dt=1e-2*t_b, threshold=0.05)
-CFL.add_velocities(('u', 'w'))
-#CFL.add_velocity(('w'), axis=0)
+                     max_change=1.5, min_change=0.5, max_dt=1e-3*t_b, threshold=0.05)
+CFL.add_velocities(('w', 'u'))
 
 # Flow properties
 flow = flow_tools.GlobalFlowProperty(solver, cadence=1)

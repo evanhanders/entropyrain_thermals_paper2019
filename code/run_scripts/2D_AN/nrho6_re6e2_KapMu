@@ -12,8 +12,8 @@ RE=6e2
 
 date
 mpiexec_mpt -n 1024 ~/.python3 AN_2D_thermal.py \
-    --nr=1024 \
-    --nz=2048 \
+    --nr=2048 \
+    --nz=1024 \
     --n_rho=$NRHO \
     --wall_hours=15.5 \
     --Reynolds=$RE \

@@ -3,7 +3,7 @@ Stratified fully compressible thermals in an adibatically stratified polytrope.
 Mu and Kappa are constant with depth.
 
 Usage:
-    FC_thermal_falling.py [options]
+    FC_3D_thermal.py [options]
 
 Options:
     --Reynolds=<Reynolds>                Reynolds number [default: 5e2]

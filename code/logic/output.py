@@ -34,15 +34,16 @@ def initialize_output(data_dir, solver, threeD=False, output_cadence=1, writes_p
     if threeD:
         volumes = solver.evaluator.add_file_handler(data_dir+'volumes', sim_dt=output_cadence*threeD_factor, max_writes=writes_per, mode=mode, parallel=False)
         analysis_tasks['volumes'] = volumes
-        volumes.add_task('Vort_x',     name='vorticity_x')
-        volumes.add_task('Vort_y',     name='vorticity_y')
         volumes.add_task('u',          name='u')
         volumes.add_task('v',          name='v')
         volumes.add_task('w',          name='w')
         volumes.add_task('T1',         name='T1')
-        volumes.add_task('rho_fluc',   name='rho_fluc')
         volumes.add_task('s1',         name='entropy')
 
+        slices.add_task('interp(u, x = 0)',         name='u x mid')
+        slices.add_task('interp(u, y = 0)',         name='u y mid')
+        slices.add_task('interp(v, x = 0)',         name='v x mid')
+        slices.add_task('interp(v, y = 0)',         name='v y mid')
         slices.add_task('interp(w, x = 0)',         name='w x mid')
         slices.add_task('interp(w, y = 0)',         name='w y mid')
         slices.add_task('interp(s1, x = 0)',        name='s x mid')
@@ -50,12 +51,12 @@ def initialize_output(data_dir, solver, threeD=False, output_cadence=1, writes_p
         slices.add_task('interp(Vort_x, x = 0)',    name='vorticity x mid')
         slices.add_task('interp(Vort_y, y = 0)',    name='vorticity y mid')
     else:
-        slices.add_task('Vort_y',       name='vorticity_y')
+        slices.add_task('Vort_y',       name='V')
         slices.add_task('u',            name='u')
         slices.add_task('w',            name='w')
         slices.add_task('T1',           name='T1')
         slices.add_task('rho_fluc',     name='rho_fluc')
-        slices.add_task('s1',           name='entropy')
+        slices.add_task('s1',           name='S1')
         slices.add_task('enstrophy',    name='enstrophy')
 
     #PROFILES

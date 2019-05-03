@@ -1,7 +1,7 @@
 #PBS -S /bin/bash
 #PBS -N AN_thermal_KapMu_nrho1_Re6e2
 #PBS -l select=5:ncpus=28:mpiprocs=28:model=bro
-#PBS -l walltime=1:00:00
+#PBS -l walltime=2:00:00
 #PBS -j oe
 #PBS -q normal
 
@@ -15,11 +15,11 @@ mpiexec_mpt -n 128 ~/.python3 AN_2D_thermal.py \
     --nr=256 \
     --nz=512 \
     --n_rho=$NRHO \
-    --wall_hours=0.9 \
+    --wall_hours=1.7 \
     --Reynolds=$RE \
-    --aspect=0.2 \
+    --aspect=0.25 \
     --run_time_buoy=8.5 \
-    --rk443 \
+    --label=sbdf2 \
     > ./out.AN_thermal_2D.Re$RE.nrho$NRHO.$PBS_JOBID
 date
 
