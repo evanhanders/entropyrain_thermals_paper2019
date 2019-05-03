@@ -144,11 +144,11 @@ On the other hand, the $n_\rho = 3$ case has a radius which remains approximatel
 over time, and it reaches the bottom of the domain in many fewer nondimensional freefall
 time units.
 
-\begin{figure*}[t!]
+\begin{figure}[t!]
     \includegraphics[width=\columnwidth]{evolution_colormeshes.png}
     \caption{
     \label{fig:evolution_colormeshes} }
-\end{figure*}
+\end{figure}
 
 
 \subsection{Theoretical description of thermal evolution}
@@ -156,15 +156,16 @@ The evolution of thermals as buoyant vortex rings has been well described in
 the unstratified, Boussinesq limit for decades (as early as e.g., CITE, and
 see \citet{lecoanet&jeevanjee2018} for other sources). Buoyant motions 
 in the atmospheres of stars and planets are generally large enough to feel the
-atmospheric stratification, and therefore a more thorough tratment of the
-evolution of thermals in stratified domains is required to understand the nature
-of thermal entrainment in nature.
+atmospheric stratification, and therefore a more thorough treatment of the
+evolution of thermals in stratified domains is required to understand 
+thermal entrainment in nature.
 
 In this work, we focus on the non-dissipative, low Mach number regime, 
 in which the ideal anelastic equations are a decent approximation to the fully
-compressible equations. In this regime, the buoyancy is directly proportional to the
-specific entropy. In the absence of diffusion, or in the limit where diffusivities
-are sufficiently small, the volume-integrated total entropy is constant,
+compressible equations. In this regime, buoyant forces can be expressed explicitly
+in terms of the entropy. In the the limit where diffusivities
+are sufficiently small and therea re no thermal sources or sinks, 
+the volume-integrated total entropy inside of a buoyant vortex ring is constant,
 \begin{equation}
 B \equiv \int_{\mathcal{V}} \rho\, s\, dV = \text{const},
 \end{equation}
@@ -172,46 +173,58 @@ where $s = c_V \ln T - R \ln\rho$ is the specific entropy, with $c_V$ the
 specific heat at constant volume and $R$ the ideal gas constant.
 
 In a stratified domain, the hydrodynamic impulse is defined
-\citet{shivamoggi2010},
+\citep{shivamoggi2010},
 \begin{equation}
 \bm{I} = \frac{1}{2}\int_{\mathcal{V}} \bm{x}\times(\grad\times(\rho\bm{u}))dV,
 \end{equation}
 where $\bm{x}$ is the position vector, $\bm{u}$ is vector velocity, $\rho$ is density,
-and $\mathcal{V}$ is the volume being integrated over. Furthermore, changes in the impulse
-can be expressed
+and $\mathcal{V}$ is the volume being integrated over. Impulse is equivalent to the time-integrated
+work acting on the fluid resulting in the current fluid motion. 
+Changes in the impulse can be expressed as
 \begin{equation}
 \frac{\partial\bm{I}}{\partial t} = \int_{\mathcal{V}}\frac{\partial}{\partial t}(\rho \bm{u})dV
 = B\hat{z} + S,
 \end{equation}
 where $S$ is a combination of surface terms that disappears upon appropriate boundary conditions
-on $\mathcal{V}$ \citep{shivamoggi2010}. As we have assumed that the buoyancy, $B$, is constant,
-we can straightforwardly integrate
+on $\mathcal{V}$ \citep{shivamoggi2010}. In this context where buoyancy is the only source of
+work and the buoyancy, $B$, is constant, the impulse can be straightforwardly integrated as
 \begin{equation}
 I_z = B t + I_0,
 \end{equation}
-for some constant $I_0$.
-
-(need to work through this section carefully).
-Assuming an adiabatically stratified atmosphere in
-hydrostatic equilibrium, the vertical momentum equation is
-\begin{equation}
- = - \partial_z \varpi +  g\frac{S_1}{c_P},
-\label{eqn:buoyancy}
-\end{equation}
-where $w$ is vertical velocity, $S_1$ is specific entropy, $\varpi$ is the reduced pressure,
-$D/Dt = \partial_t + (\bm{u}\cdot\grad)$ is the (eulerian? lagrangian?)
-derivative, $g$ is gravity, and $c_P$ is the specific heat at constant pressure.
-In the anelastic approximation, the density stratification is constant in time. 
-OH GOD I DON'T KNOW THIS MATH WELL MAGIC MAGIC MAGIC.
-By doing magic, we arrive at
-\begin{equation}
-P_z = \beta B t + P_0.
-\end{equation}
-
+for some constant $I_0$. In the limiting regime where all of the buoyant fluid initially
+located in the thermal remains in the buoyant vortex ring, $I_0 \rightarrow 0$, but as
+some of the buoyant fluid is generally detrained in the initial spin-up to a vortex ring,
+it is important to keep the factor of $I_0$.
 Under the assumption that the thermal develops into a thin-core 
 propagating vortex ring whose vortex core is radius $r$ away from the axis of symmetry, 
-the impulse can be approximated as $I_z \approx \pi \rho r^2 \Gamma$, where 
-$\Gamma$ is the circulation of the thermal vortex, which we assume to be constant. 
+the impulse can be well approximated as $I_z \approx \pi \rho r^2 \Gamma$, where 
+$\Gamma = \iint (\grad\times\bm{u}) dr dz$ is the circulation in the vortex ring.
+Under this approximation, it becomes clear that so long as the vortex core is bounded
+by $\mathcal{V}$, the volume integrated over is rather arbitrary, as most of the circulation
+is located in the concentrated vortex ring.
+
+The vertical momentum of the thermal is less straightforward to find than the momentum. 
+Upon weighting the momentum equation (Eqn.~\ref{eqn:AN_momentum_full}) by the density, 
+Assuming an adiabatically stratified atmosphere in
+hydrostatic equilibrium, the change in volume integrated momentum over time is
+\begin{equation}
+\frac{D \bm{P}}{Dt} = \frac{D}{Dt}\int_{\mathcal{V}}\rho\bm{u} dV
+= \int_{\mathcal{V}} \rho\frac{D\bm{u}}{Dt} dV
+\approx B\hat{z} - \int_{\mathcal{V}} \rho\grad\varpi dV.
+\end{equation}
+As noted by \citet{tarshish&all2018}, only infinitesimally small buoyant regions of
+fluid accelerate according exactly according to their buoyant nature. Any buoyant anomaly
+with a finite size disrupts its fluid environment, and this disruption results in
+pressure terms which reduce the efficacy of the buoyant fluid in driving motions. 
+In their work with Boussinesq thermals, they find that the true buoyant acceleration
+can be well approximated by scaling down the buoyant force by a factor of O($1/2$).
+Taking their work into account, we assume that the vertical momentum of the thermal
+follows
+\begin{equation}
+P_z = \beta B t + P_0,
+\end{equation}
+where in this work we set $\beta = 1/2$.
+
 Rearranging, we find our first result,
 \begin{equation}
 r = \sqrt{\frac{B t + I_0}{\pi\rho\Gamma}}.
@@ -222,7 +235,9 @@ we retrieve the $r \propto \sqrt{t}$ scaling found in the Boussinesq regime by
 \citet{lecoanet&jeevanjee2018}. We find that the inclusion of stratification adds the
 additional complexity of $r \propto \rho^{-1/2}$, such that downward-propogating 
 vortex rings (as studied here) will not entrain to the same degree as boussinesq thermals,
-and upward-propogating rings will entrain more.
+and upward-propogating rings will entrain more. In the absence of buoyancy ($B = 0$),
+this result aligns with the prediction for purely horizontal compression noted by
+\citet{brandenburg2016} of $r^2 \propto \rho^{-1}$.
 
 We further assume that the volume-integrated momentum, $P_z \approx \rho V w_{th}$,
 where $w_{th}$ is the vertical velocity of the thermal as a whole, and the volume
@@ -235,7 +250,7 @@ find that
 Substituting $w = dz/dt$ and $\tau \equiv (Bt + I_0)/\Gamma$, We retrieve
 \begin{equation}
 \frac{dz}{\sqrt{\rho(z)}} 
-= \left(\frac{\pi^{3/2}\Gamma}{V_0}\right)
+= \left(\frac{\pi^{3/2}\Gamma}{V_0 B}\right)
 \left(\beta\Gamma\tau^{-1/2} + [M_0 - \beta I_0]\tau^{-3/2}\right)d\tau.
 \label{eqn:general_theory}
 \end{equation}
@@ -246,6 +261,38 @@ general for now, we will plug in our polytropic stratification at the end of
 section \ref{sec:experiment}, and show that the resulting expression does a
 good job of explaining the evolution of thermals in these atmospheres in
 section \ref{sec:results}.
+
+\subsection{Parameterization}
+
+\begin{deluxetable*}{c c c c c c}
+\tabletypesize{\footnotesize}
+\caption{Simulation output parameterization
+\label{table:simulation_info}
+}
+\tablehead{																																															
+\colhead{$n_\rho$} & \colhead{$L_{thermal}/H_\rho$} & \colhead{nr or nx = ny} & \colhead{nz} & \colhead{$t_{evolution}$} & \colhead{safety}	}	
+\startdata																																															
+\multicolumn{3}{l}{\textbf{2D Anelastic Simulations}}\\
+0.1 	& 					&	256			& 512			& 49 	&	0.2	\\
+0.5 	& 					&	256			& 512			& 42.5 	&	0.2	\\
+1	 	& 					&	256			& 512			& 38 	&	0.2	\\
+2	 	& 					&	256			& 512			& 31.75	&	0.2	\\
+3	 	& 					&	512			& 1024			& 27.25	&	0.2	\\
+4	 	& 					&	1024		& 1024			& 25 	&	0.2	\\
+5	 	& 					&			& 			&  	&		\\
+6	 	& 					&			& 			&  	&		\\
+7	 	& 					&			& 			&  	&		\\
+\multicolumn{3}{l}{\textbf{3D Fully Compressible Simulations}}\\
+0.5 	& 					&	256			& 512			& 45 	&	0.2	\\
+1	 	& 					&	256			& 512			& 45 	&	0.2	\\
+2	 	& 					&	256			& 1024			& 45 	&	0.2	\\
+3	 	& 					&	256			& 2048			& 45 	&	0.2	\\
+\enddata																																															
+\tablecomments{
+}
+\end{deluxetable*}
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% EXPERIMENT SECTION
@@ -260,9 +307,12 @@ We later verify that these simulations produce the same results a 3D fully compr
 simulations in 3D cartesian domains (see sec. REF). 
 The LBR anelastic equations are \citep{lecoanet&all2014},
 \begin{gather}
-\td{\grad}\cdot\td{\bm{u}} = -\td{w}\partial_{\tilde{z}} \ln\rho_0 \\
-\frac{D \td{\bm{u}}}{D \td{t}} = -\td{\grad} \td{\varpi} + g\frac{\td{S_1}}{c_P}\hat{z} + \frac{1}{\rho_0}\td{\grad}\cdot\left(\mu\td{\lilstressT}\right) \\
-\frac{D \td{S_1}}{D\td{t}} = \frac{1}{\rho c_P}\td{\grad}\cdot\left(\kappa T_0 \td{\grad} \td{S_1}\right) + \frac{\mu}{\rho_0 T_0}\td{\sigma_{ij}}\partial_{\td{x_i}}\td{u_j}.
+\td{\grad}\cdot\td{\bm{u}} = -\td{w}\partial_{\tilde{z}} \ln\rho_0 
+\label{eqn:AN_continuity_full}\\
+\frac{D \td{\bm{u}}}{D \td{t}} = -\td{\grad} \td{\varpi} + g\frac{\td{S_1}}{c_P}\hat{z} + \frac{1}{\rho_0}\td{\grad}\cdot\left(\mu\td{\lilstressT}\right)
+\label{eqn:AN_momentum_full}\\
+\frac{D \td{S_1}}{D\td{t}} = \frac{1}{\rho c_P}\td{\grad}\cdot\left(\kappa T_0 \td{\grad} \td{S_1}\right) + \frac{\mu}{\rho_0 T_0}\td{\sigma_{ij}}\partial_{\td{x_i}}\td{u_j}
+\label{eqn:AN_energy_full}.
 \end{gather}
 where terms with tildes are dimensional, and where
 $D/D\td{t} = \partial/\partial \td{t} + \td{\bm{u}}\cdot\td{\grad}$. In our azimuthally symetric
@@ -390,7 +440,7 @@ We note that, $\rho_0 = T_0^{m_{ad}}$ and
 $dT_0 = (\grad_{\text{ad}}) dz$, such that we must solve
 \begin{equation}
 T_0^{-m_{ad}/2} dT_0 
-= \left(\frac{\pi^{3/2}\Gamma\grad_{\text{ad}}}{V_0}\right)
+= \left(\frac{\pi^{3/2}\Gamma\grad_{\text{ad}}}{V_0 B}\right)
 \left(\beta\Gamma\tau^{-1/2} + [M_0 - \beta I_0]\tau^{-3/2}\right)d\tau.
 \label{eqn:general_theory}
 \end{equation}
@@ -485,20 +535,20 @@ is taken to be the volume radially inward from that contour.
 \colhead{$n_\rho$} & \colhead{$L_{thermal}/H_\rho$} & \colhead{nr or nx = ny} & \colhead{nz} & \colhead{$t_{evolution}$} & \colhead{safety}	}	
 \startdata																																															
 \multicolumn{3}{l}{\textbf{2D Anelastic Simulations}}\\
-0.1 	& 					&	128			& 512			& 45 	&	100	\\
-0.5 	& 					&	128			& 512			& 45 	&	100	\\
-1	 	& 					&	128			& 512			& 45 	&	100	\\
-2	 	& 					&	256			& 512			& 30 	&	100	\\
-3	 	& 					&	512			& 1024			& 30 	&	100	\\
-4	 	& 					&	1024		& 1024			& 30 	&	100	\\
+0.1 	& 					&	256			& 512			& 49 	&	0.2	\\
+0.5 	& 					&	256			& 512			& 42.5 	&	0.2	\\
+1	 	& 					&	256			& 512			& 38 	&	0.2	\\
+2	 	& 					&	256			& 512			& 31.75	&	0.2	\\
+3	 	& 					&	512			& 1024			& 27.25	&	0.2	\\
+4	 	& 					&	1024		& 1024			& 25 	&	0.2	\\
 5	 	& 					&			& 			&  	&		\\
 6	 	& 					&			& 			&  	&		\\
 7	 	& 					&			& 			&  	&		\\
 \multicolumn{3}{l}{\textbf{3D Fully Compressible Simulations}}\\
-0.5 	& 					&	256			& 512			& 45 	&	0.6	\\
-1	 	& 					&	256			& 512			& 45 	&	0.6	\\
-2	 	& 					&	256			& 1024			& 45 	&	0.6	\\
-3	 	& 					&	256			& 2048			& 45 	&	0.6	\\
+0.5 	& 					&	256			& 512			& 45 	&	0.2	\\
+1	 	& 					&	256			& 512			& 45 	&	0.2	\\
+2	 	& 					&	256			& 1024			& 45 	&	0.2	\\
+3	 	& 					&	256			& 2048			& 45 	&	0.2	\\
 \enddata																																															
 \tablecomments{
 }
