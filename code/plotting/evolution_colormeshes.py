@@ -5,23 +5,25 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 import h5py
 
-dirs = [    ('../apr30/AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20', (1, 0), (2, 18), (5, 17)) ,
-            ('../apr30/AN_2D_thermal_nrho3_Re6e2_Pr1_aspect0.125_Lz20' , (1,0), (2, 12),  (4, 5))]
+dirs = [    ('../may03/AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20', (1, 0), (2, 18), (5, 17)) ,
+            ('../may03/AN_2D_thermal_nrho3_Re6e2_Pr1_aspect0.25_Lz20' , (1,0), (2, 12),  (4, 5))]
 
 
 gs = gridspec.GridSpec(1000, 1000)
 
-subplots = [    ( (100, 50),    900, 450 ),  ( (100, 550),  900, 450 )
-            ]
+subplots = [    ( (100, 50),    900, 450 ),  ( (100, 550),  900, 450 ) ]
+colorbar = [    ( (50, 50),    50, 450 ),  ( (50, 550),  50, 450 ) ]
 
 fig = plt.figure(figsize=(3.25, 3))
 axs = [plt.subplot(gs.new_subplotspec(*args)) for args in subplots]
+cax = plt.subplot(gs.new_subplotspec( (50, 50),    50, 950 ))
 
 plot_count = 0
 for i, ax in enumerate(axs):
     this_dir = dirs[i][0]
     for j, info in enumerate(dirs[i][1:]):
         filenum, imgnum = info
+        print('opening file ', this_dir, filenum, imgnum)
         f  = h5py.File('{:s}/slices/slices_s{}.h5'.format(this_dir, filenum), 'r')
         cf = h5py.File('{:s}/thermal_analysis/contour_file.h5'.format(this_dir), 'r')
 
@@ -30,6 +32,10 @@ for i, ax in enumerate(axs):
         rr, zz = np.meshgrid(r.flatten(), z.flatten())
         t = f['scales']['sim_time'].value[imgnum]
 
+        n_rho = float(this_dir.split('_nrho')[-1].split('_Re')[0])
+        grad_T = -(np.exp(n_rho/1.5)-1)/20
+        rho = 1#(1 + grad_T*(zz-20))**1.5
+
         contour = cf['contours'].value[20*(filenum-1)+imgnum,:]
         contours = cf['contours'].value 
         
@@ -37,13 +43,15 @@ for i, ax in enumerate(axs):
         f.close()
         cf.close()
 
-        minval = field.min()
+        minval = -1 
         breaks = len(dirs[i]) - 1
         good   = (zz > (breaks-1-j)/breaks * 20)*(zz <= (breaks-j)/breaks * 20)
-        print(good)
         z_shape = np.sum((z > (breaks-1-j)/breaks * 20)*(z <= (breaks-j)/breaks * 20))
-        ax.pcolormesh( rr[good].reshape(z_shape, len(r)), zz[good].reshape(z_shape, len(r)), field[good].reshape(z_shape, len(r)), cmap='RdBu_r', rasterized=True, vmin=minval, vmax=-minval)
-        ax.pcolormesh(-rr[good].reshape(z_shape, len(r)), zz[good].reshape(z_shape, len(r)), field[good].reshape(z_shape, len(r)), cmap='RdBu_r', rasterized=True, vmin=minval, vmax=-minval)
+        ax.pcolormesh( rr[good].reshape(z_shape, len(r)), zz[good].reshape(z_shape, len(r)), (rho*field)[good].reshape(z_shape, len(r)), cmap='Blues_r', rasterized=True, vmin=minval, vmax=0)
+        c = ax.pcolormesh(-rr[good].reshape(z_shape, len(r)), zz[good].reshape(z_shape, len(r)), (rho*field)[good].reshape(z_shape, len(r)), cmap='Blues_r', rasterized=True, vmin=minval, vmax=0)
+        if i == 0 and j == 0:
+            bar = plt.colorbar(c, cax=cax, orientation='horizontal')
+            cax.xaxis.set_ticks_position('top')
         x_max = 5
         if j == len(dirs[i])-2:
             max_contours = contours.max(axis=1)
@@ -87,5 +95,7 @@ for i, ax in enumerate(axs):
             ax.set_xticks((-x_max, 0, x_max))
             ax.set_yticks((0, 5, 10, 15, 20))
             ax.text(-0.97*x_max, 18.7, r'$n_\rho = \frac{1}{2}$', size=9)
+            ax.set_ylabel('z')
+        ax.set_xlabel('x')
 
-fig.savefig('evolution_colormeshes.png', dpi=300)
+fig.savefig('evolution_colormeshes.png', dpi=300, bbox_inches='tight')
