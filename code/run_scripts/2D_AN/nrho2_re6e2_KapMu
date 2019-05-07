@@ -21,7 +21,6 @@ mpiexec_mpt -n 256 ~/.python3 AN_2D_thermal.py \
     --run_time_buoy=7.1 \
     --rk443 \
     --safety=0.2 \
-    --label=high_safety \
     > ./out.AN_thermal_2D.Re$RE.nrho$NRHO.$PBS_JOBID
 date
 

@@ -17,9 +17,9 @@ mpiexec_mpt -n 128 ~/.python3 AN_2D_thermal.py \
     --n_rho=$NRHO \
     --wall_hours=1.7 \
     --Reynolds=$RE \
-    --aspect=0.25 \
+    --aspect=0.35 \
     --run_time_buoy=11 \
-    --label=sbdf2 \
+    --rk443 \
     > ./out.AN_thermal_2D.Re$RE.nrho$NRHO.$PBS_JOBID
 date
 

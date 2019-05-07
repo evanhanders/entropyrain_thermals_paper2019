@@ -6,74 +6,113 @@ import numpy as np
 import h5py
 
 CASES = [0.1, 0.5, 1, 2, 3, 4]
-r_bounds = [(0, 2), (0, 2), (0, 1.5), (0, 1), (0, 3./4), (0, 3./4)]
 ROOT_DIR='../may03/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect0.25_Lz20/'.format(ROOT_DIR,case) for case in CASES] 
 
-height, width = 5, 6.5
-pad = 50
-h_pad = 100
-p_height = int(np.round((1000 - 2*pad)/len(CASES)))
-p_width  = int(np.round((1000 - 2*pad - h_pad)/3))
+CASES_3D = [0.5, 1, 2]
+AR_3D    = [0.5, 0.4, 0.35]
+THREED_DIR = '../good_3D_runs/'
+DIRS_3D=['{:s}FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho{}_aspect{}/'.format(THREED_DIR,nrho, ar) for nrho, ar in zip(CASES_3D, AR_3D)] 
+dict_3D = {}
+for i in range(len(CASES_3D)):
+    dict_3D[CASES_3D[i]] = DIRS_3D[i]
+
+
+height, width = 2.5, 3.25 
 
 gs = gridspec.GridSpec(1000, 1000)
-
-subplots = []
-for i in range(len(CASES)):
-    for j in range(3):
-        if j > 0:
-            hpad = h_pad + pad
-        else:
-            hpad = pad
-        subplots.append( ( (pad+i*p_height, hpad+j*p_width), p_height, p_width))
-
 fig = plt.figure(figsize=(width, height))
-axs = [plt.subplot(gs.new_subplotspec(*args)) for args in subplots]
+ax  = plt.subplot(gs.new_subplotspec((100, 0), 900, 1000))
+cax = plt.subplot(gs.new_subplotspec((0,   0), 100, 1000))
 
+norm = matplotlib.colors.Normalize(vmin=1, vmax=len(CASES))
+sm   = plt.cm.ScalarMappable(cmap='viridis_r', norm=norm)
+sm.set_array([])
 
 for i, direc in enumerate(DIRS):
     f = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(direc), 'r')
-    for j in range(3):
-        ax = axs[i*3+j]
+    x, y     = f['times'].value, f['d_measured'].value
+    x_t, y_t = f['times'].value, f['d_theory'].value
+    color = sm.to_rgba(i+1)
+    ax.plot(x[::2], y[::2], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.5), markerfacecolor=(*color[:-1], 0.2))
+    if CASES[i] in CASES_3D:
+        f_3D = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(dict_3D[CASES[i]]), 'r')
+        x_3D, y_3D     = f_3D['times'].value, f_3D['d_measured'].value
+        f_3D.close()
+        ax.plot(x_3D[::2], y_3D[::2], marker='+', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.7))
+    ax.plot(x_t, y_t, c=color, lw=1)
+    f.close()
+
+ax.set_xlim(0, 50)
+ax.set_ylim(0, 20)
+ax.set_ylabel('depth')
+ax.set_xlabel(r'$t/t_b$')
+
+ax.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markerfacecolor=(1,1,1,0.8), markeredgecolor='k', label='2D AN')
+ax.plot([100, 101], [100, 101], lw=0, marker='+', c='k', label='3D FC')
+ax.legend(loc='lower right', frameon=False)
+
+cb = plt.colorbar(sm, cax=cax, orientation='horizontal')
+cax.xaxis.set_ticks_position('top')
+cax.xaxis.set_ticklabels(CASES)
+cb.set_label(r'$n_\rho$', labelpad=-40)
+fig.savefig('results_panels_d_v_t.png', dpi=300, bbox_inches='tight')
+
+
+fig = plt.figure(figsize=(width, height*2))
+cax = plt.subplot(gs.new_subplotspec((30,   0), 50, 1000))
+ax1 = plt.subplot(gs.new_subplotspec((80,  0), 460, 1000))
+ax2 = plt.subplot(gs.new_subplotspec((540,  0), 460, 1000))
+
+norm = matplotlib.colors.Normalize(vmin=1, vmax=len(CASES))
+sm   = plt.cm.ScalarMappable(cmap='viridis_r', norm=norm)
+sm.set_array([])
+
+for i, direc in enumerate(DIRS):
+    f = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(direc), 'r')
+    for j in range(2):
         if j == 0:
-            x, y     = f['times'].value, f['d_measured'].value
-            x_t, y_t = f['times'].value, f['d_theory'].value
-        elif j == 1:
             x, y     = f['d_measured'].value, f['r_measured'].value
             x_t, y_t = f['d_theory'].value,   f['r_theory'].value
-        elif j == 2:
+            ax = ax1
+        elif j == 1:
             x, y     = f['d_measured'].value[2:-2], f['w_measured'].value
             x_t, y_t = f['d_theory'].value[2:-2],   f['w_theory'].value
-            ax.yaxis.tick_right()
-            ax.yaxis.set_label_position("right")
-        ax.plot(x, y, c='k', marker='o', lw=0, markersize=1, markeredgecolor='black')
-        ax.plot(x_t, y_t, c='orange', lw=1)
+            ax = ax2
+        color = sm.to_rgba(i+1)
+        ax.plot(x[::2], y[::2], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.5), markerfacecolor=(*color[:-1], 0.2))
+        if CASES[i] in CASES_3D:
+            f_3D = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(dict_3D[CASES[i]]), 'r')
+            if j == 0:
+                x_3D, y_3D     = f_3D['d_measured'].value, f_3D['r_measured'].value
+            elif j == 1:
+                x_3D, y_3D     = f_3D['d_measured'].value[2:-2], f_3D['w_measured'].value
+            f_3D.close()
+            ax.plot(x_3D[::2], y_3D[::2], marker='+', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.7))
+        ax.plot(x_t, y_t, c=color, lw=1)
 
         if j == 0:
-            ax.set_xlim(0, 50)
-            ax.set_ylim(0, 20)
-            ax.set_ylabel('depth')
-            ax.text(0.5, 16, r'$n_\rho = {}$'.format(CASES[i]), size=10)
-        elif j == 1:
             ax.set_xlim(0, 20)
             ax.set_yticks((0.5, 1, 1.5, 2))
-            ax.set_ylim(*r_bounds[i])
+            ax.set_ylim(0, 2)
             ax.set_ylabel('r')
-        elif j == 2:
+            ax.tick_params(labelbottom=False)
+        elif j == 1:
             ax.set_xlim(0, 20)
             ax.set_ylim(-1, 0)
             ax.set_yticks((-1, -0.5))
             ax.set_ylabel('w')
 
-        if i < len(DIRS) - 1:
-            ax.tick_params(labelbottom=False)
-        else:
-            if j == 0:
-                ax.set_xlabel('t')
-            else:
-                ax.set_xlabel('depth')
-
+        ax.set_xlabel('depth')
 
     f.close()
+ax1.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markerfacecolor=(1,1,1,0.8), markeredgecolor='k', label='2D AN')
+ax1.plot([100, 101], [100, 101], lw=0, marker='+', c='k', label='3D FC')
+ax1.legend(loc='upper center', frameon=False)
 
-fig.savefig('results_panels.png', dpi=300, bbox_inches='tight')
+cb = plt.colorbar(sm, cax=cax, orientation='horizontal')
+cax.xaxis.set_ticks_position('top')
+cax.xaxis.set_ticklabels(CASES)
+cb.set_label(r'$n_\rho$', labelpad=-40)
+
+fig.savefig('results_panels_vs_depth.png', dpi=300, bbox_inches='tight')

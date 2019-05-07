@@ -24,7 +24,7 @@ mpiexec_mpt -n 8192 ~/.python3 FC_3D_thermal.py \
         --run_time=23.9 \
         --aspect=0.25 \
         --SBDF2 \
-        > $dedalus_dir/out.label$LABEL.3D.nrho3.Re$RE.Eps$EPS.$PBS_JOBID
+        > $dedalus_dir/out.3D.nrho3.Re$RE.Eps$EPS.$PBS_JOBID
 
 date
 

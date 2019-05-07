@@ -44,92 +44,66 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     """
     #### Step 1.
     #Set up general run info
-    full_out_dir, n_rho, aspect, gamma, m_ad, Cp, Lz, Lr, grad_T_ad, g, files, prof_files, L_factor, t_factor, s_factor, twoD = get_basic_run_info(root_dir, out_dir)
-
-    count           = 0
-    times           = []
-    for fn, fp in zip(files, prof_files):
-        logger.info('reading time on file {:s}'.format(fn))
-        f = h5py.File(fp, 'r')
-        these_times = f['scales']['sim_time'].value
-        [times.append(t) for t in these_times]
-    times = np.array(times)*t_factor
-
-    t0 = times[0]
-    times -= t0
+    post = ThermalPostProcessor(root_dir, out_dir)
 
     #### Step 2.
     #If flagged, solve thermal tracking algorithm to get contour
     if get_contour:
-        measure_cb(root_dir, out_dir, times)
-        fit_w_cb(root_dir, out_dir, times, iterative=iterative)
-        calculate_contour(root_dir, out_dir, times)
+        post.measure_cb()
+        post.fit_w_cb(iterative=iterative)
+        post.calculate_contour()
 
     #### Step 3.
     #If flagged, plot colormeshes
     if plot:
-        plot_colormeshes(root_dir, out_dir, times)
+        post.plot_colormeshes()
     
     #### Step 4.
     #If the thermal contour is found, this section calculates quantities inside (or outside) of the thermal from sim outputs
     if analyze:
-        measure_values_in_thermal(root_dir, out_dir, times)
+        post.measure_values_in_thermal()
 
     #### Step 5.
     #Read in post-processed data and make plots
 
-    output_file = h5py.File('{:s}/post_analysis.h5'.format(full_out_dir), 'r')
-    times       = output_file['times'].value
-    int_circ    = output_file['int_circ'].value
-    int_circ_a  = output_file['int_circ_above'].value
-    int_s1      = output_file['int_s1'].value
-    int_mass    = output_file['int_mass'].value
-    int_impulse = output_file['int_impulse'].value
-    int_impulse_p1 = output_file['int_impulse_p1'].value
-    impulse_piece1 = output_file['impulse_piece1'].value
-    int_impulse_p2 = output_file['int_impulse_p2'].value
-    int_ke      = output_file['int_ke'].value
-    int_rho_s1_a= output_file['int_rho_s1_above'].value
-    int_rho_s1  = output_file['int_rho_s1'].value
-    int_mom     = output_file['int_mom'].value
-    int_pe      = output_file['int_pe'].value
-    int_w       = output_file['int_w'].value
-    int_u       = output_file['int_u'].value
-    volumes     = output_file['int_vol'].value
-    area        = output_file['int_area'].value
-    radius      = output_file['radius'].value
-    w_cb        = output_file['w_cb'].value
-    z_cb        = output_file['z_cb'].value
-    max_s1_therm = output_file['max_s1_therm'].value
-    torus_vol   = output_file['torus_vol'].value
-    full_impulse   = output_file['full_impulse'].value
-    full_momentum   = output_file['full_momentum'].value
-    full_ke    = output_file['full_ke'].value
-
+    #Read in integrated quantities
+    output_file  = h5py.File('{:s}/post_analysis.h5'.format(post.full_out_dir), 'r')
+    times        = output_file['times'].value
+    int_circ     = output_file['int_circ'].value
+    int_circ_a   = output_file['int_circ_above'].value
+    int_impulse  = output_file['int_impulse'].value
+    int_rho_s1_a = output_file['int_rho_s1_above'].value
+    int_rho_s1   = output_file['int_rho_s1'].value
+    int_mom      = output_file['int_mom'].value
+    volumes      = output_file['int_vol'].value
+    area         = output_file['int_area'].value
+    radius       = output_file['radius'].value
+    w_cb         = output_file['w_cb'].value
+    z_cb         = output_file['z_cb'].value
     output_file.close()
 
+    #Read in fit quantities
+    fit_file = h5py.File('{:s}/fit_file.h5'.format(post.full_out_dir), 'r')
+    fit_B     = fit_file['fit_B'].value 
+    fit_M0    = fit_file['fit_M0'].value  
+    fit_I0    = fit_file['fit_I0'].value  
+    fit_beta  = fit_file['fit_beta'].value    
+    fit_Gamma = fit_file['fit_Gamma'].value     
+    fit_V0    = fit_file['fit_V0'].value  
+    fit_T0    = fit_file['fit_T0'].value  
 
-
-
-    output_file = h5py.File('{:s}/fit_file.h5'.format(full_out_dir), 'r')
-    fit_B   = output_file['fit_B']           .value 
-    fit_M0   = output_file['fit_M0']         .value  
-    fit_I0   = output_file['fit_I0']         .value  
-    fit_beta   = output_file['fit_beta']     .value    
-    fit_Gamma   = output_file['fit_Gamma']   .value     
-    fit_V0   = output_file['fit_V0']         .value  
-    fit_T0   = output_file['fit_T0']         .value  
-
-    w_cb = output_file['w_cb'].value
-    cb_T_fit = output_file['cb_T_fit'].value
-    vortex_T = output_file['vortex_T'].value
-    therm_radius = output_file['vortex_radius'].value
-    height      = output_file['vortex_height'].value
-    output_file.close()
-    output_file = h5py.File('{:s}/contour_file.h5'.format(full_out_dir), 'r')
-    z = output_file['z'].value
-    contours = output_file['contours'].value
-    output_file.close()
+    w_cb         = fit_file['w_cb'].value
+    cb_T_fit     = fit_file['cb_T_fit'].value
+    vortex_T     = fit_file['vortex_T'].value
+    therm_radius = fit_file['vortex_radius'].value
+    height       = fit_file['vortex_height'].value
+    fit_file.close()
+   
+    #Read in contours
+    contour_file = h5py.File('{:s}/contour_file.h5'.format(post.full_out_dir), 'r')
+    z        = contour_file['z'].value
+    contours = contour_file['contours'].value
+    contour_file.close()
 
     thermal_found = np.zeros(contours.shape[0], dtype =bool) 
     for i in range(contours.shape[0]):
@@ -138,11 +112,11 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     good = thermal_found
 
     #Recreate thermo profiles
-    height = z_measured = (vortex_T - 1)/grad_T_ad + Lz
-    T0   = (1 + grad_T_ad*(height-Lz))
-    rho0 = T0**m_ad
-    rho0_z = -m_ad*T0**(m_ad-1)*grad_T_ad
-    H_rho = T0 / m_ad / (-grad_T_ad)
+    height = z_measured = (vortex_T - 1)/post.grad_T_ad + post.Lz
+    T0   = (1 + post.grad_T_ad*(height-post.Lz))
+    rho0 = T0**post.m_ad
+    rho0_z = -post.m_ad*T0**(post.m_ad-1)*post.grad_T_ad
+    H_rho = T0 / post.m_ad / (-post.grad_T_ad)
 
     #Find Rz based on contour 
     Rz = np.zeros_like(times)
@@ -159,16 +133,16 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
         z_top = z[z>z_bot][contours[i][z>z_bot] < 0.05*max_c][0]
         Rz[i] = (z_top - z_bot)/2
         z_bots[i] = z_bot
-    rho_bots = (1 + Lz - z_bots)**(1.5)
-    rho_tops = (1 + Lz - z_bots - 2*Rz)**(1.5)
+    rho_bots = (1 + post.Lz - z_bots)**(1.5)
+    rho_tops = (1 + post.Lz - z_bots - 2*Rz)**(1.5)
 
 
     #cb fit
-    depth = Lz - z_cb
+    depth = post.Lz - z_cb
     t_max = times.max()
     t_cond = times.max()/t_max
     times /= t_cond
-    fit_t = (height < 0.7*Lz)*(height > 0.1*Lz)
+    fit_t = (height < 0.75*post.Lz)*(height > 0.25*post.Lz)
     fit_t[0] = False
     found_therm = False
     therm_done  = False
@@ -190,32 +164,10 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
                        labels=['t',r'$\int (\rho S_1) dV$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
     axs[0].axhline(fit_B, c='green', dashes=(2,1))
-    fig.savefig('{:s}/tot_entropy_v_time{:s}'.format(full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
+    fig.savefig('{:s}/tot_entropy_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
     B_approx = scale_t*a + b
-
-    #Eqn2, Aspect ratio = A = R/R_z = const
-    logger.info('plotting eqn2, aspect ratio')
-    aspect_ratio = therm_radius/(Rz)
-    aspect_ratio[np.isinf(aspect_ratio)] = 0
-    aspect_ratio[np.isnan(aspect_ratio)] = 0
-    fig, axs, cb_depth_fit, (a, b) = plot_and_fit_trace(scale_t[good], aspect_ratio[good], fit_ind=fit_t[good], fit_func=linear_fit, 
-                       labels=['t',r'$A = R / R_z$'],
-                       fit_str_format='{:.2g} $t$ + {:.2g}')
-    axs[0].axhline(4*np.pi/3/fit_V0, c='green', dashes=(2,1))
-    fig.savefig('{:s}/aspect_ratio_v_time{:s}'.format(full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
-    plt.close(fig)
-
-#    #Eqn3, r = f R, vortex core radius / total radius is a fraction and constant
-#    logger.info('plotting eqn3, r = f R')
-#    f = therm_radius/radius
-#    fig, axs, f_fit, (df_dt, f_Fit) = plot_and_fit_trace(scale_t[good*np.isfinite(f)], f[good*np.isfinite(f)], fit_ind=fit_t[good*np.isfinite(f)], fit_func=linear_fit, 
-#                       labels=['t',r'$f = r/R$'],
-#                       fit_str_format='{:.2g} $t$ + {:.2g}')
-#    axs[0].axhline(fit_f, c='green', dashes=(2,1))
-#    fig.savefig('{:s}/rR_fraction_v_time{:s}'.format(full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
-#    plt.close(fig)
 
     #Eqn4, volume ~ R^3, or r^3
     logger.info('plotting eqn4, V/r^3 = V_0')
@@ -224,7 +176,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
                        labels=['t',r'$V_0 = V/R^3$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
     axs[0].axhline(fit_V0, c='green', dashes=(2,1))
-    fig.savefig('{:s}/V0_v_time{:s}'.format(full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
+    fig.savefig('{:s}/V0_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
     #Eqn 7, rho V w / B = beta t + M_0
@@ -235,7 +187,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
                        labels=['t',r'$\rho V w / B$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
     axs[0].axhline(fit_M0/B_approx[0], c='green', dashes=(2,1))
-    fig.savefig('{:s}/momentum_div_B_v_time{:s}'.format(full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
+    fig.savefig('{:s}/momentum_div_B_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
     #Eqn 8, 0.5*rho0*r^2*Gamma / B = t + Const
@@ -246,7 +198,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
                        labels=['t',r'$\pi\rho r^2 \Gamma / B$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
     axs[0].axhline(fit_I0/B_approx[0], c='green', dashes=(2,1))
-    fig.savefig('{:s}/impulse_div_B_v_time{:s}'.format(full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
+    fig.savefig('{:s}/impulse_div_B_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
     #Eqn9, B = \int omega dA = const
@@ -254,16 +206,15 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     fig, axs, Gamma_fit, (a, b) = plot_and_fit_trace(scale_t[good],int_circ[good], fit_ind=fit_t[good], fit_func=linear_fit, 
                        labels=['t',r'$\Gamma_{thermal}$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
-    axs[0].axhline(fit_I0/fit_Gamma, c='green', dashes=(2,1))
     print(fit_Gamma)
-    fig.savefig('{:s}/circulation_v_time{:s}'.format(full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
+    axs[0].axhline(fit_Gamma, c='green', dashes=(2,1))
+    fig.savefig('{:s}/circulation_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
 
     #Eqn 10, r = sqrt ( 2 * [Bt + I_0] / rho / Gamma )
     logger.info('plotting eqn10, radius fit')
     r_fit = np.sqrt((B_approx)*(I0_f*scale_t + I0_div_B) / rho0 / int_circ / np.pi)
-    print(r_fit)
 
     fig = plt.figure()
     ax = fig.add_subplot(2,1,1) 
@@ -277,7 +228,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     plt.yscale('log')
     plt.ylabel('fractional diff')
     plt.xlabel('t')
-    fig.savefig('{:s}/r_Fit_v_time.png'.format(full_out_dir), bbox_inches='tight', dpi=200)
+    fig.savefig('{:s}/r_Fit_v_time.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
 
     #Eqn 11, 
@@ -307,7 +258,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     plt.yscale('log')
     plt.ylabel('fractional diff')
     plt.xlabel('t')
-    fig.savefig('{:s}/p_Fit_v_time.png'.format(full_out_dir), bbox_inches='tight', dpi=200)
+    fig.savefig('{:s}/p_Fit_v_time.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
     # Entrainment rate, dlnV_dz
     logger.info('plotting dlnV_dz = dlnV_dt / w_cb')
@@ -318,23 +269,23 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     fig, axs, cb_depth_fit, (a, b) = plot_and_fit_trace(scale_t[1:][use], eps[use], fit_ind=fit_t[1:][use], fit_func=linear_fit, 
                        labels=['t',r'$\frac{d\ln V}{dz}$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
-    fig.savefig('{:s}/entrainment_rate_v_time{:s}'.format(full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
+    fig.savefig('{:s}/entrainment_rate_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
     #Outputs: z(t), r(z), w(z)
     logger.info('plotting z(t)')
-    z_theory   = ((cb_T_fit - 1)/grad_T_ad + Lz)
-    z_measured = ((vortex_T - 1)/grad_T_ad + Lz)
+    z_theory   = ((cb_T_fit - 1)/post.grad_T_ad + post.Lz)
+    z_measured = ((vortex_T - 1)/post.grad_T_ad + post.Lz)
 
-    d_theory   = Lz - z_theory
-    d_measured = Lz - z_measured
+    d_theory   = post.Lz - z_theory
+    d_measured = post.Lz - z_measured
     fig = plt.figure()
     ax = fig.add_subplot(2,1,1) 
     plt.scatter(scale_t[good], d_measured[good], c='k', label=r'$L_z - z$ (measured)', marker='+')
     plt.plot(scale_t[good], d_theory[good], c='orange', label=r'$L_z - z$ (theory)')
     plt.ylabel('depth')
     plt.legend(loc='best')
-    plt.ylim(0, Lz)
+    plt.ylim(0, post.Lz)
     ax = fig.add_subplot(2,1,2)
     plt.grid(which='major')
     plt.plot(scale_t[good], np.abs(1 - d_theory[good]/d_measured[good]), c='orange', label='theory V measured')
@@ -343,7 +294,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     plt.ylabel('fractional diff')
     plt.xlabel('t')
 
-    fig.savefig('{:s}/z_v_t.png'.format(full_out_dir), bbox_inches='tight', dpi=200)
+    fig.savefig('{:s}/z_v_t.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
 
 
@@ -355,11 +306,11 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     plt.scatter(d_measured[good], r_measured[good], c='k', label=r'$r$ (measured)', marker='+')
     plt.plot(d_theory[good],   r_theory[good], c='orange', label=r'$r$ (theory)')
     plt.ylim(0, np.max(r_measured)*1.25)
-    plt.xlim(0, Lz)
+    plt.xlim(0, post.Lz)
     plt.ylabel('r')
     plt.legend(loc='best')
     plt.xlabel('depth')
-    fig.savefig('{:s}/r_v_z.png'.format(full_out_dir), bbox_inches='tight', dpi=200)
+    fig.savefig('{:s}/r_v_z.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
     logger.info('plotting w(z)')
     w_measured = differentiate(scale_t, z_measured)
@@ -370,11 +321,11 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     plt.scatter(d_measured[2:-2][this_good], w_measured[this_good], c='k', marker='+', label=r'$w$ (measured)')
     plt.plot(d_theory[2:-2][this_good],  w_theory[this_good],   c='orange', label=r'$w$ (theory)')
     plt.ylim(np.min(w_measured[fit_t[2:-2]])*1.25, np.max(w_measured[fit_t[2:-2]])/1.25)
-    plt.xlim(0, Lz)
+    plt.xlim(0, post.Lz)
     plt.ylabel('w')
     plt.legend(loc='best')
     plt.xlabel('depth')
-    fig.savefig('{:s}/w_v_z.png'.format(full_out_dir), bbox_inches='tight', dpi=200)
+    fig.savefig('{:s}/w_v_z.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
 
     logger.info('plotting integrated / approx quantities')
@@ -391,11 +342,11 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     plt.ylabel('fractions')
     plt.legend(loc='best')
     plt.xlabel('t')
-    fig.savefig('{:s}/fractions_v_t.png'.format(full_out_dir), bbox_inches='tight', dpi=200)
+    fig.savefig('{:s}/fractions_v_t.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
 
 
-    f = h5py.File('{:s}/iterative_file.h5'.format(full_out_dir), 'w')
+    f = h5py.File('{:s}/iterative_file.h5'.format(post.full_out_dir), 'w')
     (a_i, i0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], I[fit_t])
     (a_p, p0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], p[fit_t])
     print(a_i, a_p)
@@ -406,13 +357,12 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     f['V0'] = np.mean(V0_fit)
     f.close()
 
-    f = h5py.File('{:s}/final_outputs.h5'.format(full_out_dir), 'w')
+    f = h5py.File('{:s}/final_outputs.h5'.format(post.full_out_dir), 'w')
     f['good'] = good
     f['fit_t'] = fit_t
     f['times'] = scale_t
     f['B'] = int_rho_s1
     f['B_approx'] = B_approx 
-    f['A'] = aspect_ratio
     f['f'] = therm_radius/radius
     f['V0'] = V0
     f['p']  = p
