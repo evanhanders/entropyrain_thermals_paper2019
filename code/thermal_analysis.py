@@ -78,8 +78,6 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     volumes      = output_file['int_vol'].value
     area         = output_file['int_area'].value
     radius       = output_file['radius'].value
-    w_cb         = output_file['w_cb'].value
-    z_cb         = output_file['z_cb'].value
     output_file.close()
 
     #Read in fit quantities
@@ -91,6 +89,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     fit_Gamma = fit_file['fit_Gamma'].value     
     fit_V0    = fit_file['fit_V0'].value  
     fit_T0    = fit_file['fit_T0'].value  
+    fit_If    = fit_file['fit_If'].value  
 
     w_cb         = fit_file['w_cb'].value
     cb_T_fit     = fit_file['cb_T_fit'].value
@@ -138,11 +137,11 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
 
 
     #cb fit
-    depth = post.Lz - z_cb
+    depth = post.Lz - height
     t_max = times.max()
     t_cond = times.max()/t_max
     times /= t_cond
-    fit_t = (height < 0.75*post.Lz)*(height > 0.25*post.Lz)
+    fit_t = (height < 0.75*post.Lz)*(height > 0.1*post.Lz)
     fit_t[0] = False
     found_therm = False
     therm_done  = False
@@ -181,23 +180,28 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
 
     #Eqn 7, rho V w / B = beta t + M_0
     logger.info('plotting eqn7, rho V w / B = linear')
-    p_B = rho0*volumes*w_cb/B_approx
-    p = p_B*B_approx
+    p_B = rho0*volumes*w_cb/fit_B/fit_If#B_approx
+    p = p_B*fit_B#B_approx
     fig, axs, cb_depth_fit, (beta, M0_div_B) = plot_and_fit_trace(scale_t[good*np.isfinite(p_B)], p_B[good*np.isfinite(p_B)], fit_ind=fit_t[good*np.isfinite(p_B)], fit_func=linear_fit, 
                        labels=['t',r'$\rho V w / B$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
-    axs[0].axhline(fit_M0/B_approx[0], c='green', dashes=(2,1))
+#    axs[0].axhline(fit_M0/fit_B/fit_If, c='green', dashes=(2,1))
+    theory = linear_fit(post.times, fit_beta*fit_B, fit_M0)/fit_B
+    axs[0].plot(post.times, theory, c='indigo')
     fig.savefig('{:s}/momentum_div_B_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
     #Eqn 8, 0.5*rho0*r^2*Gamma / B = t + Const
     logger.info('plotting eqn8, 0.5* rho r^2 Gamma / B = t + const')
-    I_B = np.pi*rho0*therm_radius**2*int_circ/B_approx
-    I = I_B*B_approx
+    I_B = np.pi*rho0*therm_radius**2*int_circ/fit_B/fit_If#B_approxa
+    I_B_true = int_impulse/fit_B
+    I = I_B*fit_B#B_approx
+    theory = linear_fit(post.times, fit_B, fit_I0)/fit_B
     fig, axs, I_B_fit, (I0_f, I0_div_B) = plot_and_fit_trace(scale_t[good*np.isfinite(I_B)], I_B[good*np.isfinite(I_B)], fit_ind=fit_t[good*np.isfinite(I_B)], fit_func=linear_fit, 
                        labels=['t',r'$\pi\rho r^2 \Gamma / B$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
-    axs[0].axhline(fit_I0/B_approx[0], c='green', dashes=(2,1))
+    axs[0].plot(post.times, theory, c='indigo')
+#    axs[0].axhline(fit_I0/fit_B/fit_If, c='green', dashes=(2,1))
     fig.savefig('{:s}/impulse_div_B_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
@@ -214,12 +218,14 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
 
     #Eqn 10, r = sqrt ( 2 * [Bt + I_0] / rho / Gamma )
     logger.info('plotting eqn10, radius fit')
-    r_fit = np.sqrt((B_approx)*(I0_f*scale_t + I0_div_B) / rho0 / int_circ / np.pi)
+    r_fit = np.sqrt((fit_If)*(fit_B*scale_t + fit_I0) / rho0 / fit_Gamma / np.pi)
+#    r_fit = np.sqrt((fit_B)*(I0_f*scale_t + I0_div_B) / rho0 / int_circ / np.pi)
 
     fig = plt.figure()
     ax = fig.add_subplot(2,1,1) 
     plt.plot(scale_t[good], therm_radius[good], label='r')
-    plt.plot(scale_t[good], r_fit[good], label=r'$\sqrt{{\frac{{({:.2f}Bt + I_0)}}{{\pi \rho \Gamma}}}}$'.format(I0_f))
+    plt.plot(scale_t[good], r_fit[good], label=r'$\sqrt{{\frac{{(Bt + I_0)}}{{\pi \rho \Gamma}}}}$')
+#    plt.plot(scale_t[good], r_fit[good], label=r'$\sqrt{{\frac{{({:.2f}Bt + I_0)}}{{\pi \rho \Gamma}}}}$'.format(I0_f))
     plt.ylim(0, 1.25*np.max(therm_radius))
     plt.ylabel('r')
     plt.legend(loc='best')
@@ -233,15 +239,14 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
 
     #Eqn 11, 
     logger.info('plotting eqn 4 & 11, momentum fit')
-    V_est = V0 * r_fit**3
-#    w_cb  = (z_cb[2:] - z_cb[:-2])/(scale_t[2:] - scale_t[:-2])
+    V_est = fit_V0 * r_fit**3
     momentum_est = rho0 * V_est * w_cb
-    momentum_linear = B_approx*(beta*scale_t+M0_div_B)
+    momentum_linear = fit_B*fit_If*(beta*scale_t+M0_div_B)
 
     fig = plt.figure()
     ax = fig.add_subplot(2,1,1) 
     plt.plot(scale_t[good], int_mom[good], c='k', label=r'$\int \rho w dV$')
-    plt.plot(scale_t[good], momentum_est[good], c='indigo', label=r'$\rho\frac{V_0}{f^3}r_{fit}^3 \frac{d z_{cb}}{dt}$')
+    plt.plot(scale_t[good], momentum_est[good], c='indigo', label=r'$\rho V_0 r_{fit}^3 w_{cb}$')
     plt.plot(scale_t[good], momentum_linear[good], c='orange', ls='--', label=r'$B\left(\beta t + \frac{M_0}{B}\right)$')
     if np.mean(B_approx) < 0:
         plt.ylim(int_mom[good].min()*1.25, 0)
@@ -331,8 +336,9 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     logger.info('plotting integrated / approx quantities')
     impulse = int_impulse
     momentum = int_mom
-    momentum_approx = p_B * B_approx
-    impulse_approx  = I_B * B_approx
+    momentum_approx = p_B * fit_B * fit_If#B_approx
+    impulse_approx  = I_B * fit_B * fit_If#B_approx
+    measured_If     = impulse_approx/impulse
     fig = plt.figure()
     ax = fig.add_subplot(1,1,1) 
     plt.grid()
@@ -345,16 +351,17 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     fig.savefig('{:s}/fractions_v_t.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
 
-
     f = h5py.File('{:s}/iterative_file.h5'.format(post.full_out_dir), 'w')
     (a_i, i0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], I[fit_t])
     (a_p, p0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], p[fit_t])
-    print(a_i, a_p)
-    f['I0'] = i0
-    f['M0'] = p0
+    print(a_i, a_p, I0_f*fit_If)
+    f['I0'] = i0/I0_f
+    f['M0'] = p0/I0_f
     f['B']  = np.mean(B_approx)
     f['Gamma'] = np.mean(Gamma_fit)
     f['V0'] = np.mean(V0_fit)
+    f['T0'] = fit_T0 
+    f['If'] = I0_f*fit_If
     f.close()
 
     f = h5py.File('{:s}/final_outputs.h5'.format(post.full_out_dir), 'w')
@@ -365,6 +372,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     f['B_approx'] = B_approx 
     f['f'] = therm_radius/radius
     f['V0'] = V0
+    f['If'] = measured_If
     f['p']  = p
     f['I']  = I
     f['Gamma'] = int_circ

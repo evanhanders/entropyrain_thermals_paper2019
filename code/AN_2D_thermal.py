@@ -34,7 +34,7 @@ Options:
 
     --chi_nu              If true, use a constant diffusivity (rather than constant dynamic diffusivity) eqn formulation
     --safety=<s>          Safety factor base [default: 0.08]
-    --out_cadence=<o>     Time cadence of output saves in buoyancy times [default: 0.2]  
+    --out_cadence=<o>     Time cadence of output saves in buoyancy times [default: 0.08]  
 
     --restart=<file>      Name of file to restart from, if starting from checkpoint
 

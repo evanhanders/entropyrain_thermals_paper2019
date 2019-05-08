@@ -38,27 +38,35 @@ def linear_fit(x, a, b):
     """ A linear fit: y = a* x + b """
     return a*x + b
 
-def theory_C(B, Gamma, V0, grad_T_ad=-1):
+def theory_C(B, Gamma, V0, If, grad_T_ad=-1):
     """ The constant in stratified thermals theory """
-    return np.pi**(3./2) * Gamma * grad_T_ad / (V0 * B)
+    return np.pi**(3./2) * Gamma * grad_T_ad / (V0 * B * If**(1./2))
 
-def theory_T(t, B, M0, I0, Gamma, V0, T0, beta, grad_T_ad=-1, m_ad=1.5):
+def theory_T(t, B, M0, I0, Gamma, V0, T0, beta, If, grad_T_ad=-1, m_ad=1.5):
     """ The temperature profile (vs time) from stratified thermals theory """
-    C0 = theory_C(B, Gamma, V0, grad_T_ad=grad_T_ad)
-    tau = (B * t + I0)/Gamma
+    C0 = theory_C(B, Gamma, V0, If, grad_T_ad=grad_T_ad)
+    tau = (If * B * t + I0)/Gamma
     tau0 = I0/Gamma
     Tpow = 1 - (m_ad/2)
     tau_int  = np.sqrt(tau )*(Gamma*beta - (M0 - beta*I0)/tau)
     tau_int0 = np.sqrt(tau0)*(Gamma*beta - (M0 - beta*I0)/tau0)
     return (2*Tpow*C0*(tau_int-tau_int0) + T0**(Tpow))**(1./Tpow)
 
-def theory_dT_dt(t, B, M0, I0, Gamma, V0, T0, beta, grad_T_ad=-1, m_ad=1.5):
+def theory_dT_dt(t, B, M0, I0, Gamma, V0, T0, beta, If, grad_T_ad=-1, m_ad=1.5):
     """ The temperature derivative (vs time) from stratified thermals theory """
-    C0 = theory_C(B, Gamma, V0, grad_T_ad=grad_T_ad)
-    this_T = theory_T(t, B, M0, I0, Gamma, V0, T0, beta, grad_T_ad=grad_T_ad, m_ad=m_ad)
-    tau = (B * t + I0)/Gamma
-    dtau_dt = B/Gamma
+    C0 = theory_C(B, Gamma, V0, If, grad_T_ad=grad_T_ad)
+    this_T = theory_T(t, B, M0, I0, Gamma, V0, T0, beta, If, grad_T_ad=grad_T_ad, m_ad=m_ad)
+    tau = (If * B * t + I0)/Gamma
+    dtau_dt = If * B/Gamma
     return C0*dtau_dt*this_T**(m_ad/2)*(beta*Gamma/np.sqrt(tau) + (M0 - beta*I0)/np.sqrt(tau**3))
+
+def theory_r(t, B, I0, Gamma, If, rho_f=None):
+    """ The temperature profile (vs time) from stratified thermals theory """
+    r = np.sqrt(If*(B*t + I0)/np.pi/Gamma)
+    if rho_f is None:
+        return r
+    return r/np.sqrt(rho_f(t))
+
 
 class DedalusIntegrator():
     """
@@ -377,7 +385,7 @@ class ThermalPostProcessor():
         c_f.close()
 
 
-        fit_t = self.get_good_times(z_cb, L_max=0.75, L_min=0.25)
+        fit_t = self.get_good_times(z_cb, L_max=0.6, L_min=0.2)
 
         #Estimates
         B_est = np.mean(B[fit_t])
@@ -387,7 +395,7 @@ class ThermalPostProcessor():
         V0_est   = 4*np.pi/3/A_est / f_est**3
 
         circ0 = circ[fit_t][0]
-        I    = vortex_T[fit_t]**self.m_ad * vortex_radius[fit_t]**2 * circ_est/2
+        I    = 2*np.pi*vortex_rho[fit_t] * vortex_radius[fit_t]**2 * circ_est
         (a_i, i0), pcov = scop.curve_fit(linear_fit, self.times[fit_t], I)
         (a_mom, m0), pcov = scop.curve_fit(linear_fit, self.times[fit_t], momentum[fit_t])
 
@@ -395,68 +403,93 @@ class ThermalPostProcessor():
         print(fit_t)
 
         #Set ranges for parameters in solver
-        if iterative:
-            output_file = h5py.File('{:s}/iterative_file.h5'.format(self.full_out_dir), 'r')
-            B = output_file['B']        .value
-            V0 = output_file['V0']      .value
-            M0 = output_file['M0']      .value
-            I0 = output_file['I0']      .value
-            Gamma = output_file['Gamma'].value
-            output_file.close()
-            beta_min, beta_max = 0.5, 0.501
-            T0_min, T0_max = 0, vortex_T[0]*2
-            V0_min, V0_max = 0.8*V0, 1.2*V0
-            I0_min, I0_max = 1.2*I0, 0.8*I0
-            M0_min, M0_max = 1.2*M0, 0.8*M0
-            bounds = ((beta_min, T0_min, V0_min, I0_min, M0_min), 
-                      (beta_max, T0_max, V0_max, I0_max, M0_max))
-            p = (0.5, T0_max/2, V0, I0, M0)
-            this_T_theory     = lambda times, beta, T0, V0, I0, M0:     theory_T(times, B, M0, I0, Gamma, V0, T0, beta, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
-            this_dT_dt_theory = lambda times, beta, T0, V0, I0, M0: theory_dT_dt(times, B, M0, I0, Gamma, V0, T0, beta, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
-            vortex_dT_dt = differentiate(self.times, vortex_T)#np.diff(vortex_T)/np.diff(times)
-#            (beta, T0, V0, I0, M0), pcov = scop.curve_fit(this_dT_dt_theory, self.times[2:-2][fit_t[2:-2]], vortex_dT_dt[fit_t[2:-2]], bounds=bounds, p0=p)
-            (beta, T0, V0, I0, M0), pcov = scop.curve_fit(this_T_theory, self.times[fit_t], vortex_T[fit_t], bounds=bounds, p0=p)
-            cb_T_fit =  this_T_theory(self.times, beta, T0, V0, I0, M0)
-            dT_dt = this_dT_dt_theory(self.times, beta, T0, V0, I0, M0)
+#        if iterative:
+#            output_file = h5py.File('{:s}/iterative_file.h5'.format(self.full_out_dir), 'r')
+#            B = output_file['B']        .value
+#            V0 = output_file['V0']      .value
+#            M0 = output_file['M0']      .value
+#            I0 = output_file['I0']      .value
+#            T0 = output_file['T0']      .value
+#            Gamma = output_file['Gamma'].value
+#            If    = output_file['If'].value
+#            output_file.close()
+#            beta = 0.5
+#
+##            beta_min, beta_max = 0.5,  0.5001
+#            T0_min, T0_max = 0.8*T0, 1.2*T0
+#            V0_min, V0_max = 0.9*V0, 1.2*V0
+#            I0_min, I0_max = 1.2*I0, 0.8*I0
+#            M0_min, M0_max = 1.2*M0, 0.8*M0
+#            If_min, If_max = 0.999*If, 1.001*If
+##            bounds = ((beta_min, T0_min, V0_min, I0_min, M0_min, If_min), 
+##                      (beta_max, T0_max, V0_max, I0_max, M0_max, If_max))
+#            bounds = ((T0_min, V0_min, I0_min, M0_min, If_min), 
+#                      (T0_max, V0_max, I0_max, M0_max, If_max))
+#            p = (T0, V0, I0, M0, If)
+#            this_T_theory     = lambda times, T0, V0, I0, M0, If:     theory_T(times, B, M0, I0, Gamma, V0, T0, beta, If, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
+#            this_dT_dt_theory = lambda times, T0, V0, I0, M0, If: theory_dT_dt(times, B, M0, I0, Gamma, V0, T0, beta, If, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
+#            vortex_dT_dt = differentiate(self.times, vortex_T)#np.diff(vortex_T)/np.diff(times)
+##            (T0, V0, I0, M0, If), pcov = scop.curve_fit(this_dT_dt_theory, self.times[2:-2][fit_t[2:-2]], vortex_dT_dt[fit_t[2:-2]], bounds=bounds, p0=p)
+#            (T0, V0, I0, M0, If), pcov = scop.curve_fit(this_T_theory, self.times[fit_t], vortex_T[fit_t], bounds=bounds, p0=p)
+#            cb_T_fit =  this_T_theory(self.times, T0, V0, I0, M0, If)
+#            dT_dt = this_dT_dt_theory(self.times, T0, V0, I0, M0, If)
+#        else:
+        B_min, B_max = B_est, 0.99*B_est
+        Gamma_min, Gamma_max = 1*circ_est, 0.95*circ_est
+#        B_min, B_max = B_est, 0.95*B_est
+#        Gamma_min, Gamma_max = 0.9*circ_est, 0.725*circ_est
+        if i0 < 0:
+            I_min, I_max = 3*i0, i0/3
         else:
-            B_min, B_max = B_est, 0.5*B_est
-            Gamma_min, Gamma_max = circ_est, 0.6*circ_est
-            M_min, M_max = 5*m0, -0.2*m0
-            if i0 < 0:
-                I_min, I_max = 5*i0, -0.2*i0
-            else:
-                I_min, I_max = -0.2*i0, 5*i0
-            beta_min, beta_max = 0.5, 0.51 
-            V0_min, V0_max = 1, 10*V0_est
-            T0_min, T0_max = 0, 1*vortex_T[0]#, 1.5*vortex_T[0]
-            bounds = ((B_min, M_min, I_min, Gamma_min, beta_min, T0_min, V0_min), 
-                      (B_max, M_max, I_max, Gamma_max, beta_max, T0_max, V0_max))
+            I_min, I_max = i0/3, 3*i0
+        If_min, If_max = 0.999, 1.001
+        If_min, If_max = 0.8, 1.25
+        p = (B_min, i0, Gamma_min, 1)
+        bounds = ((B_min, I_min, Gamma_min, If_min), 
+                  (B_max, I_max, Gamma_max, If_max))
+        #fit to r
+        this_r_theory     = lambda t, B, I0, Gamma, If:     theory_r(t, B, I0, Gamma, If, rho_f=interp1d(self.times, vortex_rho))
+        (B, I0, Gamma, If), pcov = scop.curve_fit(this_r_theory, self.times[fit_t], vortex_radius[fit_t], maxfev=int(1e4), p0=p, bounds=bounds)
 
-            p = (B_min, m0, i0, Gamma_min, beta_min, vortex_T[0], V0_est)
+        V0_min, V0_max = V0_est/2, 5*V0_est
+        T0_min, T0_max = 0.7*vortex_T[0], 1.3*vortex_T[0]#, 1.5*vortex_T[0]
+        if m0 < 0:
+            M_min, M_max = 5*m0, 0.2*m0
+        else:
+            M_min, M_max = 0.2*m0, 5*m0
+        beta_min, beta_max = 0.5, 0.501
 
-            vortex_dT_dt = differentiate(self.times, vortex_T)#np.diff(vortex_T)/np.diff(times)
-            #Wrap theory functions with assumptions and atmospheric info
-            this_T_theory     = lambda times, B, M0, I0, Gamma, beta, T0, V0:     theory_T(times, B, M0, I0, Gamma, V0, T0, beta, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
-            this_dT_dt_theory = lambda times, B, M0, I0, Gamma, beta, T0, V0: theory_dT_dt(times, B, M0, I0, Gamma, V0, T0, beta, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
-#            (B, M0, I0, Gamma, beta, T0, V0), pcov = scop.curve_fit(this_dT_dt_theory, self.times[2:-2][fit_t[2:-2]], vortex_dT_dt[fit_t[2:-2]], bounds=bounds, p0=p, maxfev=int(1e4))
-            (B, M0, I0, Gamma, beta, T0, V0), pcov = scop.curve_fit(this_T_theory, self.times[fit_t], vortex_T[fit_t], bounds=bounds, p0=p, maxfev=int(1e4))
-            cb_T_fit = this_T_theory(self.times, B, M0, I0, Gamma, beta,  T0, V0)
-            dT_dt = this_dT_dt_theory(self.times, B, M0, I0, Gamma, beta, T0, V0)
-            V0 = V0_est
+        bounds = ((M_min, T0_min, V0_min, beta_min), 
+                  (M_max, T0_max, V0_max, beta_max))
+
+        p = (m0, vortex_T[0], V0_max, 0.5)
+        
+        #fit to temp
+        vortex_dT_dt = differentiate(self.times, vortex_T)#np.diff(vortex_T)/np.diff(times)
+        #Wrap theory functions with assumptions and atmospheric info
+        print(len(self.times), len(vortex_rho))
+        this_T_theory     = lambda times, M0, T0, V0, beta:     theory_T(times, B, M0, I0, Gamma, V0, T0, beta, If, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
+        this_dT_dt_theory = lambda times, M0, T0, V0, beta: theory_dT_dt(times, B, M0, I0, Gamma, V0, T0, beta, If, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
+#        (M0, T0, V0, beta), pcov = scop.curve_fit(this_dT_dt_theory, self.times[2:-2][fit_t[2:-2]], vortex_dT_dt[fit_t[2:-2]], bounds=bounds, p0=p, maxfev=int(1e4))
+        (M0, T0, V0, beta), pcov = scop.curve_fit(this_T_theory, self.times[fit_t], vortex_T[fit_t], bounds=bounds, p0=p, maxfev=int(1e4))
+        cb_T_fit = this_T_theory(self.times,  M0, T0, V0, beta)
+        dT_dt = this_dT_dt_theory(self.times, M0, T0, V0, beta)
+        radius = this_r_theory(self.times, B, I0, Gamma, If)
 
         cb_dT_dt = differentiate(self.times, cb_T)#np.diff(vortex_T)/np.diff(times)
         w_cb = dT_dt/self.grad_T_ad
+        w_vortex = vortex_dT_dt/self.grad_T_ad
         if np.isnan(w_cb[0]) or np.isinf(w_cb[0]):
             w_cb[0] = 0
 
         #Output info & safe to file
-        logger.info('theory B {:.4e}, M0 {:.4e}, I0 {:.4e}, beta {:.4e}, V0 {:.4e}, Gamma {:.4e}, T0 {:.2f}'.format(B, M0, I0, beta, V0, Gamma, T0))
-        logger.info('w_cb {}'.format(w_cb[fit_t]))
-        logger.info('vortex dT_dt/gradT {}'.format(vortex_dT_dt[fit_t[2:-2]]/self.grad_T_ad))
-        logger.info('theory T  {}'.format(cb_T_fit[fit_t]))
-        logger.info('vortex T  {}'.format(vortex_T[fit_t]))
+        logger.info('theory B {:.4e}, M0 {:.4e}, I0 {:.4e}, beta {:.4e}, V0 {:.4e}, Gamma {:.4e}, T0 {:.2f}, If {:.2f}'.format(B, M0, I0, beta, V0, Gamma, T0, If))
+        logger.info('w_cb % diff {}'.format(1 - w_cb[2:-2][fit_t[2:-2]]/w_vortex[fit_t[2:-2]]))
+        logger.info('T % diff  {}'.format(1 - cb_T_fit[fit_t]/vortex_T[fit_t]))
+        logger.info('r % diff  {}'.format(1 - radius[fit_t]/vortex_radius[fit_t]))
+        logger.info('(vortex - theory)/vortex r {:.2e}'.format(np.mean(np.abs((1 - radius/vortex_radius)[fit_t]))))
         logger.info('(vortex - theory)/vortex T {:.2e}'.format(np.mean(np.abs((1 - cb_T_fit/vortex_T)[fit_t]))))
-        logger.info('(vortex - theory)/vortex dT/dz {:.2e}'.format(np.mean(np.abs((1 - dT_dt[2:-2]/vortex_dT_dt)[fit_t[2:-2]]))))
+        logger.info('(vortex - theory)/vortex w {:.2e}'.format(np.mean(np.abs((1 - w_cb[2:-2]/w_vortex)[fit_t[2:-2]]))))
 
         output_file = h5py.File('{:s}/fit_file.h5'.format(self.full_out_dir), 'w')
         output_file['w_cb']             = w_cb
@@ -472,7 +505,8 @@ class ThermalPostProcessor():
         output_file['fit_beta']         = beta
         output_file['fit_Gamma']        = Gamma
         output_file['fit_V0']           = V0
-        output_file['fit_T0']           = vortex_T[0]
+        output_file['fit_T0']           = T0
+        output_file['fit_If']           = If
         output_file.close()
 
 
@@ -564,19 +598,6 @@ class ThermalPostProcessor():
 
                 for i in range(s1.shape[0]):
                     count += 1
-                    #Circulation
-                    integrator.fd1['g'] = V[i,:,:]
-                    circ[count-1] = integrator.full_integrate()
-                    integrator.field_clean()
-                    #Buoyancy
-                    integrator.fd1['g'] = 2*np.pi*integrator.rho0['g']*s1[i,:,:]*integrator.r
-                    B[count-1] = integrator.full_integrate()
-                    integrator.field_clean()
-                    #momentum
-                    integrator.fd1['g'] = 2*np.pi*integrator.rho0['g']*w[i,:,:]*integrator.r
-                    momentum[count-1] = integrator.full_integrate()
-                    integrator.field_clean()
-
                     if count == 1:
                         integrator.fd1['g'] = integrator.rho0['g']*s1[i,:,:]*integrator.r
                     else:
@@ -657,6 +678,33 @@ class ThermalPostProcessor():
 
                     z_cb[count - 1] = this_z_cb
                     logger.info('cb calc count {}, t = {:.2e} / z_cb {:.2e} / (r,z) = ({:.2e}, {:.2e})'.format(count, self.times[count-1], this_z_cb, vortex_radius[count-1], vortex_height[count-1]))
+
+                    mask = (np.sqrt(rr**2 + (zz-vortex_height[count - 1])**2) > 2*vortex_radius[count - 1])
+                    #Circulation
+                    Vort = V[i,:]
+                    Vort[mask] *= 0
+                    integrator.fd1['g'] = Vort 
+                    circ[count-1] = Gamma = integrator.full_integrate()
+                    integrator.field_clean()
+                    #Buoyancy
+                    Buoy = s1[i,:]
+                    Buoy[mask] *= 0
+                    integrator.fd1['g'] = (2*np.pi*integrator.rho0['g']*Buoy*integrator.r)
+                    B[count-1] = this_B = integrator.full_integrate()
+                    integrator.field_clean()
+                    #momentum
+                    Vel = w[i,:]
+                    Vel[mask] *= 0
+                    integrator.fd1['g'] = (2*np.pi*integrator.rho0['g']*Vel*integrator.r)
+                    momentum[count-1] = P = integrator.full_integrate()
+                    integrator.field_clean()
+
+                    logger.info('B: {:.2e}, Gamma: {:.2e}, P: {:.2e}\n\n'.format(this_B, Gamma, P))
+
+
+
+
+
             output_file = h5py.File('{:s}/z_cb_file.h5'.format(self.full_out_dir), 'w')
             output_file['times']            = self.times
             output_file['z']                = z
@@ -705,9 +753,6 @@ class ThermalPostProcessor():
                             'int_area', 
                             'max_s1_therm',
                             'torus_vol',
-                            'impulse_piece1',
-                            'int_impulse_p1',
-                            'int_impulse_p2',
                             'full_impulse',
                             'full_momentum',
                             'full_circ',
@@ -763,14 +808,12 @@ class ThermalPostProcessor():
                             'int_ke' :  2*np.pi*integrator.rho0['g']*w[i,:]**2*integrator.r / 2, 
                             'int_mom' : 2*np.pi*integrator.rho0['g']*w[i,:]*integrator.r, 
                             'int_pe' : 2*np.pi*s1[i,:]*integrator.rho0['g']*self.g*-1*integrator.z*integrator.r,
-                            'int_impulse_p1' : 2*np.pi*0.5*integrator.rho0['g']*V[i,:]*integrator.r**2,
-                            'int_impulse_p2' : 2*np.pi*0.5*integrator.rho0_z['g']*u[i,:]*integrator.r**2,
+                            'int_impulse' : np.pi*integrator.rho0['g']*V[i,:]*integrator.r**2,
                             'int_rho_s1' : 2*np.pi*integrator.rho0['g']*s1[i,:]*integrator.r, 
                             'int_rho_s1_above' : 2*np.pi*integrator.rho0['g']*s1[i,:]*integrator.r, 
                             'int_w' : 2*np.pi*w[i,:]*integrator.r, 
                             }
 
-                integrands['int_impulse'] = integrands['int_impulse_p1'] + integrands['int_impulse_p2']
                 integrands['full_impulse'] = np.copy(integrands['int_impulse'])
                 integrands['full_momentum'] = np.copy(integrands['int_mom'])
                 integrands['full_circ'] = np.copy(integrands['int_circ'])
