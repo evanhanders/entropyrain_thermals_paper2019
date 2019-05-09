@@ -51,7 +51,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     if get_contour:
         post.measure_cb()
         post.fit_w_cb(iterative=iterative)
-        post.calculate_contour()
+        post.calculate_contour(iterative=iterative)
 
     #### Step 3.
     #If flagged, plot colormeshes
@@ -86,17 +86,24 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     fit_M0    = fit_file['fit_M0'].value  
     fit_I0    = fit_file['fit_I0'].value  
     fit_beta  = fit_file['fit_beta'].value    
+    fit_chi   = fit_file['fit_chi'].value    
     fit_Gamma = fit_file['fit_Gamma'].value     
     fit_V0    = fit_file['fit_V0'].value  
     fit_T0    = fit_file['fit_T0'].value  
-    fit_If    = fit_file['fit_If'].value  
 
     w_cb         = fit_file['w_cb'].value
     cb_T_fit     = fit_file['cb_T_fit'].value
-    vortex_T     = fit_file['vortex_T'].value
+    T0 = vortex_T     = fit_file['vortex_T'].value
+    vortex_w     = fit_file['vortex_w'].value
+    rho0 = vortex_rho   = fit_file['vortex_rho'].value
     therm_radius = fit_file['vortex_radius'].value
     height       = fit_file['vortex_height'].value
     fit_file.close()
+    height = z_measured = (T0 - 1)/post.grad_T_ad + post.Lz
+
+    theory_impulse  = linear_fit(post.times, fit_B*fit_beta,   fit_I0*fit_beta)
+    theory_momentum = linear_fit(post.times, fit_B*fit_beta*fit_chi, fit_M0*fit_beta*fit_chi)
+    theory_radius   = np.sqrt(theory_impulse/(np.pi*vortex_rho*fit_Gamma))
    
     #Read in contours
     contour_file = h5py.File('{:s}/contour_file.h5'.format(post.full_out_dir), 'r')
@@ -109,13 +116,6 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
         if not (contours[i,-1] != 0)*(contours[i,-2]==0):
             thermal_found[i] = True
     good = thermal_found
-
-    #Recreate thermo profiles
-    height = z_measured = (vortex_T - 1)/post.grad_T_ad + post.Lz
-    T0   = (1 + post.grad_T_ad*(height-post.Lz))
-    rho0 = T0**post.m_ad
-    rho0_z = -post.m_ad*T0**(post.m_ad-1)*post.grad_T_ad
-    H_rho = T0 / post.m_ad / (-post.grad_T_ad)
 
     #Find Rz based on contour 
     Rz = np.zeros_like(times)
@@ -132,16 +132,10 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
         z_top = z[z>z_bot][contours[i][z>z_bot] < 0.05*max_c][0]
         Rz[i] = (z_top - z_bot)/2
         z_bots[i] = z_bot
-    rho_bots = (1 + post.Lz - z_bots)**(1.5)
-    rho_tops = (1 + post.Lz - z_bots - 2*Rz)**(1.5)
-
 
     #cb fit
     depth = post.Lz - height
-    t_max = times.max()
-    t_cond = times.max()/t_max
-    times /= t_cond
-    fit_t = (height < 0.75*post.Lz)*(height > 0.1*post.Lz)
+    fit_t = (height < 0.65*post.Lz)*(height > 0.1*post.Lz)
     fit_t[0] = False
     found_therm = False
     therm_done  = False
@@ -157,80 +151,118 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
 
     scale_t = times
 
+    (dB, B0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], int_rho_s1[fit_t])
+    best_fit_B = B0 + dB*scale_t[fit_t][-1]/2
+    (dGamma, Gamma0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], int_circ[fit_t])
+    best_fit_Gamma = Gamma0 + dGamma*scale_t[fit_t][-1]/2
+    best_fit_beta = fit_beta * (fit_B/best_fit_B) * (best_fit_Gamma/fit_Gamma)
+    p_B = int_mom/best_fit_B/(best_fit_beta)/fit_chi
+    (chi_adjust, M0_div_B), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], p_B[fit_t])
+    best_fit_chi = fit_chi*chi_adjust 
+
+#    if fit_M0 > 0:
+#        M0_min, M0_max = -fit_M0, 2*fit_M0
+#    else:
+#        M0_min, M0_max = 2*fit_M0, -fit_M0
+#    if fit_I0 > 0:
+#        I0_min, I0_max = -fit_I0, 2*fit_I0
+#    else:
+#        I0_min, I0_max = 2*fit_I0, -fit_I0
+#    bounds = ((0.7*T0[0], 0.7*fit_V0, M0_min, I0_min), 
+#              (1.3*T0[0], 1.3*fit_V0, M0_max, I0_max ))
+#
+    bounds = ((0*T0[0], 0.7*fit_V0), 
+              (2*T0[0], 1.3*fit_V0 ))
+    p0 = (T0[0], fit_V0)
+    this_T_theory      = lambda times, T, V:  theory_T_no_I0(    times, best_fit_B, best_fit_Gamma, V, T, best_fit_beta, best_fit_chi, grad_T_ad=post.grad_T_ad, m_ad=post.m_ad)
+#
+    this_fit = good*post.get_good_times(height, L_max=0.5, L_min=0.1)
+    best_fit_M0 = best_fit_I0 = 0
+    (best_fit_T0, best_fit_V0), pcov = scop.curve_fit(this_T_theory, scale_t[this_fit], T0[this_fit], bounds=bounds, p0=p0, maxfev=1e4)
+#    try:
+#        (best_fit_T0, best_fit_V0, best_fit_M0, best_fit_I0), pcov = scop.curve_fit(this_T_theory, scale_t[this_fit], T0[this_fit], bounds=bounds, p0=p0, maxfev=1e4)
+#    except:
+#        bounds = ((0.7*T0[0], 0.5*fit_V0, M0_min, I0_min), 
+#                  (1.3*T0[0], 1.5*fit_V0, M0_min/10, I0_min/10 ))
+#        (best_fit_T0, best_fit_V0, best_fit_M0, best_fit_I0), pcov = scop.curve_fit(this_T_theory, scale_t[this_fit], T0[this_fit], bounds=bounds, p0=p0, maxfev=1e4)
+#        best_fit_T0, best_fit_V0, best_fit_M0, best_fit_I0 = fit_T0, fit_V0, fit_M0, fit_I0
+
+    best_theory_impulse  = linear_fit(post.times, best_fit_B*best_fit_beta,   fit_I0*best_fit_beta)
+    best_theory_momentum = linear_fit(post.times, best_fit_B*best_fit_beta*best_fit_chi, fit_M0*best_fit_beta*best_fit_chi)
+    best_theory_radius   = np.sqrt(best_theory_impulse/(np.pi*rho0*best_fit_Gamma))
+    best_theory_T        = theory_T_no_I0(scale_t, best_fit_B, best_fit_Gamma, best_fit_V0, best_fit_T0, best_fit_beta, best_fit_chi, grad_T_ad=post.grad_T_ad, m_ad=post.m_ad)
+    best_theory_w        = theory_dT_dt_no_I0(scale_t, best_fit_B, best_fit_Gamma, best_fit_V0, best_fit_T0, best_fit_beta, best_fit_chi, grad_T_ad=post.grad_T_ad, m_ad=post.m_ad)/post.grad_T_ad
+
     #Eqn1, B = \int \rho S_1 dV = const
     logger.info('plotting eqn1, integrated entropy')
-    fig, axs, cb_depth_fit, (a, b) = plot_and_fit_trace(scale_t[good], int_rho_s1[good], fit_ind=fit_t[good], fit_func=linear_fit, 
+    fig, axs, B_fit, (a, B0) = plot_and_fit_trace(scale_t[good], int_rho_s1[good], fit_ind=fit_t[good], fit_func=linear_fit, 
                        labels=['t',r'$\int (\rho S_1) dV$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
     axs[0].axhline(fit_B, c='green', dashes=(2,1))
+    axs[0].axhline(best_fit_B, c='mediumorchid', dashes=(2,1))
+    logger.info('entropy frac change: {}'.format(a*scale_t[fit_t][-1]/B0))
     fig.savefig('{:s}/tot_entropy_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
-    B_approx = scale_t*a + b
 
     #Eqn4, volume ~ R^3, or r^3
     logger.info('plotting eqn4, V/r^3 = V_0')
     V0 = volumes/therm_radius**3
     fig, axs, V0_fit, (dV0_dt, V0) = plot_and_fit_trace(scale_t[good*np.isfinite(V0)], V0[good*np.isfinite(V0)], fit_ind=fit_t[good*np.isfinite(V0)], fit_func=linear_fit, 
-                       labels=['t',r'$V_0 = V/R^3$'],
+                       labels=['t',r'$V_0 = V/r^3$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
     axs[0].axhline(fit_V0, c='green', dashes=(2,1))
+    axs[0].axhline(best_fit_V0, c='mediumorchid', dashes=(2,1))
     fig.savefig('{:s}/V0_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
     #Eqn 7, rho V w / B = beta t + M_0
     logger.info('plotting eqn7, rho V w / B = linear')
-    p_B = rho0*volumes*w_cb/fit_B/fit_If#B_approx
-    p = p_B*fit_B#B_approx
-    fig, axs, cb_depth_fit, (beta, M0_div_B) = plot_and_fit_trace(scale_t[good*np.isfinite(p_B)], p_B[good*np.isfinite(p_B)], fit_ind=fit_t[good*np.isfinite(p_B)], fit_func=linear_fit, 
-                       labels=['t',r'$\rho V w / B$'],
+    p_B = int_mom/fit_B/fit_beta/fit_chi
+    fig, axs, momentum_div_B, (beta, M0_div_B) = plot_and_fit_trace(scale_t[good*np.isfinite(p_B)], p_B[good*np.isfinite(p_B)], fit_ind=fit_t[good*np.isfinite(p_B)], fit_func=linear_fit, 
+                       labels=['t',r'$\int \rho w dV / B / (\beta\chi)$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
-#    axs[0].axhline(fit_M0/fit_B/fit_If, c='green', dashes=(2,1))
-    theory = linear_fit(post.times, fit_beta*fit_B, fit_M0)/fit_B
-    axs[0].plot(post.times, theory, c='indigo')
+    axs[0].plot(post.times, theory_momentum/fit_B/(fit_beta)/fit_chi, c='green', dashes=(2,1))
+    axs[0].plot(post.times, best_theory_momentum/fit_B/(fit_beta)/fit_chi, c='mediumorchid', dashes=(2,1))
     fig.savefig('{:s}/momentum_div_B_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
-    plt.close(fig)
-
-    #Eqn 8, 0.5*rho0*r^2*Gamma / B = t + Const
-    logger.info('plotting eqn8, 0.5* rho r^2 Gamma / B = t + const')
-    I_B = np.pi*rho0*therm_radius**2*int_circ/fit_B/fit_If#B_approxa
-    I_B_true = int_impulse/fit_B
-    I = I_B*fit_B#B_approx
-    theory = linear_fit(post.times, fit_B, fit_I0)/fit_B
-    fig, axs, I_B_fit, (I0_f, I0_div_B) = plot_and_fit_trace(scale_t[good*np.isfinite(I_B)], I_B[good*np.isfinite(I_B)], fit_ind=fit_t[good*np.isfinite(I_B)], fit_func=linear_fit, 
-                       labels=['t',r'$\pi\rho r^2 \Gamma / B$'],
-                       fit_str_format='{:.2g} $t$ + {:.2g}')
-    axs[0].plot(post.times, theory, c='indigo')
-#    axs[0].axhline(fit_I0/fit_B/fit_If, c='green', dashes=(2,1))
-    fig.savefig('{:s}/impulse_div_B_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
     #Eqn9, B = \int omega dA = const
     logger.info('plotting eqn9, circulation')
-    fig, axs, Gamma_fit, (a, b) = plot_and_fit_trace(scale_t[good],int_circ[good], fit_ind=fit_t[good], fit_func=linear_fit, 
+    fig, axs, Gamma_fit, (a, Gamma0) = plot_and_fit_trace(scale_t[good],int_circ[good], fit_ind=fit_t[good], fit_func=linear_fit, 
                        labels=['t',r'$\Gamma_{thermal}$'],
                        fit_str_format='{:.2g} $t$ + {:.2g}')
-    print(fit_Gamma)
     axs[0].axhline(fit_Gamma, c='green', dashes=(2,1))
+    axs[0].axhline(best_fit_Gamma, c='mediumorchid', dashes=(2,1))
     fig.savefig('{:s}/circulation_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
     plt.close(fig)
 
+    #Eqn 8, 0.5*rho0*r^2*Gamma / B = t + Const
+    logger.info('plotting eqn8, 0.5* rho r^2 Gamma / B = t + const')
+    I_B = np.pi*therm_radius**2*fit_Gamma*rho0/fit_B/fit_beta
+#    I_B = int_impulse/fit_B/fit_beta
+    fig, axs, I_B_fit, (I0_f, I0_div_B) = plot_and_fit_trace(scale_t[good*np.isfinite(I_B)], I_B[good*np.isfinite(I_B)], fit_ind=fit_t[good*np.isfinite(I_B)], fit_func=linear_fit, 
+                       labels=['t',r'$\pi\rho r^2 \Gamma / B / \beta$'],
+                       fit_str_format='{:.2g} $t$ + {:.2g}')
+    axs[0].plot(post.times, theory_impulse/fit_B/fit_beta, c='green', dashes=(2,1))
+    axs[0].plot(post.times, best_theory_impulse/fit_B/fit_beta, c='mediumorchid', dashes=(2,1))
+    fig.savefig('{:s}/impulse_div_B_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
+    plt.close(fig)
 
     #Eqn 10, r = sqrt ( 2 * [Bt + I_0] / rho / Gamma )
     logger.info('plotting eqn10, radius fit')
-    r_fit = np.sqrt((fit_If)*(fit_B*scale_t + fit_I0) / rho0 / fit_Gamma / np.pi)
-#    r_fit = np.sqrt((fit_B)*(I0_f*scale_t + I0_div_B) / rho0 / int_circ / np.pi)
 
     fig = plt.figure()
     ax = fig.add_subplot(2,1,1) 
-    plt.plot(scale_t[good], therm_radius[good], label='r')
-    plt.plot(scale_t[good], r_fit[good], label=r'$\sqrt{{\frac{{(Bt + I_0)}}{{\pi \rho \Gamma}}}}$')
-#    plt.plot(scale_t[good], r_fit[good], label=r'$\sqrt{{\frac{{({:.2f}Bt + I_0)}}{{\pi \rho \Gamma}}}}$'.format(I0_f))
+    plt.scatter(scale_t[good], therm_radius[good], label='r', marker='+', c='k')
+    plt.plot(scale_t[good], theory_radius[good], label=r'$\sqrt{{\frac{{\beta(Bt + I_0)}}{{\pi \rho \Gamma}}}}$', color='green')
+    plt.plot(scale_t[good], best_theory_radius[good], label=r'$\sqrt{{\frac{{\beta(Bt + I_0)}}{{\pi \rho \Gamma}}}}$', color='mediumorchid', ls='--')
     plt.ylim(0, 1.25*np.max(therm_radius))
     plt.ylabel('r')
     plt.legend(loc='best')
     ax = fig.add_subplot(2,1,2)
-    plt.plot(scale_t[good], np.abs(1 - therm_radius[good]/r_fit[good]))
+    plt.plot(scale_t[good], np.abs(1 - therm_radius[good]/theory_radius[good]), c='green')
+    plt.plot(scale_t[good], np.abs(1 - therm_radius[good]/best_theory_radius[good]), c='mediumorchid', ls='--')
     plt.yscale('log')
     plt.ylabel('fractional diff')
     plt.xlabel('t')
@@ -239,16 +271,15 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
 
     #Eqn 11, 
     logger.info('plotting eqn 4 & 11, momentum fit')
-    V_est = fit_V0 * r_fit**3
-    momentum_est = rho0 * V_est * w_cb
-    momentum_linear = fit_B*fit_If*(beta*scale_t+M0_div_B)
+    momentum_est = theory_momentum
+    momentum_linear = (best_fit_beta/2)*(best_fit_B*scale_t+best_fit_M0)
 
     fig = plt.figure()
     ax = fig.add_subplot(2,1,1) 
     plt.plot(scale_t[good], int_mom[good], c='k', label=r'$\int \rho w dV$')
-    plt.plot(scale_t[good], momentum_est[good], c='indigo', label=r'$\rho V_0 r_{fit}^3 w_{cb}$')
-    plt.plot(scale_t[good], momentum_linear[good], c='orange', ls='--', label=r'$B\left(\beta t + \frac{M_0}{B}\right)$')
-    if np.mean(B_approx) < 0:
+    plt.plot(scale_t[good], theory_momentum[good], c='green', ls='--', label=r'old fit')
+    plt.plot(scale_t[good], best_theory_momentum[good], c='mediumorchid', label=r'new fit')
+    if fit_B < 0:
         plt.ylim(int_mom[good].min()*1.25, 0)
     else:
         plt.ylim(0, int_mom[good].max()*1.25)
@@ -257,43 +288,38 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     plt.legend(loc='best')
     ax = fig.add_subplot(2,1,2)
     plt.grid(which='major')
-    plt.plot(scale_t[good], np.abs(1 - momentum_est[good]/int_mom[good]), c='indigo', label='theory V measured')
-    plt.plot(scale_t[good], np.abs(1 - momentum_linear[good]/int_mom[good]), c='orange', label='linear V measured')
+    plt.plot(scale_t[good], np.abs(1 - best_theory_momentum[good]/int_mom[good]), c='mediumorchid', label='theory V measured')
+    plt.plot(scale_t[good], np.abs(1 - theory_momentum[good]/int_mom[good]), c='orange', label='linear V measured')
     plt.ylim(1e-4, 1e0)
     plt.yscale('log')
     plt.ylabel('fractional diff')
     plt.xlabel('t')
     fig.savefig('{:s}/p_Fit_v_time.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
-    # Entrainment rate, dlnV_dz
-    logger.info('plotting dlnV_dz = dlnV_dt / w_cb')
-    lnV = np.log(volumes)
-    dlnV_dt = np.diff(lnV)/np.diff(scale_t)
-    eps = - dlnV_dt / w_cb[1:]
-    use = good[1:]*np.isfinite(eps)*(scale_t[1:]>2)*fit_t[1:]
-    fig, axs, cb_depth_fit, (a, b) = plot_and_fit_trace(scale_t[1:][use], eps[use], fit_ind=fit_t[1:][use], fit_func=linear_fit, 
-                       labels=['t',r'$\frac{d\ln V}{dz}$'],
-                       fit_str_format='{:.2g} $t$ + {:.2g}')
-    fig.savefig('{:s}/entrainment_rate_v_time{:s}'.format(post.full_out_dir, FILETYPE), dpi=200, bbox_inches='tight')
-    plt.close(fig)
+
+    w_theory_2 = differentiate(scale_t, best_theory_T)/post.grad_T_ad#best_theory_momentum / rho0 / best_fit_V0 / best_theory_radius**3
 
     #Outputs: z(t), r(z), w(z)
     logger.info('plotting z(t)')
     z_theory   = ((cb_T_fit - 1)/post.grad_T_ad + post.Lz)
+    new_z_theory   = ((best_theory_T - 1)/post.grad_T_ad + post.Lz)
     z_measured = ((vortex_T - 1)/post.grad_T_ad + post.Lz)
 
     d_theory   = post.Lz - z_theory
+    new_d_theory   = post.Lz - new_z_theory
     d_measured = post.Lz - z_measured
     fig = plt.figure()
     ax = fig.add_subplot(2,1,1) 
     plt.scatter(scale_t[good], d_measured[good], c='k', label=r'$L_z - z$ (measured)', marker='+')
     plt.plot(scale_t[good], d_theory[good], c='orange', label=r'$L_z - z$ (theory)')
+    plt.plot(scale_t[good], new_d_theory[good], c='mediumorchid', label=r'$L_z - z$ (new theory)')
     plt.ylabel('depth')
     plt.legend(loc='best')
     plt.ylim(0, post.Lz)
     ax = fig.add_subplot(2,1,2)
     plt.grid(which='major')
-    plt.plot(scale_t[good], np.abs(1 - d_theory[good]/d_measured[good]), c='orange', label='theory V measured')
+    plt.scatter(scale_t[good], np.abs(1 - d_theory[good]/d_measured[good]), c='orange', label='theory V measured')
+    plt.scatter(scale_t[good], np.abs(1 - new_d_theory[good]/d_measured[good]), c='mediumorchid', label='new theory V measured', marker='x')
     plt.ylim(1e-4, 1e0)
     plt.yscale('log')
     plt.ylabel('fractional diff')
@@ -305,76 +331,80 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
 
     logger.info('plotting r(z)')
     r_measured = therm_radius
-    r_theory   = r_fit
+    r_theory   = theory_radius
     fig = plt.figure()
-    ax = fig.add_subplot(1,1,1) 
+    ax = fig.add_subplot(2,1,1) 
     plt.scatter(d_measured[good], r_measured[good], c='k', label=r'$r$ (measured)', marker='+')
     plt.plot(d_theory[good],   r_theory[good], c='orange', label=r'$r$ (theory)')
-    plt.ylim(0, np.max(r_measured)*1.25)
+    plt.plot(new_d_theory[good],   best_theory_radius[good], c='mediumorchid', label=r'$r$ (new theory)')
+    plt.ylim(np.min(r_measured[good])*0.75, np.max(r_measured[good])*1.25)
     plt.xlim(0, post.Lz)
     plt.ylabel('r')
     plt.legend(loc='best')
     plt.xlabel('depth')
+    ax = fig.add_subplot(2,1,2)
+    plt.grid(which='major')
+    plt.scatter(scale_t[good], np.abs(1 - r_theory[good]/r_measured[good]), c='orange', label='theory V measured')
+    plt.scatter(scale_t[good], np.abs(1 - best_theory_radius[good]/r_measured[good]), c='mediumorchid', label='new theory V measured', marker='x')
+    plt.ylim(1e-4, 1e0)
+    plt.yscale('log')
+    plt.ylabel('fractional diff')
+    plt.xlabel('t')
+
+
     fig.savefig('{:s}/r_v_z.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
     logger.info('plotting w(z)')
-    w_measured = differentiate(scale_t, z_measured)
+    w_measured = vortex_w#differentiate(scale_t, z_measured)
+    w_m_2      = np.diff(z_measured)/np.diff(scale_t)
     w_theory   = w_cb[2:-2]
     this_good  = good[2:-2]
     fig = plt.figure()
-    ax = fig.add_subplot(1,1,1) 
+    ax = fig.add_subplot(2,1,1) 
     plt.scatter(d_measured[2:-2][this_good], w_measured[this_good], c='k', marker='+', label=r'$w$ (measured)')
     plt.plot(d_theory[2:-2][this_good],  w_theory[this_good],   c='orange', label=r'$w$ (theory)')
+    plt.plot(new_d_theory[2:-2],  best_theory_w[2:-2],   c='mediumorchid', label=r'$w$ (new theory)')
     plt.ylim(np.min(w_measured[fit_t[2:-2]])*1.25, np.max(w_measured[fit_t[2:-2]])/1.25)
     plt.xlim(0, post.Lz)
     plt.ylabel('w')
     plt.legend(loc='best')
     plt.xlabel('depth')
+    ax = fig.add_subplot(2,1,2)
+    plt.grid(which='major')
+    plt.scatter(scale_t[2:-2][this_good], np.abs(1 - (w_theory/w_measured)[this_good]), c='orange', label='theory V measured')
+    plt.scatter(scale_t[2:-2][this_good], np.abs(1 - best_theory_w[2:-2][this_good]/w_measured[this_good]), c='mediumorchid', label='new theory V measured', marker='x')
+    plt.ylim(1e-4, 1e0)
+    plt.yscale('log')
+    plt.ylabel('fractional diff')
+    plt.xlabel('t')
     fig.savefig('{:s}/w_v_z.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
 
-    logger.info('plotting integrated / approx quantities')
-    impulse = int_impulse
-    momentum = int_mom
-    momentum_approx = p_B * fit_B * fit_If#B_approx
-    impulse_approx  = I_B * fit_B * fit_If#B_approx
-    measured_If     = impulse_approx/impulse
-    fig = plt.figure()
-    ax = fig.add_subplot(1,1,1) 
-    plt.grid()
-    plt.plot(scale_t[good], momentum_approx[good]/momentum[good], c='k', label=r'$(\rho V w) / P_z$')
-    plt.plot(scale_t[good], impulse_approx[good]/impulse[good],   c='orange', label=r'$(\pi\rho r^2\Gamma)/I_z$')
-    plt.ylim(0.5, 1.5)
-    plt.ylabel('fractions')
-    plt.legend(loc='best')
-    plt.xlabel('t')
-    fig.savefig('{:s}/fractions_v_t.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
-
-
     f = h5py.File('{:s}/iterative_file.h5'.format(post.full_out_dir), 'w')
-    (a_i, i0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], I[fit_t])
-    (a_p, p0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], p[fit_t])
-    print(a_i, a_p, I0_f*fit_If)
-    f['I0'] = i0/I0_f
-    f['M0'] = p0/I0_f
-    f['B']  = np.mean(B_approx)
-    f['Gamma'] = np.mean(Gamma_fit)
-    f['V0'] = np.mean(V0_fit)
-    f['T0'] = fit_T0 
-    f['If'] = I0_f*fit_If
+    f['I0'] = best_fit_I0#i0/I0_f
+    f['M0'] = best_fit_M0#p0/I0_f
+    f['B']  = best_fit_B
+    f['Gamma'] = best_fit_Gamma#np.mean(Gamma_fit)
+    f['V0'] = best_fit_V0#np.mean(V0_fit)
+    f['T0'] = best_fit_T0 
+    f['beta'] = best_fit_beta#I0_f*fit_If
+    f['chi'] = best_fit_chi#I0_f*fit_If
     f.close()
+
+    for k, new, old in (('I0', best_fit_I0, fit_I0), ('M0', best_fit_M0, fit_M0), ('B', best_fit_B, fit_B),
+                        ('Gamma', best_fit_Gamma, fit_Gamma), ('V0', best_fit_V0, fit_V0),
+                        ('T0', best_fit_T0, fit_T0), ('beta', best_fit_beta, fit_beta), ('chi', best_fit_chi, fit_chi)):
+        logger.info('key: {}, old: {:.2e}, new: {:.2e}, change: {:.2e}'.format(k, old, new, 1-new/old))
 
     f = h5py.File('{:s}/final_outputs.h5'.format(post.full_out_dir), 'w')
     f['good'] = good
     f['fit_t'] = fit_t
     f['times'] = scale_t
     f['B'] = int_rho_s1
-    f['B_approx'] = B_approx 
     f['f'] = therm_radius/radius
     f['V0'] = V0
-    f['If'] = measured_If
-    f['p']  = p
-    f['I']  = I
+    f['p']  = theory_momentum
+    f['I']  = theory_impulse
     f['Gamma'] = int_circ
     f['d_measured'] = d_measured
     f['d_theory'] = d_theory

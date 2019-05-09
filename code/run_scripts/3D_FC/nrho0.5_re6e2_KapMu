@@ -1,5 +1,5 @@
 #PBS -S /bin/bash
-#PBS -N FC_thermal_KapMu_Re6e2_nrho0.5
+#PBS -N FC_thermal_KapMu_Re6e2_nrho0.5_eps1e-6
 #PBS -l select=43:ncpus=24:mpiprocs=24:model=has
 #PBS -l walltime=11:00:00
 #PBS -j oe
@@ -8,7 +8,7 @@
 cd $PBS_O_WORKDIR
 
 RE=6e2
-EPS=1.00e-4
+EPS=1.00e-6
 dedalus_dir=./
 
 date

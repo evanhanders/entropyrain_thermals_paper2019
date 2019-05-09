@@ -5,9 +5,10 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 import h5py
 
+aspect = [0.35, 0.35, 0.25, 0.25, 0.25, 0.25]
 CASES = [0.1, 0.5, 1, 2, 3, 4]
-ROOT_DIR='../may03/'
-DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect0.25_Lz20/'.format(ROOT_DIR,case) for case in CASES] 
+ROOT_DIR='../good_2D_runs/'
+DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
 CASES_3D = [0.5, 1, 2]
 AR_3D    = [0.5, 0.4, 0.35]
@@ -48,9 +49,9 @@ ax.set_ylim(0, 20)
 ax.set_ylabel('depth')
 ax.set_xlabel(r'$t/t_b$')
 
-ax.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markerfacecolor=(1,1,1,0.8), markeredgecolor='k', label='2D AN')
-ax.plot([100, 101], [100, 101], lw=0, marker='+', c='k', label='3D FC')
-ax.legend(loc='lower right', frameon=False)
+ax.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markersize=3, markerfacecolor=(0,0,0,0.2), markeredgecolor=(0,0,0,0.5), label='2D AN')
+ax.plot([100, 101], [100, 101], lw=0, marker='+', c='k', markersize=3, label='3D FC')
+ax.legend(loc='lower right', frameon=False, fontsize=8, handletextpad=0)
 
 cb = plt.colorbar(sm, cax=cax, orientation='horizontal')
 cax.xaxis.set_ticks_position('top')
@@ -106,9 +107,9 @@ for i, direc in enumerate(DIRS):
         ax.set_xlabel('depth')
 
     f.close()
-ax1.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markerfacecolor=(1,1,1,0.8), markeredgecolor='k', label='2D AN')
-ax1.plot([100, 101], [100, 101], lw=0, marker='+', c='k', label='3D FC')
-ax1.legend(loc='upper center', frameon=False)
+ax1.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markersize=3, markerfacecolor=(0,0,0,0.2), markeredgecolor=(0,0,0,0.5), label='2D AN')
+ax1.plot([100, 101], [100, 101], lw=0, marker='+', c='k', markersize=3, label='3D FC')
+ax1.legend(loc='upper left', frameon=False, fontsize=8, handletextpad=0)
 
 cb = plt.colorbar(sm, cax=cax, orientation='horizontal')
 cax.xaxis.set_ticks_position('top')
