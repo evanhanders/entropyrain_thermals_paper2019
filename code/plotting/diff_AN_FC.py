@@ -55,18 +55,18 @@ for i, direc in enumerate(DIRS):
     color = sm.to_rgba(i+2)
     for j, x2, y2, x3, y3 in zip(range(2), (t, d), (d, r), (t3, d3), (d3, r3)):
         l = np.min((len(y2), len(y3)))
-        axs[j].plot(x2[:l:3], y2[:l:3], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.5), markerfacecolor=(*color[:-1], 0.2))
-        axs[j].plot(x3[:l:3], y3[:l:3], marker='x', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.5), markerfacecolor=(*color[:-1], 0.2))
+        axs[j].plot(x2[:l], y2[:l], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.8), markerfacecolor=(*color[:-1], 0.2), markeredgewidth=0.5)
+        axs[j].plot(x3[:l], y3[:l], marker='x', lw=0, markersize=2, markeredgecolor='k', markerfacecolor='k', markeredgewidth=0.5)#markeredgecolor=(*color[:-1], 0.9), markerfacecolor=(*color[:-1], 0.2))
 
         axs[j+2].axhline(1e-2, c='k', lw=0.25)
         axs[j+2].axhline(10**(-1.5), c='k', lw=0.25)
         axs[j+2].axhline(10**(-2.5), c='k', lw=0.25)
 
-        diff = (1 - y2/y3)[:l:3]
+        diff = (1 - y2/y3)[:l]
         pos  = diff > 0
         neg  = diff < 0
-        axs[j+2].plot(x2[:l:3][pos], diff[pos], markerfacecolor=color, markeredgecolor=color, marker='o', lw=0, markersize=3)
-        axs[j+2].plot(x2[:l:3][neg], -diff[neg], markerfacecolor=(*color[:-1], 0), markeredgecolor=color, marker='o', lw=0, markersize=3)
+        axs[j+2].plot(x2[:l][pos], diff[pos], markerfacecolor=color, markeredgecolor=color, marker='o', lw=0, markersize=2, markeredgewidth=0.35)
+        axs[j+2].plot(x2[:l][neg], -diff[neg], markerfacecolor=(*color[:-1], 0), markeredgecolor=color, marker='o', lw=0, markersize=2, markeredgewidth=0.35)
         axs[j+2].set_yscale('log')
         axs[j+2].set_ylim(1e-3, 1e-1)
         axs[j+2].set_xlim(x2.min(), x2.max())
@@ -89,7 +89,7 @@ axs[0].tick_params(labelbottom=False)
 axs[1].tick_params(labelbottom=False)
 
 axs[0].plot([100, 101], [100, 101], lw=0,markersize=3,  marker='o', c='k', markerfacecolor=(1,1,1,0.8), markeredgecolor='k', label='2D AN')
-axs[0].plot([100, 101], [100, 101], lw=0,markersize=3,  marker='+', c='k', label='3D FC')
+axs[0].plot([100, 101], [100, 101], lw=0,markersize=2,  marker='x', c='k', label='3D FC')
 axs[0].legend(loc='lower right', frameon=False, fontsize=8, handletextpad=0)
 axs[2].plot([100, 101], [100, 101], lw=0,    markersize=3,  marker='o', c='k', markerfacecolor=(0,0,0,0), markeredgecolor=(0,0,0,1), label='< 0')
 axs[2].plot([100, 101], [100, 101], lw=0,    markersize=3,  marker='o', c='k', markerfacecolor=(0,0,0,1), markeredgecolor=(0,0,0,1), label='> 0')

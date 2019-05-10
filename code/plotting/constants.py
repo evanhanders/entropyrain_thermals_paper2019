@@ -55,7 +55,7 @@ for i in (0, 1, 2):
 axs[2].set_ylabel('w')
 axs[0].set_ylabel(r'$\Gamma/\Gamma_{\mathrm{max}}$')
 axs[1].set_ylabel(r'$B/B_{\mathrm{max}}$')
-axs[2].set_ylabel(r'$V_0/V_{0,f}$')
+axs[2].set_ylabel(r'$f/f_{\mathrm{final}}$')
 axs[2].set_xlabel('depth')
 
 
