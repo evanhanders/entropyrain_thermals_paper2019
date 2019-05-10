@@ -38,53 +38,50 @@ def linear_fit(x, a, b):
     """ A linear fit: y = a* x + b """
     return a*x + b
 
-def theory_C(B, Gamma, V0, beta, chi, grad_T_ad=-1):
+def theory_C(B0, Gamma, f, chi, beta, grad_T_ad=-1):
     """ The constant in stratified thermals theory """
-    return np.pi**(3./2) * Gamma * grad_T_ad * chi / (V0 * B * beta**(1./2))
+    return np.pi**(3./2) * Gamma**2 * grad_T_ad * beta / (f * B0 * chi**(1./2))
 
-def theory_T(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=-1, m_ad=1.5):
+#def theory_T(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=-1, m_ad=1.5):
+#    """ The temperature profile (vs time) from stratified thermals theory """
+#    C0 = theory_C(B, Gamma, V0, beta, chi, grad_T_ad=grad_T_ad)
+#    tau = (B * t + I0)/Gamma
+#    tau0 = I0/Gamma
+#    Tpow = 1 - (m_ad/2)
+#    tau_int  = np.sqrt(tau )*(Gamma - (M0 - I0)/tau)
+#    tau_int0 = np.sqrt(tau0)*(Gamma - (M0 - I0)/tau0)
+#    return (2*Tpow*C0*(tau_int-tau_int0) + T0**(Tpow))**(1./Tpow)
+#
+#def theory_dT_dt(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=-1, m_ad=1.5):
+#    """ The temperature derivative (vs time) from stratified thermals theory """
+#    C0 = theory_C(B, Gamma, V0, beta, chi, grad_T_ad=grad_T_ad)
+#    this_T = theory_T(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=grad_T_ad, m_ad=m_ad)
+#    tau = (B * t + I0)/Gamma
+#    dtau_dt = B/Gamma
+#    return C0*dtau_dt*this_T**(m_ad/2)*(Gamma/np.sqrt(tau) + (M0 - I0)/np.sqrt(tau**3))
+
+def theory_r(t, B0, Gamma0, chi, t_off, rho_f=None):
     """ The temperature profile (vs time) from stratified thermals theory """
-    C0 = theory_C(B, Gamma, V0, beta, chi, grad_T_ad=grad_T_ad)
-    tau = (B * t + I0)/Gamma
-    tau0 = I0/Gamma
-    Tpow = 1 - (m_ad/2)
-    tau_int  = np.sqrt(tau )*(Gamma - (M0 - I0)/tau)
-    tau_int0 = np.sqrt(tau0)*(Gamma - (M0 - I0)/tau0)
-    return (2*Tpow*C0*(tau_int-tau_int0) + T0**(Tpow))**(1./Tpow)
-
-def theory_dT_dt(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=-1, m_ad=1.5):
-    """ The temperature derivative (vs time) from stratified thermals theory """
-    C0 = theory_C(B, Gamma, V0, beta, chi, grad_T_ad=grad_T_ad)
-    this_T = theory_T(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=grad_T_ad, m_ad=m_ad)
-    tau = (B * t + I0)/Gamma
-    dtau_dt = B/Gamma
-    return C0*dtau_dt*this_T**(m_ad/2)*(Gamma/np.sqrt(tau) + (M0 - I0)/np.sqrt(tau**3))
-
-def theory_r(t, B, I0, Gamma, beta, rho_f=None):
-    """ The temperature profile (vs time) from stratified thermals theory """
-    r = np.sqrt(beta*(B*t + I0)/np.pi/Gamma)
+    tau = B0*(t+t_off)/Gamma0
+    r = np.sqrt(chi*(tau)/np.pi)
     if rho_f is None:
         return r
     return r/np.sqrt(rho_f(t))
 
-
-def theory_T_no_I0(t, B, Gamma, V0, T0, beta, chi, grad_T_ad=-1, m_ad=1.5):
+def theory_T(t, B0, Gamma0, f, chi, beta, t_off, T0, grad_T_ad=-1, m_ad=1.5):
     """ The temperature profile (vs time) from stratified thermals theory """
-    C0 = theory_C(B, Gamma, V0, beta, chi, grad_T_ad=grad_T_ad)
-    tau = (B * t)/Gamma
+    C0 = theory_C(B0, Gamma0, f, chi, beta, grad_T_ad=grad_T_ad)
+    tau = (B0 * (t+t_off))/Gamma0
     Tpow = 1 - (m_ad/2)
-    tau_int  = Gamma*np.sqrt(tau )
-    return (2*Tpow*C0*(tau_int) + T0**(Tpow))**(1./Tpow)
+    return (2*Tpow*C0*np.sqrt(tau) + T0**(Tpow))**(1./Tpow)
 
-def theory_dT_dt_no_I0(t, B, Gamma, V0, T0, beta, chi, grad_T_ad=-1, m_ad=1.5):
+def theory_dT_dt(t, B0, Gamma0, f, chi, beta, t_off, T0, grad_T_ad=-1, m_ad=1.5):
     """ The temperature derivative (vs time) from stratified thermals theory """
-    C0 = theory_C(B, Gamma, V0, beta, chi, grad_T_ad=grad_T_ad)
-    this_T = theory_T_no_I0(t, B, Gamma, V0, T0, beta, chi, grad_T_ad=grad_T_ad, m_ad=m_ad)
-    tau = (B * t)/Gamma
-    dtau_dt = B/Gamma
-    return C0*dtau_dt*this_T**(m_ad/2)*(Gamma/np.sqrt(tau))
-
-
+    C0 = theory_C(B0, Gamma0, f, chi, beta, grad_T_ad=grad_T_ad)
+    this_T = theory_T(t, B0, Gamma0, f, chi, beta, t_off, T0, grad_T_ad=grad_T_ad, m_ad=m_ad)
+    tau = (B0 * (t + t_off))/Gamma0
+    dtau_dt = B0/Gamma0
+    return C0*dtau_dt*this_T**(m_ad/2)/np.sqrt(tau)
 
 class DedalusIntegrator():
     """
@@ -313,14 +310,16 @@ class ThermalPostProcessor():
         is run, the thermal's cb velocity must be separately fit. The volume contour is
         saved into root_dir/out_dir/contour_file.h5
         """
-        c_f = h5py.File('{:s}/fit_file.h5'.format(self.full_out_dir), 'r')
         if iterative:
-            w_cb = c_f['w_cb'].value
+            c_f = h5py.File('{:s}/fit_file.h5'.format(self.full_out_dir), 'r')
+            w_cb = c_f['fit_w'].value
+            c_f.close()
         else:
+            f = h5py.File('{:s}/z_cb_file.h5'.format(self.full_out_dir), 'r')
             w_cb = np.zeros_like(self.times)
-            vortex_w = c_f['vortex_w'].value
+            vortex_w = f['vortex_w'].value
             w_cb[2:-2] = vortex_w
-        c_f.close()
+            f.close()
 
         for filenum, fn in enumerate(self.files):
             #Read entropy, density, velocity, vorticity
@@ -378,140 +377,140 @@ class ThermalPostProcessor():
 
 
 
-    def fit_w_cb(self, iterative=False):
-        """
-        Fit thermal bulk velocity (cloud bottom, 'cb') according to the
-        developed theory of stratified thermal evolution.
-
-        Output information from the fit is stored in root_dir/out_dir/fit_file.h5
-
-        Inputs:
-        -------
-        iterative   : bool, optional
-            If True, use output from a previous fit to get this fit.
-        """
-        c_f = h5py.File('{:s}/z_cb_file.h5'.format(self.full_out_dir), 'r')
-        z_cb = c_f['z_cb'].value
-        cb_T = 1 + self.grad_T_ad*(z_cb - self.Lz)
-        z = c_f['z'].value
-        vortex_height = c_f['vortex_height'].value
-        vortex_radius = c_f['vortex_radius'].value
-        vortex_rho    = c_f['vortex_rho'].value
-        vortex_T      = c_f['vortex_T'].value
-        circ          = c_f['circ'].value
-        B             = c_f['B'].value
-        momentum      = c_f['momentum'].value
-        c_f.close()
-
-
-        fit_t = self.get_good_times(z_cb, L_max=0.6, L_min=0.15)
-
-        #Estimates
-        B_est = np.mean(B[fit_t])
-        circ_est = np.mean(circ[fit_t])
-
-        circ0 = circ[fit_t][0]
-        I    = 2*np.pi*vortex_rho[fit_t] * vortex_radius[fit_t]**2 * circ_est
-        (a_i, i0), pcov = scop.curve_fit(linear_fit, self.times[fit_t], I)
-        (a_mom, m0), pcov = scop.curve_fit(linear_fit, self.times[fit_t], momentum[fit_t])
-
-        logger.info('fit i0: {:.4e} // fit m0: {:.4e} // gamma: {:.4e}'.format(i0, m0, circ_est))
-        vortex_dT_dt = differentiate(self.times, vortex_T)#np.diff(vortex_T)/np.diff(times)
-        vortex_w = vortex_dT_dt/self.grad_T_ad
-
-        #Set ranges for parameters in solver
-        if iterative:
-            output_file = h5py.File('{:s}/iterative_file.h5'.format(self.full_out_dir), 'r')
-            B = output_file['B']        .value
-            beta = output_file['beta']  .value
-            chi = output_file['chi']    .value
-            V0 = output_file['V0']      .value
-            M0 = output_file['M0']      .value
-            I0 = output_file['I0']      .value
-            T0 = output_file['T0']      .value
-            Gamma = output_file['Gamma'].value
-            output_file.close()
-
-            this_r_theory     = lambda t:     theory_r(t, B, I0, Gamma, beta, rho_f=interp1d(self.times, vortex_rho))
-            this_T_theory     = lambda t:     theory_T(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
-            this_dT_dt_theory = lambda t: theory_dT_dt(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
-            cb_T_fit =  this_T_theory(self.times)
-            dT_dt = this_dT_dt_theory(self.times)
-            radius = this_r_theory(self.times)
-        else:
-            B_min, B_max = B_est, 0.99*B_est
-            Gamma_min, Gamma_max = 1*circ_est, 0.5*circ_est
-            if i0 < 0:
-                I_min, I_max = 3*i0, i0/3
-            else:
-                I_min, I_max = -i0, 0
-            beta_min, beta_max = 0.5, 1.00
-            p = (B_min, I_min, Gamma_min, beta_min)
-            bounds = ((B_min, I_min, Gamma_min, beta_min), 
-                      (B_max, I_max, Gamma_max, beta_max))
-            #fit to r
-            this_r_theory     = lambda t, B, I0, Gamma, beta:     theory_r(t, B, I0, Gamma, beta, rho_f=interp1d(self.times, vortex_rho))
-            (B, I0, Gamma, beta), pcov = scop.curve_fit(this_r_theory, self.times[fit_t], vortex_radius[fit_t], maxfev=int(1e4), p0=p, bounds=bounds)
-
-            V0_est = 0.5*Gamma*np.pi / (np.mean(vortex_radius[2:-2]*vortex_w))
-
-            V0_min, V0_max = V0_est*0.8, 1.2*V0_est
-            T0_min, T0_max = 0.25*vortex_T[0], 4*vortex_T[0]#, 1.5*vortex_T[0]
-
-            if I0 < 0:
-                M_min, M_max = 1.2*I0/2, 0.8*I0/2
-            else:
-                M_min, M_max = 0.8*I0/2, 1.2*I0/2
-                I0 = -I0
-
-            bounds = ((M_min, T0_min, V0_min), 
-                      (M_max, T0_max, V0_max))
-
-            p = (M_min, vortex_T[0], V0_max)
-           
-            chi = 0.5
-            #fit to temp
-            #Wrap theory functions with assumptions and atmospheric info
-            this_T_theory     = lambda times, M0, T0, V0:     theory_T(times, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
-            this_dT_dt_theory = lambda times, M0, T0, V0: theory_dT_dt(times, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
-    #        (M0, T0, V0, beta), pcov = scop.curve_fit(this_dT_dt_theory, self.times[2:-2][fit_t[2:-2]], vortex_dT_dt[fit_t[2:-2]], bounds=bounds, p0=p, maxfev=int(1e4))
-            (M0, T0, V0), pcov = scop.curve_fit(this_T_theory, self.times[fit_t], vortex_T[fit_t], bounds=bounds, p0=p, maxfev=int(1e4))
-            cb_T_fit = this_T_theory(self.times,  M0, T0, V0)
-            dT_dt = this_dT_dt_theory(self.times, M0, T0, V0)
-            radius = this_r_theory(self.times, B, I0, Gamma, beta)
-
-        cb_dT_dt = differentiate(self.times, cb_T)#np.diff(vortex_T)/np.diff(times)
-        w_cb = dT_dt/self.grad_T_ad
-        if np.isnan(w_cb[0]) or np.isinf(w_cb[0]):
-            w_cb[0] = 0
-
-        #Output info & safe to file
-        logger.info('theory B {:.4e}, M0 {:.4e}, I0 {:.4e}, beta {:.4e}, chi {:.4e}, V0 {:.4e}, Gamma {:.4e}, T0 {:.2f}'.format(B, M0, I0, beta, chi, V0, Gamma, T0))
-        logger.info('w_cb % diff {}'.format(1 - w_cb[2:-2][fit_t[2:-2]]/vortex_w[fit_t[2:-2]]))
-        logger.info('T % diff  {}'.format(1 - cb_T_fit[fit_t]/vortex_T[fit_t]))
-        logger.info('r % diff  {}'.format(1 - radius[fit_t]/vortex_radius[fit_t]))
-        logger.info('(vortex - theory)/vortex r {:.2e}'.format(np.mean(np.abs((1 - radius/vortex_radius)[fit_t]))))
-        logger.info('(vortex - theory)/vortex T {:.2e}'.format(np.mean(np.abs((1 - cb_T_fit/vortex_T)[fit_t]))))
-        logger.info('(vortex - theory)/vortex w {:.2e}'.format(np.mean(np.abs((1 - w_cb[2:-2]/vortex_w)[fit_t[2:-2]]))))
-
-        output_file = h5py.File('{:s}/fit_file.h5'.format(self.full_out_dir), 'w')
-        output_file['w_cb']             = w_cb
-        output_file['z_cb']             = z_cb
-        output_file['cb_T_fit']         = cb_T_fit
-        output_file['vortex_height']    = vortex_height
-        output_file['vortex_radius']    = vortex_radius
-        output_file['vortex_rho']       = vortex_rho
-        output_file['vortex_T']         = vortex_T
-        output_file['vortex_w']         = vortex_w
-        output_file['fit_B']            = B
-        output_file['fit_M0']           = M0
-        output_file['fit_I0']           = I0
-        output_file['fit_beta']         = beta
-        output_file['fit_chi']          = chi
-        output_file['fit_Gamma']        = Gamma
-        output_file['fit_V0']           = V0
-        output_file['fit_T0']           = T0
-        output_file.close()
+#    def fit_w_cb(self, iterative=False):
+#        """
+#        Fit thermal bulk velocity (cloud bottom, 'cb') according to the
+#        developed theory of stratified thermal evolution.
+#
+#        Output information from the fit is stored in root_dir/out_dir/fit_file.h5
+#
+#        Inputs:
+#        -------
+#        iterative   : bool, optional
+#            If True, use output from a previous fit to get this fit.
+#        """
+#        c_f = h5py.File('{:s}/z_cb_file.h5'.format(self.full_out_dir), 'r')
+#        z_cb = c_f['z_cb'].value
+#        cb_T = 1 + self.grad_T_ad*(z_cb - self.Lz)
+#        z = c_f['z'].value
+#        vortex_height = c_f['vortex_height'].value
+#        vortex_radius = c_f['vortex_radius'].value
+#        vortex_rho    = c_f['vortex_rho'].value
+#        vortex_T      = c_f['vortex_T'].value
+#        circ          = c_f['circ'].value
+#        B             = c_f['B'].value
+#        momentum      = c_f['momentum'].value
+#        c_f.close()
+#
+#
+#        fit_t = self.get_good_times(z_cb, L_max=0.6, L_min=0.15)
+#
+#        #Estimates
+#        B_est = np.mean(B[fit_t])
+#        circ_est = np.mean(circ[fit_t])
+#
+#        circ0 = circ[fit_t][0]
+#        I    = 2*np.pi*vortex_rho[fit_t] * vortex_radius[fit_t]**2 * circ_est
+#        (a_i, i0), pcov = scop.curve_fit(linear_fit, self.times[fit_t], I)
+#        (a_mom, m0), pcov = scop.curve_fit(linear_fit, self.times[fit_t], momentum[fit_t])
+#
+#        logger.info('fit i0: {:.4e} // fit m0: {:.4e} // gamma: {:.4e}'.format(i0, m0, circ_est))
+#        vortex_dT_dt = differentiate(self.times, vortex_T)#np.diff(vortex_T)/np.diff(times)
+#        vortex_w = vortex_dT_dt/self.grad_T_ad
+#
+#        #Set ranges for parameters in solver
+#        if iterative:
+#            output_file = h5py.File('{:s}/iterative_file.h5'.format(self.full_out_dir), 'r')
+#            B = output_file['B']        .value
+#            beta = output_file['beta']  .value
+#            chi = output_file['chi']    .value
+#            V0 = output_file['V0']      .value
+#            M0 = output_file['M0']      .value
+#            I0 = output_file['I0']      .value
+#            T0 = output_file['T0']      .value
+#            Gamma = output_file['Gamma'].value
+#            output_file.close()
+#
+#            this_r_theory     = lambda t:     theory_r(t, B, I0, Gamma, beta, rho_f=interp1d(self.times, vortex_rho))
+#            this_T_theory     = lambda t:     theory_T(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
+#            this_dT_dt_theory = lambda t: theory_dT_dt(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
+#            cb_T_fit =  this_T_theory(self.times)
+#            dT_dt = this_dT_dt_theory(self.times)
+#            radius = this_r_theory(self.times)
+#        else:
+#            B_min, B_max = B_est, 0.99*B_est
+#            Gamma_min, Gamma_max = 1*circ_est, 0.5*circ_est
+#            if i0 < 0:
+#                I_min, I_max = 3*i0, i0/3
+#            else:
+#                I_min, I_max = -i0, 0
+#            beta_min, beta_max = 0.5, 1.00
+#            p = (B_min, I_min, Gamma_min, beta_min)
+#            bounds = ((B_min, I_min, Gamma_min, beta_min), 
+#                      (B_max, I_max, Gamma_max, beta_max))
+#            #fit to r
+#            this_r_theory     = lambda t, B, I0, Gamma, beta:     theory_r(t, B, I0, Gamma, beta, rho_f=interp1d(self.times, vortex_rho))
+#            (B, I0, Gamma, beta), pcov = scop.curve_fit(this_r_theory, self.times[fit_t], vortex_radius[fit_t], maxfev=int(1e4), p0=p, bounds=bounds)
+#
+#            V0_est = 0.5*Gamma*np.pi / (np.mean(vortex_radius[2:-2]*vortex_w))
+#
+#            V0_min, V0_max = V0_est*0.8, 1.2*V0_est
+#            T0_min, T0_max = 0.25*vortex_T[0], 4*vortex_T[0]#, 1.5*vortex_T[0]
+#
+#            if I0 < 0:
+#                M_min, M_max = 1.2*I0/2, 0.8*I0/2
+#            else:
+#                M_min, M_max = 0.8*I0/2, 1.2*I0/2
+#                I0 = -I0
+#
+#            bounds = ((M_min, T0_min, V0_min), 
+#                      (M_max, T0_max, V0_max))
+#
+#            p = (M_min, vortex_T[0], V0_max)
+#           
+#            chi = 0.5
+#            #fit to temp
+#            #Wrap theory functions with assumptions and atmospheric info
+#            this_T_theory     = lambda times, M0, T0, V0:     theory_T(times, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
+#            this_dT_dt_theory = lambda times, M0, T0, V0: theory_dT_dt(times, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=self.grad_T_ad, m_ad=self.m_ad)
+#    #        (M0, T0, V0, beta), pcov = scop.curve_fit(this_dT_dt_theory, self.times[2:-2][fit_t[2:-2]], vortex_dT_dt[fit_t[2:-2]], bounds=bounds, p0=p, maxfev=int(1e4))
+#            (M0, T0, V0), pcov = scop.curve_fit(this_T_theory, self.times[fit_t], vortex_T[fit_t], bounds=bounds, p0=p, maxfev=int(1e4))
+#            cb_T_fit = this_T_theory(self.times,  M0, T0, V0)
+#            dT_dt = this_dT_dt_theory(self.times, M0, T0, V0)
+#            radius = this_r_theory(self.times, B, I0, Gamma, beta)
+#
+#        cb_dT_dt = differentiate(self.times, cb_T)#np.diff(vortex_T)/np.diff(times)
+#        w_cb = dT_dt/self.grad_T_ad
+#        if np.isnan(w_cb[0]) or np.isinf(w_cb[0]):
+#            w_cb[0] = 0
+#
+#        #Output info & safe to file
+#        logger.info('theory B {:.4e}, M0 {:.4e}, I0 {:.4e}, beta {:.4e}, chi {:.4e}, V0 {:.4e}, Gamma {:.4e}, T0 {:.2f}'.format(B, M0, I0, beta, chi, V0, Gamma, T0))
+#        logger.info('w_cb % diff {}'.format(1 - w_cb[2:-2][fit_t[2:-2]]/vortex_w[fit_t[2:-2]]))
+#        logger.info('T % diff  {}'.format(1 - cb_T_fit[fit_t]/vortex_T[fit_t]))
+#        logger.info('r % diff  {}'.format(1 - radius[fit_t]/vortex_radius[fit_t]))
+#        logger.info('(vortex - theory)/vortex r {:.2e}'.format(np.mean(np.abs((1 - radius/vortex_radius)[fit_t]))))
+#        logger.info('(vortex - theory)/vortex T {:.2e}'.format(np.mean(np.abs((1 - cb_T_fit/vortex_T)[fit_t]))))
+#        logger.info('(vortex - theory)/vortex w {:.2e}'.format(np.mean(np.abs((1 - w_cb[2:-2]/vortex_w)[fit_t[2:-2]]))))
+#
+#        output_file = h5py.File('{:s}/fit_file.h5'.format(self.full_out_dir), 'w')
+#        output_file['w_cb']             = w_cb
+#        output_file['z_cb']             = z_cb
+#        output_file['cb_T_fit']         = cb_T_fit
+#        output_file['vortex_height']    = vortex_height
+#        output_file['vortex_radius']    = vortex_radius
+#        output_file['vortex_rho']       = vortex_rho
+#        output_file['vortex_T']         = vortex_T
+#        output_file['vortex_w']         = vortex_w
+#        output_file['fit_B']            = B
+#        output_file['fit_M0']           = M0
+#        output_file['fit_I0']           = I0
+#        output_file['fit_beta']         = beta
+#        output_file['fit_chi']          = chi
+#        output_file['fit_Gamma']        = Gamma
+#        output_file['fit_V0']           = V0
+#        output_file['fit_T0']           = T0
+#        output_file.close()
 
 
 
@@ -701,8 +700,8 @@ class ThermalPostProcessor():
 
                     logger.info('B: {:.2e}, Gamma: {:.2e}, P: {:.2e}\n\n'.format(this_B, Gamma, P))
 
-
-
+            vortex_dT_dt = differentiate(self.times, vortex_T)#np.diff(vortex_T)/np.diff(times)
+            vortex_w = vortex_dT_dt/self.grad_T_ad
 
 
             output_file = h5py.File('{:s}/z_cb_file.h5'.format(self.full_out_dir), 'w')
@@ -710,6 +709,7 @@ class ThermalPostProcessor():
             output_file['z']                = z
             output_file['z_cb']             = z_cb
             output_file['vortex_height']    = vortex_height
+            output_file['vortex_w']         = vortex_w
             output_file['vortex_radius']    = vortex_radius
             output_file['vortex_rho']       = vortex_rho
             output_file['vortex_T']         = vortex_T
@@ -729,10 +729,12 @@ class ThermalPostProcessor():
         by taking integrals over the dedalus domain. Integrals are output into
         root_dir/out_dir/post_analysis.h5
         """
-        c_f = h5py.File('{:s}/fit_file.h5'.format(self.full_out_dir), 'r')
-        w_cb = c_f['w_cb'].value
-        z_cb = c_f['z_cb'].value
-        c_f.close()
+        f = h5py.File('{:s}/z_cb_file.h5'.format(self.full_out_dir), 'r')
+        w_cb = np.zeros_like(self.times)
+        vortex_w = f['vortex_w'].value
+        w_cb[2:-2] = vortex_w
+        f.close()
+
         c_f = h5py.File('{:s}/contour_file.h5'.format(self.full_out_dir), 'r')
         contours = c_f['contours'].value
         c_f.close()
@@ -868,10 +870,6 @@ class ThermalPostProcessor():
             output_file[f]    = fd
         output_file['height']      = height
         output_file['radius']      = radius
-        output_file['w_cb']        = w_cb
-        output_file['z_cb']        = z_cb
-
-
         output_file.close()
 
     def plot_colormeshes(self):
@@ -1022,7 +1020,6 @@ def plot_and_fit_trace(x, y, fit_ind=None, fit_func=linear_fit,
     plt.xlim(x.min(), x.max())
     plt.ylim(0.9, 1.1)
     plt.ylabel(r'{:s} / fit'.format(labels[1]))
-    print(labels)
     plt.xlabel(labels[0])
 
     return fig, (ax1, ax2), best_fit, fits
