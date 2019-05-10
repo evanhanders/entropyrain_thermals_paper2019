@@ -164,9 +164,9 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     fit_t_off = fit[0]
     scale_t += fit_t_off    
 
-    bounds = ((0,       0.5*f0), 
-              (2*T0[0], 1.5*f0))
-    p0 = (T0[0], f0)
+    bounds = ((0,                        0.5*f0), 
+              (1 + (vortex_T.max()-1)/2, 1.5*f0))
+    p0 = (1, f0)
     this_T_theory      = lambda times, T, f:  theory_T(times, fit_B0, fit_Gamma0, f, fit_chi, fit_beta, 0, T, grad_T_ad=post.grad_T_ad, m_ad=post.m_ad)
     (fit_T0, fit_f), pcov = scop.curve_fit(this_T_theory, scale_t[this_fit], T0[this_fit], bounds=bounds, p0=p0, maxfev=1e4)
 

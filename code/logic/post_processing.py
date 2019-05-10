@@ -38,32 +38,13 @@ def linear_fit(x, a, b):
     """ A linear fit: y = a* x + b """
     return a*x + b
 
-def theory_C(B0, Gamma, f, chi, beta, grad_T_ad=-1):
+def theory_C(B0, Gamma0, f, chi, beta, grad_T_ad=-1):
     """ The constant in stratified thermals theory """
-    return np.pi**(3./2) * Gamma**2 * grad_T_ad * beta / (f * B0 * chi**(1./2))
-
-#def theory_T(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=-1, m_ad=1.5):
-#    """ The temperature profile (vs time) from stratified thermals theory """
-#    C0 = theory_C(B, Gamma, V0, beta, chi, grad_T_ad=grad_T_ad)
-#    tau = (B * t + I0)/Gamma
-#    tau0 = I0/Gamma
-#    Tpow = 1 - (m_ad/2)
-#    tau_int  = np.sqrt(tau )*(Gamma - (M0 - I0)/tau)
-#    tau_int0 = np.sqrt(tau0)*(Gamma - (M0 - I0)/tau0)
-#    return (2*Tpow*C0*(tau_int-tau_int0) + T0**(Tpow))**(1./Tpow)
-#
-#def theory_dT_dt(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=-1, m_ad=1.5):
-#    """ The temperature derivative (vs time) from stratified thermals theory """
-#    C0 = theory_C(B, Gamma, V0, beta, chi, grad_T_ad=grad_T_ad)
-#    this_T = theory_T(t, B, M0, I0, Gamma, V0, T0, beta, chi, grad_T_ad=grad_T_ad, m_ad=m_ad)
-#    tau = (B * t + I0)/Gamma
-#    dtau_dt = B/Gamma
-#    return C0*dtau_dt*this_T**(m_ad/2)*(Gamma/np.sqrt(tau) + (M0 - I0)/np.sqrt(tau**3))
+    return (beta * grad_T_ad * Gamma0 * np.pi**(3./2) / f) * np.sqrt(Gamma0/(B0 * chi))
 
 def theory_r(t, B0, Gamma0, chi, t_off, rho_f=None):
     """ The temperature profile (vs time) from stratified thermals theory """
-    tau = B0*(t+t_off)/Gamma0
-    r = np.sqrt(chi*(tau)/np.pi)
+    r = np.sqrt(chi*B0*(t + t_off)/np.pi/Gamma0)
     if rho_f is None:
         return r
     return r/np.sqrt(rho_f(t))
@@ -71,17 +52,14 @@ def theory_r(t, B0, Gamma0, chi, t_off, rho_f=None):
 def theory_T(t, B0, Gamma0, f, chi, beta, t_off, T0, grad_T_ad=-1, m_ad=1.5):
     """ The temperature profile (vs time) from stratified thermals theory """
     C0 = theory_C(B0, Gamma0, f, chi, beta, grad_T_ad=grad_T_ad)
-    tau = (B0 * (t+t_off))/Gamma0
     Tpow = 1 - (m_ad/2)
-    return (2*Tpow*C0*np.sqrt(tau) + T0**(Tpow))**(1./Tpow)
+    return (2*Tpow*C0*np.sqrt(t + t_off) + T0**(Tpow))**(1./Tpow)
 
 def theory_dT_dt(t, B0, Gamma0, f, chi, beta, t_off, T0, grad_T_ad=-1, m_ad=1.5):
     """ The temperature derivative (vs time) from stratified thermals theory """
     C0 = theory_C(B0, Gamma0, f, chi, beta, grad_T_ad=grad_T_ad)
     this_T = theory_T(t, B0, Gamma0, f, chi, beta, t_off, T0, grad_T_ad=grad_T_ad, m_ad=m_ad)
-    tau = (B0 * (t + t_off))/Gamma0
-    dtau_dt = B0/Gamma0
-    return C0*dtau_dt*this_T**(m_ad/2)/np.sqrt(tau)
+    return C0*this_T**(m_ad/2)/np.sqrt(t + t_off)
 
 class DedalusIntegrator():
     """

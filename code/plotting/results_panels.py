@@ -32,17 +32,21 @@ sm.set_array([])
 
 for i, direc in enumerate(DIRS):
     f = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(direc), 'r')
-    x, y     = f['times'].value, f['d_measured'].value
-    x_t, y_t = f['times'].value, f['d_theory'].value
+    ft = h5py.File('{:s}/thermal_analysis/z_cb_file.h5'.format(direc), 'r')
+    x, y     = ft['times'].value, f['d_measured'].value
+    x_t, y_t = ft['times'].value, f['d_theory'].value
+    f.close()
+    ft.close()
     color = sm.to_rgba(i+1)
     ax.plot(x[::2], y[::2], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.5), markerfacecolor=(*color[:-1], 0.2))
     if CASES[i] in CASES_3D:
         f_3D = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(dict_3D[CASES[i]]), 'r')
-        x_3D, y_3D     = f_3D['times'].value, f_3D['d_measured'].value
+        f_3Dt = h5py.File('{:s}/thermal_analysis/z_cb_file.h5'.format(dict_3D[CASES[i]]), 'r')
+        x_3D, y_3D     = f_3Dt['times'].value, f_3D['d_measured'].value
         f_3D.close()
+        f_3Dt.close()
         ax.plot(x_3D[::2], y_3D[::2], marker='+', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.7))
     ax.plot(x_t, y_t, c=color, lw=1)
-    f.close()
 
 ax.set_xlim(0, 50)
 ax.set_ylim(0, 20)
