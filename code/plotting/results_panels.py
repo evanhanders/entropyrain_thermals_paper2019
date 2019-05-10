@@ -38,23 +38,23 @@ for i, direc in enumerate(DIRS):
     f.close()
     ft.close()
     color = sm.to_rgba(i+1)
-    ax.plot(x[::2], y[::2], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.5), markerfacecolor=(*color[:-1], 0.2))
+    ax.plot(x[::3], y[::3], marker='o', lw=0, markersize=4, markeredgecolor=(*color[:-1], 0.8), markerfacecolor=(*color[:-1], 0.2))
     if CASES[i] in CASES_3D:
         f_3D = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(dict_3D[CASES[i]]), 'r')
         f_3Dt = h5py.File('{:s}/thermal_analysis/z_cb_file.h5'.format(dict_3D[CASES[i]]), 'r')
         x_3D, y_3D     = f_3Dt['times'].value, f_3D['d_measured'].value
         f_3D.close()
         f_3Dt.close()
-        ax.plot(x_3D[::2], y_3D[::2], marker='+', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.7))
-    ax.plot(x_t, y_t, c=color, lw=1)
+        ax.plot(x_3D[::3], y_3D[::3], marker='+', lw=0, markersize=4, markeredgecolor=(*color[:-1], 0.9))
+    ax.plot(x_t, y_t, c='k', lw=0.5)
 
 ax.set_xlim(0, 50)
 ax.set_ylim(0, 20)
 ax.set_ylabel('depth')
 ax.set_xlabel(r'$t/t_b$')
 
-ax.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markersize=3, markerfacecolor=(0,0,0,0.2), markeredgecolor=(0,0,0,0.5), label='2D AN')
-ax.plot([100, 101], [100, 101], lw=0, marker='+', c='k', markersize=3, label='3D FC')
+ax.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markersize=4, markerfacecolor=(0,0,0,0.2), markeredgecolor=(0,0,0,0.8), label='2D AN')
+ax.plot([100, 101], [100, 101], lw=0, marker='+', c='k', markersize=4, label='3D FC')
 ax.legend(loc='lower right', frameon=False, fontsize=8, handletextpad=0)
 
 cb = plt.colorbar(sm, cax=cax, orientation='horizontal')
@@ -85,7 +85,7 @@ for i, direc in enumerate(DIRS):
             x_t, y_t = f['d_theory'].value[2:-2],   f['w_theory'].value
             ax = ax2
         color = sm.to_rgba(i+1)
-        ax.plot(x[::2], y[::2], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.5), markerfacecolor=(*color[:-1], 0.2))
+        ax.plot(x[::3], y[::3], marker='o', lw=0, markersize=4, markeredgecolor=(*color[:-1], 0.8), markerfacecolor=(*color[:-1], 0.2))
         if CASES[i] in CASES_3D:
             f_3D = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(dict_3D[CASES[i]]), 'r')
             if j == 0:
@@ -93,8 +93,8 @@ for i, direc in enumerate(DIRS):
             elif j == 1:
                 x_3D, y_3D     = f_3D['d_measured'].value[2:-2], f_3D['w_measured'].value
             f_3D.close()
-            ax.plot(x_3D[::2], y_3D[::2], marker='+', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.7))
-        ax.plot(x_t, y_t, c=color, lw=1)
+            ax.plot(x_3D[::3], y_3D[::3], marker='+', lw=0, markersize=4, markeredgecolor=(*color[:-1], 0.9))
+        ax.plot(x_t, y_t, c='k', lw=0.5)#c=color, lw=1)
 
         if j == 0:
             ax.set_xlim(0, 20)
@@ -111,8 +111,8 @@ for i, direc in enumerate(DIRS):
         ax.set_xlabel('depth')
 
     f.close()
-ax1.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markersize=3, markerfacecolor=(0,0,0,0.2), markeredgecolor=(0,0,0,0.5), label='2D AN')
-ax1.plot([100, 101], [100, 101], lw=0, marker='+', c='k', markersize=3, label='3D FC')
+ax1.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markersize=4, markerfacecolor=(0,0,0,0.2), markeredgecolor=(0,0,0,0.8), label='2D AN')
+ax1.plot([100, 101], [100, 101], lw=0, marker='+', c='k', markersize=4, label='3D FC')
 ax1.legend(loc='upper left', frameon=False, fontsize=8, handletextpad=0)
 
 cb = plt.colorbar(sm, cax=cax, orientation='horizontal')
