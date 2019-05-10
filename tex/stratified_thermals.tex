@@ -34,7 +34,7 @@
 
 
 \received{\today}
-\revised{\today}
+\revised{??}
 \accepted{??}%\today}
 \submitjournal{ApJ}
 
@@ -53,7 +53,8 @@
 \affil{Dept. Astrophysical \& Planetary Sciences, University of Colorado -- Boulder, Boulder, CO 80309, USA}
 \affil{Laboratory for Atmospheric and Space Physics, Boulder, CO 80303, USA}
 \author[0000-0002-7635-9728]{Daniel Lecoanet}
-\affil{Stuff}
+\affil{Princeton Center for Theoretical Science, Princeton, NJ 08544, USA}
+\affil{Department of Astrophysical Sciences, Princeton, NJ 08544, USA}
 \author[0000-0001-8935-219X]{Benjamin P. Brown}
 \affil{Dept. Astrophysical \& Planetary Sciences, University of Colorado -- Boulder, Boulder, CO 80309, USA}
 \affil{Laboratory for Atmospheric and Space Physics, Boulder, CO 80303, USA}
@@ -70,12 +71,15 @@
 \section{Introduction}
 \label{sec:intro}
 Recent observations of solar convection have revealed a convective conundrum.
-Power spectra have revealed weaker flows than anticipated at large length scales,
+Power spectra have revealed weaker flows than anticipated at large length scales
+\citep{hanasoge&all2012, greer&all2015},
 calling into question the existence of so-called ``giant cells'' driven by deep
 convection which would manifest as powerful, large-scale motions at the solar
 surface. This discrepancy between theory and observations has called into question
-our fundamental understanding of convection, sparking fruitful investigations into
-the nature of convection in the Sun.
+our fundamental understanding of convection, sparking numerous targeted investigations
+the nature of convection in the Sun 
+\citep{featherstone&hindman2016, omara&all2016, cossette&rast2016, kapyla&all2017,
+hotta2017}.
 
 \cite{spruit1997} hypothesized that convective motions may be driven entirely by
 cool downflows at the surface of the Sun, and \citet{brandenburg2016} expanded
@@ -94,7 +98,8 @@ convective elements. In the context of Earth's atmosphere, so-called ``thermals'
 are thought to be the nucleus of cloud formation. Thermals are buoyant areas
 of fluid which evolve into propagating buoyant vortex rings, and their
 evolution in the Boussinesq limit have been well studied in the laboratory
-for decades (see e.g., CITE), and more recently have been studied through
+for decades \citep[see e.g.][]{morton&all1956, scorer1957}, 
+and more recently have been studied through
 Direct Numerical Simulation (DNS) in the laminar and turbulent regime
 \citep{lecoanet&jeevanjee2018}. One fundamental result of these studies of
 thermals is that they experience a large degree of entrainment: their size expands
@@ -105,28 +110,36 @@ significant atmospheric stratification.
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{overview_fig.png}
-    \caption{
+    \caption{We have plotted the evolution of the filling factor, or radius
+	squared, of a buoyant vortex ring with depth (the $n_\rho = 3$ case examined
+	later in this work). Overplotted in a thin
+	solid line is the prediction for filling factor growth in the Boussinesq
+	case, and in the thin dashed line is plotted the prediction for pure horizontal
+	compression, as in \citet{brandenburg2016}.
     \label{fig:overview} }
 \end{figure}
 
-
 In the absence of buoyantly-induced entrainment, \citet{brandenburg2016}
 suggests that the filling factor, $f$, of vortex rings should decrease like
-$f \propto \rho^{\alpha}$ for horizontal compression and $f \propto \rho^{\alpha}$ for 
+$f \propto \rho^{-1}$ for horizontal compression and $f \propto \rho^{-2/3}$ for 
 spherical compression. On the other hand, the filling factor of Boussinesq
-thermals \emph{increases} like $f \propto d$, where $d$ is the depth propagated.
+thermals \emph{increases} like $f \propto d^2$, where $d$ is the depth propagated.
+These regimes are shown in Fig.~\ref{fig:overview}, and compared to the true
+propagation of a thermal in an appreciably stratified environment.
+
 In this work, we extend the study of \citet{lecoanet&jeevanjee2018} to study
-the propagation of low-Mach number, cold thermals in stratified domains, and how
-buoyant entrainment affects the scaling of their filling factor with depth. If
-buoyant entrainment is a dominant effect, it is possible that these buoyant vortex rings
+the propagation of low-Mach number, cold thermals in stratified domains. We are
+specifically interested in how
+buoyant entrainment affects the scaling of the thermal radius, or filling factor, with depth. If
+buoyant entrainment is a dominant effect, it is possible that entropy rain
 would simply grow too large and stall before reaching the bottom of the solar convection zone.
 On the other hand, if the compression effects suggested by \citet{brandenburg2016} are the
 dominant effect, then it is possible that these thermals could propagate to the bottom of the solar
 convection zone, or potentially shrink to a sufficiently small size where thermal dissipation is
 significant.
 
-We lay out our work as follows. In section \ref{sec:theory}, we develop a theoretical description
-of thermals in a stratified domain. In section \ref{sec:experiment}, we describe and verify
+In section \ref{sec:theory}, we develop a theoretical description
+of thermals in a stratified domain. In section \ref{sec:experiment}, we describe 
 the experiments conducted in this work. In section \ref{sec:results}, we compare the results
 of our experiments to the theory developed in section \ref{sec:theory}. Finally, in section
 \ref{sec:discussion}, we discuss what our results imply for the entropy rain hypothesis.
@@ -153,7 +166,13 @@ time units.
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{evolution_colormeshes.png}
-    \caption{
+    \caption{The evolution of $\rho S_1 r^3$, or the total entropy weighted by
+	the cube of the thermal radius, is shown for two thermals. On the left is
+	a thermal in a weakly stratified domain with $n_\rho = 1/2$ density scale heights and 
+	on the right is a thermal in a strongly stratified domain with $n_\rho = 3$.
+	While both start with precisely the same initial condition, the case with low stratification
+	expands with depth like the boussinesq case, whereas the strongly stratified thermal
+	compresses with depth.
     \label{fig:evolution_colormeshes} }
 \end{figure}
 
@@ -252,7 +271,13 @@ time determined by the buoyant nature of the thermal}.
 \subsection{Parameterized description of thermal evolution}
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{constants.png}
-    \caption{
+    \caption{Plotted are time traces for three quantities which we assume to be constant
+	in our thermal theory. In (a) and (b), the circulation and buoyancy, divided by their
+	maxima, are plotted vs. depth. We see that with increasing stratification, there is marginally
+	more detrainment of both of these quantities, but to first order they are constant over the
+	evolution of the thermal. In (c) the constant $f = V/r^3$ is plotted; after significant
+	noise during the development of the vortex ring, this quantity remains relatively constant, 
+	and increasingly approaches a constant with depth.
     \label{fig:constants} }
 \end{figure}
 
@@ -559,13 +584,18 @@ in post-processing for direct comparison with 2D anelastic cases}
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{results_panels_d_v_t.png}
-    \caption{
+    \caption{Shown are the measured depths of thermals as a function of time for all 2D
+	Anelastic and 3D Fully compressible simulations conducted in this work. Overplotted
+	is the theoretical prediction for depth as a function of time.
     \label{fig:results_d_v_t} }
 \end{figure}
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{results_panels_vs_depth.png}
-    \caption{
+    \caption{Shown are (a) the measured radii of thermals as a function of depth and
+	(b) the measured thermal velocities as a function of depth for all 2D
+	Anelastic and 3D Fully compressible simulations conducted in this work. Overplotted
+	are the predictions from theory.
     \label{fig:results_vs_depth} }
 \end{figure}
 
@@ -614,7 +644,10 @@ in section \ref{sec:discussion}
 \subsection{Verification of 2D Anelastic approximation}
 \begin{figure*}[t!]
     \includegraphics[width=\textwidth]{diff_AN_FC.png}
-    \caption{
+    \caption{Measured values of (a) depth vs. time and (c) radius vs. depth are plotted
+	for both the 2D anelastic and 3D fully compressible simulations. The fractional
+	difference between anelastic and fully compressible results are respectively shown
+	in (b) and (d).
     \label{fig:diff} }
 \end{figure*}
 
