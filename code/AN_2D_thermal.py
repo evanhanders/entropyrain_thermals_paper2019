@@ -118,7 +118,7 @@ r_basis = de.Chebyshev('r', nr, interval=(0, Lr), dealias=3/2)
 domain = de.Domain([z_basis, r_basis], grid_dtype=np.float64)
 
 problem = de.IVP(domain, variables=['u', 'w', 'ur', 'wr', 'S1', 'S1r', 'p'])
-problem.meta['u', 'w', 'S1r', 'p']['r']['dirichlet'] = True
+problem.meta['u', 'ur', 'w', 'wr', 'S1', 'S1r', 'p']['r']['dirichlet'] = True
 problem.parameters['u_phi'] = problem.parameters['u_phir'] = 0
 
 problem.parameters['pi']         = np.pi
@@ -134,6 +134,7 @@ problem.parameters['Pr']         = Pr
 problem.parameters['Lnondim']    = -grad_T_ad #scaling factor from unscaled polytropes -- for viscous heating term.
 
 problem.substitutions['T']            = '(1 + grad_T_ad*(z - Lz))'
+problem.substitutions['ln_rho0']      = '(m_ad*log(T))'              
 problem.substitutions['T0']           = '(T)'
 problem.substitutions['rho0']         = '((T)**(m_ad))'              
 problem.substitutions['ln_rho0_z']    = '(m_ad*grad_T_ad/T)'         
@@ -157,10 +158,9 @@ problem.substitutions['UdotGradU_phi']      = '(UdotGrad(u_phi, u_phir) - u_phi*
 problem.substitutions['Lap(A, Ar)']         = '(Ar/r + dr(Ar) + dz(dz(A)))'
 problem.substitutions['Lap_phi(A, Ar)']     = '(Lap(A, Ar) - A/r**2)'
 problem.substitutions['Lap_r(A, Ar)']       = '(Lap(A, Ar) - A/r**2)'
-problem.substitutions['DivU_true']          = '(u/r + ur + dz(w))'
-problem.substitutions['DivU']               = '(DivU_true)'
+problem.substitutions['DivU']               = '(u/r + ur + dz(w))'
 problem.substitutions['DivUr']              = '(ur/r - u/r**2 + dr(ur) + dz(wr))'
-problem.substitutions['DivUz']              = '(-1)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)'
+problem.substitutions['DivUz']              = '(-1)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)' #This isn't stable as a natural dz(DivU)
 
 #Stress Tensor Components
 problem.substitutions['t_rr']               = '(2*ur      - (2/3)*DivU)'
@@ -173,8 +173,6 @@ problem.substitutions['t_phir']             = '(u_phir - u_phi/r)'
 problem.substitutions['t_rr_dr']            = '(2*dr(ur)  - (2/3)*DivUr)'
 problem.substitutions['t_rz_dr']            = '(dr(wr) + dz(ur))'
 problem.substitutions['t_phir_dr']          = '(dr(u_phir) - u_phir/r)'
-problem.substitutions['t_zz_dz_L']          = '(2*dz(dz(w)) - (2./3)*dz(DivU))'
-problem.substitutions['t_zz_dz_R']          = '(2*dz(dz(w)) - (2./3)*(DivUz))'
 
 #Momentum equation diffusivitiy substitutions
 problem.substitutions['visc_L_u']      = '((xi_L/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
@@ -192,31 +190,30 @@ else:
 problem.substitutions['visc_heat']     = '(g*Lnondim*xi*(((Cp*Re*T0)**(-1))*(t_rr*dr(u) + t_rz*dz(u) + t_phir*u_phir + t_phiz*dz(u_phi) + t_rz*dr(w) + t_zz*dz(w))))'
 
 #Equation scaling, vorticity substitution
-problem.substitutions['scale_m']       = '(r**2)'
-problem.substitutions['scale_e']       = '(r)'
-problem.substitutions['scale_c']       = '(r)'
 problem.substitutions['V']             = '(dz(u) - wr)'
 problem.substitutions['Vr']            = '(dz(ur) - dr(wr))'
 
+
+problem.add_equation("u   = 0", condition="nz == 0", tau=False)
+problem.add_equation("ur  = 0", condition="nz == 0", tau=False)
+problem.add_equation("p   = 0", condition="nz == 0", tau=False)
+
 #Defn
 problem.add_equation("(S1r - dr(S1)) = 0")
-problem.add_equation("(ur  - dr(u))  = 0")
+problem.add_equation("(ur  - dr(u))  = 0", condition="nz != 0")
 problem.add_equation("(wr  - dr(w))  = 0")
 #Continuity
-problem.add_equation("scale_c*(DivU_true) = -scale_c*(w*ln_rho0_z)", tau=False)
+problem.add_equation("(r)*(DivU) = -(r)*(w*ln_rho0_z)",  condition="nz != 0", tau=True)
 #Momentum equations
-problem.add_equation("scale_m*(dt(u) +  dr(p)      - visc_L_u) = scale_m*(-UdotGradU_r     + visc_R_u    )", tau=False)
-problem.add_equation("scale_m*(dt(w) +  dz(p) - S1 - visc_L_w) = scale_m*(-UdotGrad(w, wr) + visc_R_w    )", tau=False)
-#Entropy equation
-problem.add_equation("scale_e*(dt(S1)              - diff_L )  = scale_e*(-UdotGrad(S1, S1r) + visc_heat + diff_R)", tau=False)
+problem.add_equation("(r**2)*(dt(u) +  dr(p)      - visc_L_u) = (r**2)*(-UdotGradU_r     + visc_R_u    )", tau=False, condition="nz != 0")
+problem.add_equation("(r)*(   dt(w) +  dz(p) - S1 - visc_L_w)    = (r)*(-UdotGrad(w, wr) + visc_R_w    )", tau=False)
+#Entropy equation             
+problem.add_equation("(r)*(   dt(S1)              - diff_L )     = (r)*(-UdotGrad(S1, S1r) + visc_heat + diff_R)", tau=False)
 
-#For whatever voodoo reason, these are the only BCs 
-#I've found that are stable at high stratification.
-problem.add_bc("right(V)   = 0", condition="nz != 0") 
-problem.add_bc("right(p)   = 0", condition="nz == 0") 
-problem.add_bc("right(w)   = 0") 
-problem.add_bc("right(S1r) = 0")
-#problem.add_bc("right(u)   = 0") 
+problem.add_bc("right(p)    = 0", condition="nz != 0") 
+problem.add_bc("right(u)    = 0", condition="nz != 0") 
+problem.add_bc("right(w)    = 0") 
+problem.add_bc("right(S1r)  = 0") 
 
 #########################
 # Initialization of run
@@ -243,7 +240,7 @@ if restart is None:
     S1['g'] = -1*(1 - erf((r_IC - radius)/delta_r))/2
     S1.differentiate('r', out=S1r)
     # Initial timestep
-    start_dt = 1e-3*t_b
+    start_dt = 5e-3*t_b
 else:
     logger.info("restarting from {}".format(restart))
     start_dt = checkpoint.restart(restart, solver)
@@ -277,7 +274,7 @@ safety_factor = float(args['--safety'])
 if args['--rk443']:
     safety_factor *= 4
 CFL = flow_tools.CFL(solver, initial_dt=start_dt, cadence=1, safety=safety_factor,
-                     max_change=1.5, min_change=0.5, max_dt=1e-3*t_b, threshold=0.05)
+                     max_change=1.5, min_change=0.5, max_dt=5e-3*t_b, threshold=0.05)
 CFL.add_velocities(('w', 'u'))
 
 # Flow properties
@@ -298,6 +295,7 @@ try:
         if (solver.iteration-1) % 1 == 0:
             logger.info('Iteration: {:.2e}, Time/t_b: {:.2e}, dt/t_b: {:.2e}'.format(solver.iteration, solver.sim_time/t_b, dt/t_b) +\
                         ' Max Re = {:.2e}, Circ = {:.2e}, tot_e = {:.2e}'.format(flow.max('Re'), flow.max('circ'), flow.max('tot_entropy')))
+
         if np.isnan(flow.max('v_rms')):
             logger.info('NaN, breaking.')
             break

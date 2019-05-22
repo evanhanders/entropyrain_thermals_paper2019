@@ -78,10 +78,10 @@ nrho_001_r_no_buoy = theory_r(times, 0, -1/2, nrho_001[3], nrho_001[-2], rho_f=i
 ind_001 = nrho_001_d[nrho_001_d > 2][0] == nrho_001_d
 ind_3 = nrho_3_d[nrho_3_d > 2][0] == nrho_3_d
 plt.plot(nrho_001_d, (nrho_001_d/nrho_001_d[ind_001])**2, c='black', lw=0.5)
-ax.text(2.5, 5, r'$f \propto d^2$', fontsize=10)
+ax.text(2.5, 5, r'$f \propto d^2\,\mathrm{(Boussinesq, LJ19)}$', fontsize=10)
 plt.plot(nrho_3_d, (nrho_3_r/nrho_3_r[ind_3])**2, c='k', lw=1.5)
-plt.plot(nrho_3_d, (nrho_3_r_no_buoy/nrho_3_r_no_buoy[ind_3])**2, c='black', lw=0.5, dashes=(4,1))
-ax.text(2.5, 1.5e-1, r'$f \propto \rho^{-1}$', fontsize=10)
+plt.plot(nrho_3_d, (nrho_3_r_no_buoy/nrho_3_r_no_buoy[ind_3])**2, c='black', lw=0.5)
+ax.text(2.5, 1.5e-1, r'$f \propto \rho^{-1}\,\mathrm{(Horizontal compression, B16)}$', fontsize=10)
 plt.yscale('log')
 plt.ylabel(r'$f = r^2$')
 plt.xlabel('Depth')
