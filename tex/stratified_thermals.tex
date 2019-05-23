@@ -302,7 +302,7 @@ These appear to be constant or only weakly dependent on the stratification for t
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% EXPERIMENT SECTION
-\section{Experiment} 
+\section{Numerical Experiment} 
 \label{sec:experiment}
 
 
@@ -435,7 +435,7 @@ The measured values of these parameters for the cases studied in this paper are 
 
 
 \begin{figure}[t!]
-    \includegraphics[width=\columnwidth]{results_panels_d_v_t.png}
+    \includegraphics[width=\columnwidth]{results_panels.png}
     \caption{
 	Shown are the measured depths of thermals as a function of time for all 2D Anelastic and 3D Fully compressible simulations conducted in this work. 
 	Overplotted is the theoretical prediction for depth as a function of time.
@@ -443,12 +443,14 @@ The measured values of these parameters for the cases studied in this paper are 
 \end{figure}
 
 \begin{figure}[t!]
-    \includegraphics[width=\columnwidth]{results_panels_vs_depth.png}
+    \includegraphics[width=\columnwidth]{diff_AN_FC.png}
     \caption{
-	Shown are (a) the measured radii of thermals as a function of depth and (b) the measured thermal velocities as a function of depth for all 2D Anelastic and 3D Fully compressible simulations conducted in this work. 
-	Overplotted are the predictions from theory.
-    \label{fig:results_vs_depth} }
+	Measured values of (a) depth vs. time and (c) radius vs. depth are plotted for both the 2D anelastic and 3D fully compressible simulations. 
+	The fractional difference between anelastic and fully compressible results are respectively shown in (b) and (d).
+    \label{fig:diff} }
 \end{figure}
+
+
 
 In Fig. \ref{fig:results_d_v_t}, we show the measured depth $d_{\text{th}} = L_z - z_{\text{th}}$ of the thermal as a function of time for low and high stratification. 
 At very low stratification (e.g., $n_\rho = 0.1$), the thermal is small compared to the local density scale height at all depths, and it evolves roughly according to the Boussinesq prediction of $d \propto \sqrt{t}$. 
@@ -462,21 +464,8 @@ However, as stratification increases, the thermal entrains less environmental fl
 This lessened entrainment is, unsurprisingly, accompanied by greater acceleration of the thermal.
 As in the case of depth vs. time, the overplotted theoretical predictions show excellent agreement with the measured data.
 
-These results suggest that there are two regimes of downflowing thermal behavior:
-\begin{enumerate}
-\item A low-stratification ``stalling'' regime, in which the thermal entrains environmental fluid and slows down, acting much like the Boussinesq regime, and
-\item A high-stratification ``falling'' regime, in which the thermal falls fast enough that compression due to the atmospheric stratification results in minimal entrainment and the thermal accelerates as it falls deeper into the atmosphere.
-\end{enumerate}
 
 \subsection{Verification of 2D Anelastic approximation}
-\begin{figure*}[t!]
-    \includegraphics[width=\textwidth]{diff_AN_FC.png}
-    \caption{
-	Measured values of (a) depth vs. time and (c) radius vs. depth are plotted for both the 2D anelastic and 3D fully compressible simulations. 
-	The fractional difference between anelastic and fully compressible results are respectively shown in (b) and (d).
-    \label{fig:diff} }
-\end{figure*}
-
 In Fig.~\ref{fig:diff}, we display in more detail a comparison of our 2D Anelastic and 3D Fully Compressible cases. 
 In Fig.~\ref{fig:diff}a, depth vs time is shown, and the fractional difference between FC and AN cases is shown in Fig.~\ref{fig:diff}b.
 Differences between the two cases are $\leq 2$\% for all times, with greater error towards the end of the simulations as the FC simulations begin to interact with the impenetrable boundary at the bottom of their simulation domains.  
@@ -488,23 +477,32 @@ This close agreement between low Mach number Fully Compressible simulations and 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION SECTION
-\section{Discussion}
+\section{Conclusion \& Discussion}
 \label{sec:discussion}
-In this work we have extended the theory of the evolution of buoyant thermals into the low-Mach number, stratified regime and have shown that that theory has remarkable agreement with the results of both Anelastic and Fully compressible simulations.
+In this paper we extended the theory of thermal entrainment to include stratification, and showed that theory predicts that dense thermals will experience less entrainment than boussinesq thermals due to increasing atmospheric density with depth.
+We performed 2D anelastic simulations of thermal evolution for varying degrees of stratification and showed that our parameterized theory describes the evolution of thermals in these systems remarkably well.
+Furthermore, we verified the validity of our anelastic simulations with select 3D fully compressible simulations of thermal evolution.
+
+We note that the evolution of dense thermals in stratified domain is complex, and neither the assumption of horizontal compression \citep[as in e.g.][]{brandenburg2016} or the evolution of thermals in the Boussinesq regime fully describes the behavior of these events fully.
+Rather, results fall somewhere in between, and theory and simulations suggest that there are two regimes of downflowing thermal behavior:
+\begin{enumerate}
+\item A low-stratification ``stalling'' regime, in which the thermal entrains environmental fluid and slows down, acting much like the Boussinesq regime, and
+\item A high-stratification ``falling'' regime, in which the thermal falls fast enough that compression due to the atmospheric stratification results in minimal entrainment and the thermal accelerates as it falls deeper into the atmosphere.
+\end{enumerate}
 
 However, we note that both the falling and stalling regimes observed here could result in interesting problems for the entropy rain hypothesis. 
-If solar convection were comprised of thermals in the stalling regime, it is unlikely that such elements would ever make it to the base of the solar convection zone, stalling much closer to the solar surface and depositing their entropy signature there -- possibly agreeing with the hypothesis of supergranulation as the largest buoyantly driven scale of solar motion. 
-On the other hand, if solar convection is comprised of thermals in the falling regime, then it is possible that as these thermals compress and accelerate, diffusive effects and potentially viscous heating could become important. 
-We discuss these possibilities further in section \ref{sec:discussion}
+If solar convection were comprised of thermals in the stalling regime, it is unlikely that such elements would ever make it to the base of the solar convection zone.
+Rather, we expect that they would stall closer to the solar surface and deposit their entropy signature there. 
+This could be seen as agreeing with the hypothesis of supergranulation as the largest buoyantly driven scale of solar motion.
 
+On the other hand, if solar convection is comprised of thermals in the falling regime, then it is not out of the question for solar surface elements to reach deep into the Sun.
+While vortex rings in the falling regime would theoretically be able to reach the bottom of the solar convection zone, the compression effects that occur as they shrink could cause problems.
+For example, it is possible that these thermals could shrink to the point where conductivity becomes important, or as their length scales decrease and velocities increase, viscous heating could become an important effect and essentially erase the buoyant signature of these entropy rain droplets.
 
+In Fig.~\ref{fig:discussion}, we extrapolate the results of our simulations to solar convection.
+For each simulation performed, we show the behavior of our thermals if they were to fall the first $n_\rho = 10$ density scale heights of the solar convection zone, rather than the few that we were able to simulate here.
+We see blahblahblah.
 
-We should have some discussion on these topics:
-\begin{enumerate}
-\item speculation about extensions to the solar regime. Do things on the sun shrink to the point where they viscously dissipate? Do they stall?
-\item Talk about what would happen if we were to study up-thermals.
-\item Extensions, and we trust that these results should hold in the regime of solar convection where things are turbulent.
-\end{enumerate}
 
 \begin{acknowledgements}
 This work was supported by NASA Headquarters under the NASA Earth and Space Science Fellowship Program -- Grant 80NSSC18K1199.
@@ -519,11 +517,13 @@ We use a thermal tracking algorithm very similar to the one used in  \citet{leco
 
 We begin by measuring the thermal's height versus time. 
 To do so, we average the domain's entropy profile in radius and azimuth to create an average profile of entropy with height, and then assume that the thermal's vortex core is located at the entropy minima of each of those profiles.
-We numerically differentiate these found values of height vs. time using (insert numerical differentiation technique here) and then calculate the streamfunction of the velocity field as in \citet{romps&all2015},
+We numerically differentiate these found values of height vs. time using (insert numerical differentiation technique here) to get the velocity of the bulk of the thermal, $w_{\text{th}}$.
+We then calculate the streamfunction of the velocity field as in \citet{romps&all2015},
 \begin{equation}
 \frac{\partial \psi}{\partial r} = 2\pi \rho r (w - w_{\text{th}}),
 \end{equation}
-with the boundary condition that $\psi = 0$ at $r = 0$. The contour defined by $\psi = 0$ from this solution is taken to be the outline of the thermal, and the volume of the thermal is taken to be the volume radially inward from that contour.
+with the boundary condition that $\psi = 0$ at $r = 0$. 
+The contour defined by $\psi = 0$ from this solution is taken to be the outline of the thermal, and the volume of the thermal is taken to be the volume contained in that contour.
 
 
 \section{Table of Simulations}
