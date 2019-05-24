@@ -43,6 +43,10 @@
 \shorttitle{Stratified Thermals}
 \shortauthors{Anders et al.}
 
+
+\defcitealias{lecoanet&jeevanjee2018}{LJ19}
+\newcommand{\LJ}{\citetalias{lecoanet&jeevanjee2018}}
+
 \begin{document}
 \title{Entrainment of low Mach number thermals in stratified domains}
 
@@ -76,41 +80,43 @@ We discuss what the evolution of these thermals implies for the entropy rain hyp
 \section{Introduction}
 \label{sec:intro}
 Recent observations of solar convection have revealed a convective conundrum.
-Power spectra have revealed weaker flows than anticipated at large length scales \citep{hanasoge&all2012, greer&all2015}, calling into question the existence of so-called ``giant cells'' driven by deep convection which would manifest as powerful, large-scale motions at the solar surface. 
+Power spectra of horizontal velocities show weaker flows than anticipated at large length scales \citep{hanasoge&all2012, greer&all2015}.
+These obserations cast doubt on the existence of ``giant cells'' driven by deep convection which should manifest as powerful, large-scale motions at the solar surface and throughout the solar convection zone. 
 This discrepancy between theory and observations has called into question our fundamental understanding of convection, sparking numerous targeted investigations the nature of convection in the Sun  \citep{featherstone&hindman2016, omara&all2016, cossette&rast2016, kapyla&all2017, hotta2017}.
 
-\cite{spruit1997} hypothesized that convective motions may be driven entirely by cool downflows at the surface of the Sun, and \citet{brandenburg2016} expanded upon this ``entropy rain'' hypothesis. 
+\cite{spruit1997} hypothesized that convective motions in the Sun may be driven entirely by cooling at the solar surface, and \citet{brandenburg2016} expanded upon this ``entropy rain'' hypothesis. 
 Brandenburg's work includes a careful expansion of mixing length theory to incorporate flux contributions from nonlocal convective motions, and handles this theory in a horizontally-averaged sense.
-He includes some discussion of possible flow morphologies which could be manifestations of this entropy rain, and even includes some brief simulations of propogating Hill vortices. 
-However, these simulations and discussions did not include include a fundamental piece of entropy rain: it is buoyant, and has an entropy deviation from the background atmosphere.
+He includes some discussion of possible flow morphologies which could be manifestations of this entropy rain, and even includes some brief simulations of propagating Hill vortices. 
+However, these simulations and discussions did not include include a fundamental piece of entropy rain: its entropic signature deviates from the background atmosphere.
+Entropy rain is dense, and the effects of antibuoyant forces will modify its dynamics.
 
-If entropy rain does evolve into downward propagating, dense, anti-buoyant vortex rings, it is important to understand how the filling factor of these basic convective elements is affected by their entropy signature. 
+If entropy rain does evolve into downward propagating, dense vortex rings, it is important to understand how the filling factor of these basic convective elements is affected by their entropy signature. 
 In the context of Earth's atmosphere, ``thermals,'' or buoyant fluid regions which evolve into rising vortex rings, are thought to be the nucleus of cloud formation. 
-While atmospheric, cloud-forming thermals always rise, the term is also used for the reverse, falling process and the evolution of thermals in the Boussinesq limit have been well studied in the laboratory for decades \citep[see e.g.][]{morton&all1956, scorer1957}, and more recently have been studied through Direct Numerical Simulation (DNS) in the laminar and turbulent regime \citep{lecoanet&jeevanjee2018}. 
-One fundamental result of these studies of thermals is that they experience a large degree of entrainment: their size expands with height and their propagation velocity slows despite their buoyant nature.
+Atmospheric cloud-forming thermals always rise, but the term is also used for the reverse, falling process.
+The evolution of thermals in the Boussinesq limit has been well studied in the laboratory for decades \citep[see e.g.][]{morton&all1956, scorer1957}, and more recently have been studied through Direct Numerical Simulation (DNS) in the laminar and turbulent regime \citep{lecoanet&jeevanjee2018}. 
+One fundamental result of these studies of thermals is that they experience a large degree of entrainment characterized by radial expansion and decceleration of propagation velocity.
 However, we do not know of a study in which the propagation of these thermals, and thus the nature of their entrainment, is affected by a significant atmospheric stratification.
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{overview_fig.png}
     \caption{
-	We have plotted the evolution of the filling factor, or radius squared, of a buoyant vortex ring with depth (the $n_\rho = 3$ case examined later in this work). 
-	Overplotted in a thin solid line is the prediction for filling factor growth in the Boussinesq case, and in the thin dashed line is plotted the prediction for pure horizontal compression, as in \citet{brandenburg2016}.
+	The evolution of the filling factor, or radius squared, of a buoyant vortex ring with depth is shown in an atmosphere which spans three density scale heights (the $n_\rho = 3$ case examined later in this work). 
+	Overplotted in thin solid lines are the predictions for filling factor growth in the Boussinesq case (as in \LJ) and the prediction for pure horizontal compression (as in \citet{brandenburg2016}).
     \label{fig:overview} }
 \end{figure}
 
-In the absence of buoyantly-induced entrainment, \citet{brandenburg2016} suggests that the filling factor, $f$, of vortex rings should decrease like $f \propto \rho^{-1}$ for horizontal compression and $f \propto \rho^{-2/3}$ for spherical compression. 
+In the absence of buoyantly-induced entrainment, \citet{brandenburg2016} suggests that the filling factor, $f$, of convective elements should decrease like $f \propto \rho^{-1}$ for horizontal compression and $f \propto \rho^{-2/3}$ for spherical compression. 
 On the other hand, the filling factor of Boussinesq thermals \emph{increases} like $f \propto d^2$, where $d$ is the depth propagated.
-These regimes are shown in Fig.~\ref{fig:overview}, and compared to the true propagation of a thermal in an appreciably stratified environment.
+These regimes are shown in Fig.~\ref{fig:overview}, and compared to the true propagation of a numerically simulated thermal in an appreciably stratified environment.
 
-In this work, we extend the study of \citet{lecoanet&jeevanjee2018} to study the propagation of low-Mach number, cold thermals in stratified domains. 
+In this paper, we extend the study of \citet{lecoanet&jeevanjee2018} (hereafter \LJ) to study the propagation of low-Mach number, cold thermals in stratified domains. 
 We are specifically interested in how buoyant entrainment affects the scaling of the thermal radius, or filling factor, with depth. 
 If buoyant entrainment is a dominant effect, it is possible that entropy rain would simply grow too large and stall before reaching the bottom of the solar convection zone.
-On the other hand, if the compression effects suggested by \citet{brandenburg2016} are the dominant effect, then it is possible that these thermals could propagate to the bottom of the solar
-convection zone, or potentially shrink to a sufficiently small size where thermal dissipation is significant.
+On the other hand, if the compression effects suggested by \citet{brandenburg2016} are the dominant effect, then it is possible that these thermals could propagate to the bottom of the solar convection zone, and perhaps could be the nucleus of entropy rain.
 
 In section \ref{sec:theory}, we develop a theoretical description of thermals in a stratified domain. 
-In section \ref{sec:experiment}, we describe the experiments conducted in this work. 
-In section \ref{sec:results}, we compare the results of our experiments to the theory developed in section \ref{sec:theory}. 
+In section \ref{sec:experiment}, we describe the numerical experiments conducted in this work. 
+In section \ref{sec:results}, we compare our theory and simulation results. 
 Finally, in section \ref{sec:discussion}, we discuss what our results imply for the entropy rain hypothesis.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -119,18 +125,20 @@ Finally, in section \ref{sec:discussion}, we discuss what our results imply for 
 \label{sec:theory}
 
 \subsection{Phenomenological description of thermal evolution}
-We show pictorally the evolution of cold thermalss from rest in Fig.~\ref{fig:evolution_colormeshes} for two different domains which span a different number of density scale heights ($n_\rho$). 
-In Fig.~\ref{fig:evolution_colormeshes}a, the evolution of a thermal in a weakly stratified domain with $n_\rho = 0.5$ density scale heights is shown. 
-In Fig.~\ref{fig:evolution_colormeshes}b, the evolution of a thermal in an appreciably stratified domain with $n_\rho = 3$ density scale heights is shown. 
+We show pictorally the evolution of cold thermals from rest in Fig.~\ref{fig:evolution_colormeshes} for two different domains which span a different number of density scale heights ($n_\rho$). 
+In Fig.~\ref{fig:evolution_colormeshes}a, the evolution of a thermal in a weakly stratified domain with $n_\rho = 0.5$ is shown. 
+In Fig.~\ref{fig:evolution_colormeshes}b, the evolution of a thermal in an appreciably stratified domain with $n_\rho = 3$ is shown. 
 In both cases, the thermal's initial conditions are spherical, dense, low entropy perturbations of equal magnitude whose diameters are 5\% of the domain depth.
-This dense sphere spins up into an axisymmetric vortex ring, and the vertical cross section through this vortex ring shows two circular vorticity \& entropy minima.
-We find that the $n_\rho = 0.5$ case entrains and grows with depth, similarly to the Boussinesq regime.
+This dense sphere spins up into an axisymmetric vortex ring, and the vertical cross section through this vortex ring shows two circular vorticity and entropy minima.
+We find that the $n_\rho = 0.5$ case entrains and grows with depth similarly to thermal behavior in the Boussinesq regime.
 On the other hand, the $n_\rho = 3$ case has a radius which remains approximately constant over time.
-The goal of this paper is to understand the evolution of the thermal in the vortex ring stage.
-All of the thermals studied in this work are laminar, similar to the Hill vortices studied by \citet{brandenburg2016}, but \citet{lecoanet&jeevanjee2018} showed that laminar theory describes the evolution of turbulent thermals well.
-We reserve studies of turbulent thermals in stratified domains for future work.
 
-In the following sections, we will use a description of the impulse and momentum of these thermals, as determined by their buoyant nature, to describe the evolution of their depth and radii with time.
+The goal of this paper is to understand the evolution of the thermal in the vortex ring stage.
+All of the thermals studied in this work are laminar, similar to the Hill vortices studied by \citet{brandenburg2016}.
+Fortunately, \LJ\, showed that laminar theory describes the evolution of turbulent thermals well.
+As a result, we reserve studies of turbulent thermals in stratified domains for future work.
+
+In the following sections, we will use a description of the impulse and momentum of dense vortex rings to describe the evolution of their depth and radii with time.
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{evolution_colormeshes.png}
@@ -258,7 +266,7 @@ r = \sqrt{\frac{\chi B_0 t + I_0}{\pi\rho\Gamma_0}}.
 \label{eqn:r_theory}
 \end{equation}
 In the Boussinesq limit where $\rho \rightarrow \text{constant}$, we retrieve the $r \propto \sqrt{t}$ scaling found in the Boussinesq regime by \citet{lecoanet&jeevanjee2018}. 
-We find that the inclusion of stratification adds the additional complexity of $r \propto \rho^{-1/2}$, such that downward-propogating vortex rings (as studied here) will entrain less than boussinesq thermals, and upward-propogating rings will entrain more. 
+We find that the inclusion of stratification adds the additional complexity of $r \propto \rho^{-1/2}$, such that downward-propagating vortex rings (as studied here) will entrain less than boussinesq thermals, and upward-propagating rings will entrain more. 
 In the absence of buoyancy ($B = 0$), this result aligns with the prediction for purely horizontal compression noted by \citet{brandenburg2016} of $r^2 \propto \rho^{-1}$.
 
 The momentum can likewise be integrated like the impulse,
