@@ -65,7 +65,7 @@ class DedalusIntegrator():
     """
     A simple class for post-processing thermal data
     """
-    def __init__(self, nr, nz, Lr, Lz, *args, r_cheby=False, **kwargs):
+    def __init__(self, nr, nz, Lr, Lz, *args, r_cheby=False, twoD=False, **kwargs):
         """
         Initialize the domain. Sets up a 2D (z, r) grid, with chebyshev
         decomposition in the z-direction and fourier decomposition in the r-direction.
@@ -81,8 +81,9 @@ class DedalusIntegrator():
         """
         self.Lz, self.Lr = Lz, Lr
         if r_cheby:
+            bounds = (0, Lz)
             self.r_basis = de.Chebyshev('r', nr, interval=(0,Lr))
-            self.z_basis = de.Fourier('z', nz, interval=(0, Lz))
+            self.z_basis = de.Fourier('z', nz, interval=bounds)
             self.domain = de.Domain([self.z_basis, self.r_basis], grid_dtype=np.float64)
             self.r              = self.domain.grid(1)
             self.z              = self.domain.grid(0)
@@ -260,6 +261,7 @@ class ThermalPostProcessor():
             s1  = f['tasks']['S1'].value * self.s_factor
             w   = f['tasks']['w'].value  * self.L_factor/self.t_factor
             u   = f['tasks']['u'].value  * self.L_factor/self.t_factor
+#            V   = f['tasks']['p'].value  
             V   = f['tasks']['V'].value  / self.t_factor
             r   = f['scales']['r']['1.0'].value * self.L_factor 
             z   = f['scales']['z']['1.0'].value * self.L_factor 
@@ -304,7 +306,7 @@ class ThermalPostProcessor():
             r, z, rr, zz, s1, w, u, V = self.read_file(fn)
 
             if filenum == 0:
-                integrator = DedalusIntegrator(len(r), len(z), self.Lr, self.Lz, self.grad_T_ad, self.m_ad, r_cheby=True)
+                integrator = DedalusIntegrator(len(r), len(z), self.Lr, self.Lz, self.grad_T_ad, self.m_ad, r_cheby=True, twoD=self.twoD)
                 count           = 0
                 contours        = np.zeros((len(self.times), len(z)))
                 radius = np.zeros_like(self.times)
@@ -575,7 +577,7 @@ class ThermalPostProcessor():
                 r, z, rr, zz, s1, w, u, V = self.read_file(fn)
 
                 if filenum == 0:
-                    integrator = DedalusIntegrator(len(r), len(z), self.Lr, self.Lz, self.grad_T_ad, self.m_ad, r_cheby=self.twoD)
+                    integrator = DedalusIntegrator(len(r), len(z), self.Lr, self.Lz, self.grad_T_ad, self.m_ad, r_cheby=self.twoD, twoD=self.twoD)
 
                 for i in range(s1.shape[0]):
                     count += 1
@@ -585,14 +587,14 @@ class ThermalPostProcessor():
                     integrator.fd2.set_scales(1, keep_data=True)
                     if self.twoD:
                         s_prof   = np.copy(integrator.fd2['g'][:,0])
-                        integrator.fd2.set_scales(4096/len(s_prof), keep_data=True)
+                        integrator.fd2.set_scales(int(np.ceil(4096/len(s_prof))), keep_data=True)
                         s_prof_big = np.copy(integrator.fd2['g'][:,0])
-                        z_big      = integrator.domain.grid(0, scales=4096/len(s_prof)).flatten()
+                        z_big      = integrator.domain.grid(0, scales=int(np.ceil(4096/len(s_prof)))).flatten()
                     else:
                         s_prof   = np.copy(integrator.fd2['g'][0,:])
-                        integrator.fd2.set_scales(4096/len(s_prof), keep_data=True)
+                        integrator.fd2.set_scales(int(np.ceil(4096/len(s_prof))), keep_data=True)
                         s_prof_big = np.copy(integrator.fd2['g'][0,:])
-                        z_big      = integrator.domain.grid(1, scales=4096/len(s_prof)).flatten()
+                        z_big      = integrator.domain.grid(1, scales=int(np.ceil(4096/len(s_prof)))).flatten()
 
                     therm_z = integrator.z.flatten()[s_prof   < 0.2*s_prof.min()]
 
@@ -614,14 +616,14 @@ class ThermalPostProcessor():
                     integrator.fd3.set_scales(1, keep_data=True)
                     if self.twoD:
                         s_prof_r = np.copy(integrator.fd3['g'][0,:])
-                        integrator.fd3.set_scales(2048/len(s_prof_r), keep_data=True)
+                        integrator.fd3.set_scales(int(np.ceil(2048/len(s_prof_r))), keep_data=True)
                         s_prof_r_big = np.copy(integrator.fd3['g'][0,:])
-                        r_big      = integrator.domain.grid(1, scales=2048/len(s_prof_r)).flatten()
+                        r_big      = integrator.domain.grid(1, scales=int(np.ceil(2048/len(s_prof_r)))).flatten()
                     else:
                         s_prof_r = np.copy(integrator.fd3['g'][:,0])
-                        integrator.fd3.set_scales(2048/len(s_prof_r), keep_data=True)
+                        integrator.fd3.set_scales(int(np.ceil(2048/len(s_prof_r))), keep_data=True)
                         s_prof_r_big = np.copy(integrator.fd3['g'][:,0])
-                        r_big      = integrator.domain.grid(0, scales=2048/len(s_prof_r)).flatten()
+                        r_big      = integrator.domain.grid(0, scales=int(np.ceil(2048/len(s_prof_r)))).flatten()
 #
                     profile_r = s_prof_r - 0.3*s_prof_r.min()
                     r_min     = r_big[s_prof_r_big.argmin()]
@@ -756,7 +758,7 @@ class ThermalPostProcessor():
             f.close()
 
             if filenum == 0:
-                integrator = DedalusIntegrator(len(r), len(z), self.Lr, self.Lz, self.grad_T_ad, self.m_ad, r_cheby=self.twoD)
+                integrator = DedalusIntegrator(len(r), len(z), self.Lr, self.Lz, self.grad_T_ad, self.m_ad, r_cheby=self.twoD, twoD=self.twoD)
 
             for i in range(s1.shape[0]):
                 count += 1
@@ -916,14 +918,15 @@ class ThermalPostProcessor():
 
                 for j, info in enumerate(zip(axs, caxs, [s1[i,:,:], w[i,:,:], u[i,:,:], V[i,:,:]], ['s1', 'w', 'u', r'$\omega$'])):
                     ax, cax, fd, title = info
-                    maxv = np.abs(fd).max()
+                    maxv = np.sort(np.abs(fd).flatten())[int(0.998*len(fd.flatten()))]
+#                    maxv = np.abs(fd).max()
                     cmesh = ax.pcolormesh(rr, zz, fd, cmap='RdBu_r', vmin=-maxv, vmax=maxv)
                     cbar = fig.colorbar(cmesh, cax=cax, orientation="horizontal", ticks=[-maxv*.75,0,maxv*.75])
                     cax.set_xticklabels(['', r'$\pm{:.2e}$'.format(maxv), ''])
                     cax.xaxis.set_ticks_position('none')
                     cax.set_title(title)
-                    ax.set_xlim(0, 0.25*self.Lz)
-                    ax.set_ylim(0, self.Lz)
+#                    ax.set_xlim(0, 0.25*self.Lz)
+#                    ax.set_ylim(0, self.Lz)
                     ax.axhline(z_cb[count-1], lw=0.5, c='k', ls='--')
                     ax.scatter(radius[count-1], height[count-1], color='black', s=2)
                     ax.plot(contour[good_contour], z[good_contour], c='k', lw=0.5)

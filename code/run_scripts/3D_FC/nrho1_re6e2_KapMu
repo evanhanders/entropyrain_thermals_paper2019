@@ -22,7 +22,7 @@ mpiexec_mpt -n 2048 ~/.python3 FC_3D_thermal.py \
         --run_time_buoy=8.5 \
         --run_time=10.9 \
         --n_rho=1 \
-        --aspect=0.4 \
+        --aspect=0.5 \
         --SBDF2 \
         > $dedalus_dir/out.3D.nrho1.Re$RE.Eps$EPS.$PBS_JOBID
 

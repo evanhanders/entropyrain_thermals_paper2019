@@ -1,7 +1,14 @@
 import matplotlib
 matplotlib.use('Agg')
+matplotlib.rcParams['font.family'] = 'DejaVu Serif'
+matplotlib.rcParams['mathtext.fontset'] = 'custom'
+matplotlib.rcParams['mathtext.rm'] = 'DejaVu Serif'
+matplotlib.rcParams['mathtext.it'] = 'DejaVu Serif:italic'
+matplotlib.rcParams['mathtext.bf'] = 'DejaVu Serif:bold'
+matplotlib.rcParams.update({'font.size': 9})
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from scipy.interpolate import interp1d
 import numpy as np
 import h5py
 
@@ -55,6 +62,7 @@ for i, ax in enumerate(axs):
         if i == 0 and j == 0:
             bar = plt.colorbar(c, cax=cax, orientation='horizontal')
             cax.xaxis.set_ticks_position('top')
+            bar.set_label(r'$\rho S_1 r^3$', labelpad=-38)
         x_max = 5
         if j == len(dirs[i])-2:
             max_contours = contours.max(axis=1)
@@ -69,13 +77,16 @@ for i, ax in enumerate(axs):
             zs_contours = [z.flatten()[ind] for ind in max_contours_args]
             ax.plot(max_contours, zs_contours, c='k', lw=0.25)
             ax.plot(-max_contours, zs_contours, c='k', lw=0.25)
-
-            for j in range(4):
-                base = int((j+1)*np.floor(len(max_contours-2)/5))
-                dx = max_contours[base + 2] - max_contours[base]
-                dy =  zs_contours[base + 2] - zs_contours[base]
-                ax.arrow( max_contours[base], zs_contours[base],   dx,  dy, shape='full', lw=0, length_includes_head=True, head_width=0.25, color='black')
-                ax.arrow(-max_contours[base], zs_contours[base], -(dx), dy, shape='full', lw=0, length_includes_head=True, head_width=0.25, color='black')
+           
+            contour_f = interp1d(zs_contours, max_contours)
+            heights = [17, 14, 11, 8, 5, 2]
+            dy = -0.5
+            for h in heights:
+                this_r = contour_f(h)
+                next_r = contour_f(h+dy)
+                dx = next_r-this_r
+                ax.arrow( this_r, h,   dx,  dy, shape='full', lw=0, length_includes_head=True, head_width=0.25, color='black')
+                ax.arrow(-this_r, h, -(dx), dy, shape='full', lw=0, length_includes_head=True, head_width=0.25, color='black')
         good_c = contour > 0
         if np.sum(good_c) > 0:
             ax.plot( contour[good_c], z.flatten()[good_c],  c='k', lw=0.25)
@@ -88,6 +99,7 @@ for i, ax in enumerate(axs):
             ax.plot(connectors_x2, connectors_y2,  c='k', lw=0.25)
 
 
+        ax.set_yticks((0, 5, 10, 15, 20))
         if i == 1:
             ax.set_xlim(-x_max, x_max)
             ax.set_yticklabels([])
@@ -96,9 +108,9 @@ for i, ax in enumerate(axs):
         else:
             ax.set_xlim(-x_max, x_max)
             ax.set_xticks((-x_max, 0, x_max))
-            ax.set_yticks((0, 5, 10, 15, 20))
             ax.text(-0.97*x_max, 18.7, r'$n_\rho = \frac{1}{2}$', size=9)
             ax.set_ylabel('z')
         ax.set_xlabel('x')
+
 
 fig.savefig('evolution_colormeshes.png', dpi=300, bbox_inches='tight')

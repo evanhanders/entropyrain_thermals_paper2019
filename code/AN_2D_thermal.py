@@ -113,13 +113,12 @@ logger.info('saving files in {:s}'.format(data_dir))
 #####################
 # Dedalus simulation
 #####################
-z_basis = de.Fourier('z', nz, interval=(0, Lz), dealias=3/2)
+z_basis = de.Fourier(  'z', nz, interval=(0, Lz), dealias=3/2)
 r_basis = de.Chebyshev('r', nr, interval=(0, Lr), dealias=3/2)
 domain = de.Domain([z_basis, r_basis], grid_dtype=np.float64)
 
 problem = de.IVP(domain, variables=['u', 'w', 'ur', 'wr', 'S1', 'S1r', 'p'])
 problem.meta['u', 'ur', 'w', 'wr', 'S1', 'S1r', 'p']['r']['dirichlet'] = True
-problem.parameters['u_phi'] = problem.parameters['u_phir'] = 0
 
 problem.parameters['pi']         = np.pi
 problem.parameters['Lz']         = Lz
@@ -136,14 +135,22 @@ problem.parameters['Lnondim']    = -grad_T_ad #scaling factor from unscaled poly
 problem.substitutions['T']            = '(1 + grad_T_ad*(z - Lz))'
 problem.substitutions['ln_rho0']      = '(m_ad*log(T))'              
 problem.substitutions['T0']           = '(T)'
-problem.substitutions['rho0']         = '((T)**(m_ad))'              
+problem.substitutions['rho0']         = '(T**m_ad)'              
 problem.substitutions['ln_rho0_z']    = '(m_ad*grad_T_ad/T)'         
+problem.substitutions['ln_rho0_z_less_top']    = '(m_ad*grad_T_ad*(1/T - 1))'         
 problem.substitutions['ln_rho0_zz']   = '(-m_ad*grad_T_ad**2/T**2)'  
 problem.substitutions['ln_T0_z']      = '(grad_T_ad/T)'              
+problem.substitutions['T_bot']        = '(1 - grad_T_ad*Lz)'              
+problem.substitutions['rho_bot']      = '(T_bot**m_ad)'              
+problem.substitutions['ln_rho0_z_top']    = '(m_ad*grad_T_ad)'         
+problem.substitutions['ln_rho0_z_bot']    = '(m_ad*grad_T_ad/T_bot)'         
+problem.substitutions['ln_rho0_z_mid']    = '(m_ad*grad_T_ad/(1 - grad_T_ad*Lz/2))'         
+problem.substitutions['ln_T0_z_top']    = '(grad_T_ad)'         
+problem.substitutions['ln_T0_z_bot']    = '(grad_T_ad/T_bot)'         
 
 #Set up the diffusivity profile if nonconstant
 if kappa_mu:
-    problem.substitutions['xi']     = '(1/(T**m_ad))'
+    problem.substitutions['xi']     = '(1/(rho0))'
     problem.substitutions['xi_L']   =  '1'
     problem.substitutions['xi_R']   = '((xi - xi_L))'
 else:
@@ -153,67 +160,64 @@ else:
 
 #Operators (need some fancy ones in cylindrical coordinates
 problem.substitutions['UdotGrad(A, Ar)']    = '(u*Ar + w*dz(A))'
-problem.substitutions['UdotGradU_r']        = '(UdotGrad(u, ur) - u_phi**2/r)'
-problem.substitutions['UdotGradU_phi']      = '(UdotGrad(u_phi, u_phir) - u_phi*u/r)'
+problem.substitutions['UdotGradU_r']        = '(UdotGrad(u, ur))'
 problem.substitutions['Lap(A, Ar)']         = '(Ar/r + dr(Ar) + dz(dz(A)))'
 problem.substitutions['Lap_phi(A, Ar)']     = '(Lap(A, Ar) - A/r**2)'
 problem.substitutions['Lap_r(A, Ar)']       = '(Lap(A, Ar) - A/r**2)'
 problem.substitutions['DivU']               = '(u/r + ur + dz(w))'
 problem.substitutions['DivUr']              = '(ur/r - u/r**2 + dr(ur) + dz(wr))'
-problem.substitutions['DivUz']              = '(-1)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)' #This isn't stable as a natural dz(DivU)
+problem.substitutions['DivUz']              = '(dz(u)/r + dz(ur) + dz(dz(w)))'#(-1)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)' #This isn't stable as a natural dz(DivU)
 
 #Stress Tensor Components
 problem.substitutions['t_rr']               = '(2*ur      - (2/3)*DivU)'
 problem.substitutions['t_zz']               = '(2*dz(w)   - (2/3)*DivU)'
 problem.substitutions['t_phi2']             = '(2*u/r     - (2/3)*DivU)'
 problem.substitutions['t_rz']               = '(wr + dz(u))'
-problem.substitutions['t_phiz']             = '(dz(u_phi))'
-problem.substitutions['t_phir']             = '(u_phir - u_phi/r)'
 
 problem.substitutions['t_rr_dr']            = '(2*dr(ur)  - (2/3)*DivUr)'
 problem.substitutions['t_rz_dr']            = '(dr(wr) + dz(ur))'
-problem.substitutions['t_phir_dr']          = '(dr(u_phir) - u_phir/r)'
 
 #Momentum equation diffusivitiy substitutions
 problem.substitutions['visc_L_u']      = '((xi_L/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
-problem.substitutions['visc_L_w']      = '((xi_L/Re)*(Lap(w, wr)   + (1./3)*dz(DivU)))'
+problem.substitutions['visc_L_w']      = '((xi_L/Re)*(Lap(w, wr)   + (1./3)*DivUz))'
 problem.substitutions['visc_R_u']      = '((xi_R/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
 problem.substitutions['visc_R_w']      = '((xi_R/Re)*(Lap(w, wr)   + (1./3)*DivUz))'
 
 
 #Energy equation diffusivity substitutions
-problem.substitutions['diff_L']        = '( (xi_L/(Re*Pr*Cp))*Lap(S1, S1r) )'
+problem.substitutions['diff_L']        = '( ((Re*Pr*Cp)**(-1))*(ln_T0_z_top*dz(S1) + xi_L*Lap(S1, S1r) ))'
 if kappa_mu:
-    problem.substitutions['diff_R']    = '( ((Re*Pr*Cp)**(-1))*(xi*ln_T0_z*dz(S1) + xi_R*Lap(S1, S1r)) )'
+    problem.substitutions['diff_R']    = '( ((Re*Pr*Cp)**(-1))*((xi*ln_T0_z - ln_T0_z_top)*dz(S1) + xi_R*Lap(S1, S1r)) )'
 else:
     problem.substitutions['diff_R']    = '( xi*((Re*Pr*Cp)**(-1))*(ln_T0_z+ln_rho0_z)*dz(S1) )'
-problem.substitutions['visc_heat']     = '(g*Lnondim*xi*(((Cp*Re*T0)**(-1))*(t_rr*dr(u) + t_rz*dz(u) + t_phir*u_phir + t_phiz*dz(u_phi) + t_rz*dr(w) + t_zz*dz(w))))'
+problem.substitutions['visc_heat']     = '(g*Lnondim*xi*(((Cp*Re*T0)**(-1))*(t_rr*dr(u) + t_rz*dz(u) + t_rz*dr(w) + t_zz*dz(w))))'
 
 #Equation scaling, vorticity substitution
 problem.substitutions['V']             = '(dz(u) - wr)'
 problem.substitutions['Vr']            = '(dz(ur) - dr(wr))'
 
 
-problem.add_equation("u   = 0", condition="nz == 0", tau=False)
-problem.add_equation("ur  = 0", condition="nz == 0", tau=False)
-problem.add_equation("p   = 0", condition="nz == 0", tau=False)
-
 #Defn
 problem.add_equation("(S1r - dr(S1)) = 0")
-problem.add_equation("(ur  - dr(u))  = 0", condition="nz != 0")
+problem.add_equation("(ur  - dr(u))  = 0")
 problem.add_equation("(wr  - dr(w))  = 0")
 #Continuity
-problem.add_equation("(r)*(DivU) = -(r)*(w*ln_rho0_z)",  condition="nz != 0", tau=True)
+problem.add_equation("r*(2*DivU) = (r)*(DivU - w*(ln_rho0_z))")
 #Momentum equations
-problem.add_equation("(r**2)*(dt(u) +  dr(p)      - visc_L_u) = (r**2)*(-UdotGradU_r     + visc_R_u    )", tau=False, condition="nz != 0")
+problem.add_equation("(r**2)*(dt(u) +  dr(p)      - visc_L_u) = (r**2)*(-UdotGradU_r     + visc_R_u    )", tau=False)
 problem.add_equation("(r)*(   dt(w) +  dz(p) - S1 - visc_L_w)    = (r)*(-UdotGrad(w, wr) + visc_R_w    )", tau=False)
 #Entropy equation             
 problem.add_equation("(r)*(   dt(S1)              - diff_L )     = (r)*(-UdotGrad(S1, S1r) + visc_heat + diff_R)", tau=False)
 
-problem.add_bc("right(p)    = 0", condition="nz != 0") 
-problem.add_bc("right(u)    = 0", condition="nz != 0") 
+problem.add_bc("right(S1r)    = 0")
+problem.add_bc("right(V)  = 0", condition="nz != 0") 
 problem.add_bc("right(w)    = 0") 
-problem.add_bc("right(S1r)  = 0") 
+problem.add_bc("left(p)  = 0", condition="nz == 0") 
+
+#Explicitly set r = 0 boundary conditions rather than tauing them out. At r = 0, these are explicitly true for the eqns.
+#problem.add_bc("left(u) = 0")#, condition="nz != 0")
+#problem.add_bc("left(wr) = 0")
+#problem.add_bc("left(S1r) = 0")
 
 #########################
 # Initialization of run
@@ -240,7 +244,7 @@ if restart is None:
     S1['g'] = -1*(1 - erf((r_IC - radius)/delta_r))/2
     S1.differentiate('r', out=S1r)
     # Initial timestep
-    start_dt = 5e-3*t_b
+    start_dt = 1e-3#*t_b
 else:
     logger.info("restarting from {}".format(restart))
     start_dt = checkpoint.restart(restart, solver)
@@ -279,16 +283,16 @@ CFL.add_velocities(('w', 'u'))
 
 # Flow properties
 flow = flow_tools.GlobalFlowProperty(solver, cadence=1)
-flow.add_property("sqrt(u**2 + u_phi**2 + w**2)", name='v_rms')
-flow.add_property("sqrt(u**2 + u_phi**2 + w**2)*Re/xi", name='Re')
+flow.add_property("sqrt(u**2 + w**2)", name='v_rms')
+flow.add_property("sqrt(u**2 + w**2)*Re/xi", name='Re')
 flow.add_property("integ(r*rho0*S1)", name='tot_entropy')
 flow.add_property("integ(V)", name='circ')
 
 dt = start_dt
 # Main loop
+logger.info('Starting loop')
+start_time = time.time()
 try:
-    logger.info('Starting loop')
-    start_time = time.time()
     while solver.ok:
         dt = CFL.compute_dt()
         dt = solver.step(dt)
@@ -296,9 +300,13 @@ try:
             logger.info('Iteration: {:.2e}, Time/t_b: {:.2e}, dt/t_b: {:.2e}'.format(solver.iteration, solver.sim_time/t_b, dt/t_b) +\
                         ' Max Re = {:.2e}, Circ = {:.2e}, tot_e = {:.2e}'.format(flow.max('Re'), flow.max('circ'), flow.max('tot_entropy')))
 
+
+
         if np.isnan(flow.max('v_rms')):
             logger.info('NaN, breaking.')
             break
+
+
 except:
     logger.error('Exception raised, triggering end of main loop.')
     raise
