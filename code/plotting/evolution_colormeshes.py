@@ -12,8 +12,8 @@ from scipy.interpolate import interp1d
 import numpy as np
 import h5py
 
-dirs = [    ('../may03/AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20', (1, 0), (2, 18), (5, 17)) ,
-            ('../may03/AN_2D_thermal_nrho3_Re6e2_Pr1_aspect0.25_Lz20' , (1,0), (2, 12),  (4, 5))]
+dirs = [    ('../good_2D_runs/z_bot_zero/AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20', (1, 0), (2, 18), (5, 17)) ,
+            ('../good_2D_runs/z_bot_zero/AN_2D_thermal_nrho3_Re6e2_Pr1_aspect0.25_Lz20' , (1,0), (2, 12),  (4, 5))]
 
 
 gs = gridspec.GridSpec(1000, 1000)
@@ -33,6 +33,7 @@ for i, ax in enumerate(axs):
         print('opening file ', this_dir, filenum, imgnum)
         f  = h5py.File('{:s}/slices/slices_s{}.h5'.format(this_dir, filenum), 'r')
         cf = h5py.File('{:s}/thermal_analysis/contour_file.h5'.format(this_dir), 'r')
+        ff = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(this_dir), 'r')
 
         r = f['scales']['r']['1.0'].value
         z = f['scales']['z']['1.0'].value
@@ -45,12 +46,14 @@ for i, ax in enumerate(axs):
 
         contour = cf['contours'].value[20*(filenum-1)+imgnum,:]
         contours = cf['contours'].value 
+        heights  = 20 - ff['d_measured'].value
 
         if j > 0:
             rho *= np.max(contour)**3
         
         field = f['tasks']['S1'].value[imgnum,:]
         f.close()
+        ff.close()
         cf.close()
 
         minval = -1 
@@ -66,18 +69,13 @@ for i, ax in enumerate(axs):
         x_max = 5
         if j == len(dirs[i])-2:
             max_contours = contours.max(axis=1)
-            max_contours = max_contours
-            max_contours_args = contours.argmax(axis=1)
             good_a = (max_contours > 0)
-            last = np.diff(max_contours_args).argmax()
-            good_a[last:] = False
 
             max_contours = max_contours[good_a]
-            max_contours_args = max_contours_args[good_a]
-            zs_contours = [z.flatten()[ind] for ind in max_contours_args]
-            ax.plot(max_contours, zs_contours, c='k', lw=0.25)
-            ax.plot(-max_contours, zs_contours, c='k', lw=0.25)
-           
+            zs_contours = heights[good_a]
+            ax.plot( max_contours[:-1], zs_contours[:-1], c='k', lw=0.25)
+            ax.plot(-max_contours[:-1], zs_contours[:-1], c='k', lw=0.25)
+          
             contour_f = interp1d(zs_contours, max_contours)
             heights = [17, 14, 11, 8, 5, 2]
             dy = -0.5

@@ -6,12 +6,6 @@ on a freefall velocity scale with the length scale set by the diameter of the th
 This code must be used with a version of Dedalus after commit  0128fa0 by Keaton Burns 
 on 2019-02-21, such that the problem.add_equation() function has the 'tau' keyword.
 
-A 'Buoyancy time' is the freefall timescale if the length were set as the domain depth,
-rather than the thermal depth. In our nondimensional units, if the domain depth is
-Lz, t_b = sqrt(Lz), and in general it takes ~12 buoyancy times for a "boussinesq" thermal
-to cross the domain (e.g., n_rho = 0.01), whereas more stratified thermals take less time
-(e.g., at n_rho = 2, it takes about 7 buoyancy times to cross the domain).
-
 Usage:
     AN_2D_thermal.py [options]
 
@@ -23,7 +17,7 @@ Options:
     --nr=<n>              Number of r coefficients [default: 128]
 
     --wall_hours=<t>      Number of wall hours to run for max [default: 7.5]
-    --run_time_buoy=<rt>  Number of buoyancy times to run for [default: 10.0]
+    --run_time_buoy=<rt>  Number of buoyancy times to run for [default: 60]
 
     --aspect=<a>          Domain runs from [0, Lr], with Lr = aspect*Lz [default: 0.25]
     --label=<l>           an optional string at the end of the output directory for easy identification
@@ -33,8 +27,8 @@ Options:
     --Lz=<L>              The depth of the domain, in thermal diameters [default: 20]
 
     --chi_nu              If true, use a constant diffusivity (rather than constant dynamic diffusivity) eqn formulation
-    --safety=<s>          Safety factor base [default: 0.08]
-    --out_cadence=<o>     Time cadence of output saves in buoyancy times [default: 0.08]  
+    --safety=<s>          Safety factor base [default: 0.1]
+    --out_cadence=<o>     Time cadence of output saves in buoyancy times [default: 0.35]  
 
     --restart=<file>      Name of file to restart from, if starting from checkpoint
 
@@ -79,7 +73,6 @@ Cp        = gamma*m_ad
 Cv        = Cp/gamma
 grad_T_ad = -(np.exp(n_rho/m_ad) - 1)/Lz #adiabatic temperature gradient
 g         = (1 + m_ad) #* -grad_T_ad     #gravity
-t_b       = np.sqrt(Lz)                  #atmospheric buoyancy time
 
 Lr        = aspect*Lz
 radius    = 0.5       #Thermal radius, by definition, in nondimensionalization
@@ -113,7 +106,7 @@ logger.info('saving files in {:s}'.format(data_dir))
 #####################
 # Dedalus simulation
 #####################
-z_basis = de.Fourier(  'z', nz, interval=(0, Lz), dealias=3/2)
+z_basis = de.Fourier(  'z', nz, interval=(-5, Lz), dealias=3/2)
 r_basis = de.Chebyshev('r', nr, interval=(0, Lr), dealias=3/2)
 domain = de.Domain([z_basis, r_basis], grid_dtype=np.float64)
 
@@ -244,7 +237,7 @@ if restart is None:
     S1['g'] = -1*(1 - erf((r_IC - radius)/delta_r))/2
     S1.differentiate('r', out=S1r)
     # Initial timestep
-    start_dt = 1e-3#*t_b
+    start_dt = 1e-3
 else:
     logger.info("restarting from {}".format(restart))
     start_dt = checkpoint.restart(restart, solver)
@@ -252,12 +245,12 @@ else:
 checkpoint.set_checkpoint(solver, sim_dt=1, mode=mode)
 
 # Simulation termination parameters
-solver.stop_sim_time = t_b * float(args['--run_time_buoy']) + solver.sim_time
+solver.stop_sim_time = float(args['--run_time_buoy']) + solver.sim_time
 solver.stop_wall_time = 60 * 60. * float(args['--wall_hours'])
 solver.stop_iteration = np.inf
 
 # Analysis & outputs
-out_dt = float(args['--out_cadence'])*t_b
+out_dt = float(args['--out_cadence'])
 slices   = solver.evaluator.add_file_handler('{:s}/slices'.format(data_dir),   sim_dt=out_dt, max_writes=20, mode='overwrite')
 profiles = solver.evaluator.add_file_handler('{:s}/profiles'.format(data_dir), sim_dt=out_dt, max_writes=20, mode='overwrite')
 scalars  = solver.evaluator.add_file_handler('{:s}/scalars'.format(data_dir),   sim_dt=out_dt, max_writes=1e4, mode='overwrite')
@@ -278,7 +271,7 @@ safety_factor = float(args['--safety'])
 if args['--rk443']:
     safety_factor *= 4
 CFL = flow_tools.CFL(solver, initial_dt=start_dt, cadence=1, safety=safety_factor,
-                     max_change=1.5, min_change=0.5, max_dt=5e-3*t_b, threshold=0.05)
+                     max_change=1.5, min_change=0.5, max_dt=0.02, threshold=0.05)
 CFL.add_velocities(('w', 'u'))
 
 # Flow properties
@@ -297,7 +290,7 @@ try:
         dt = CFL.compute_dt()
         dt = solver.step(dt)
         if (solver.iteration-1) % 1 == 0:
-            logger.info('Iteration: {:.2e}, Time/t_b: {:.2e}, dt/t_b: {:.2e}'.format(solver.iteration, solver.sim_time/t_b, dt/t_b) +\
+            logger.info('Iteration: {:.2e}, Time: {:.2e}, dt: {:.2e}'.format(solver.iteration, solver.sim_time, dt) +\
                         ' Max Re = {:.2e}, Circ = {:.2e}, tot_e = {:.2e}'.format(flow.max('Re'), flow.max('circ'), flow.max('tot_entropy')))
 
 

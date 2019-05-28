@@ -11,9 +11,12 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 import h5py
 
-aspect = [0.35, 0.35, 0.25, 0.25, 0.25, 0.25]
-CASES = [0.1, 0.5, 1, 2, 3, 4]
-ROOT_DIR='../weird_form_good_2D_runs/'
+#aspect = [0.35, 0.35, 0.25, 0.25, 0.25, 0.25]
+#CASES = [0.1, 0.5, 1, 2, 3, 4]
+#ROOT_DIR='../weird_form_good_2D_runs/'
+aspect = [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.2, 0.25]
+CASES = [0.1, 0.5, 1, 2, 3, 4, 5, 6]
+ROOT_DIR='../good_2D_runs/z_bot_zero/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
 height, width = 4, 3.25 
@@ -32,7 +35,7 @@ fig = plt.figure(figsize=(width, height))
 axs = [plt.subplot(gs.new_subplotspec(*args)) for args in subplots]
 cax = plt.subplot(gs.new_subplotspec(*((0, 0), 50, 1000)))
 
-norm = matplotlib.colors.Normalize(vmin=0, vmax=len(DIRS))
+norm = matplotlib.colors.Normalize(vmin=0.8, vmax=len(DIRS))
 sm   = plt.cm.ScalarMappable(cmap='viridis_r', norm=norm)
 sm.set_array([])
 

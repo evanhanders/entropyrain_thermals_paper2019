@@ -13,16 +13,15 @@ RE=6e2
 date
 mpiexec_mpt -n 512 ~/.python3 AN_2D_thermal.py \
     --nr=256 \
-    --nz=1024 \
+    --nz=1536 \
     --n_rho=$NRHO \
     --wall_hours=7.5 \
     --Reynolds=$RE \
     --aspect=0.25 \
-    --run_time_buoy=5.2 \
+    --run_time_buoy=25 \
     --out_cadence=0.05 \
-    --safety=0.05 \
+    --safety=0.035 \
     --rk443 \
-    --label=safety0.05 \
     > ./out.AN_thermal_2D.Re$RE.nrho$NRHO.$PBS_JOBID
 date
 

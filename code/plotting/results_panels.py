@@ -11,9 +11,12 @@ import matplotlib.gridspec as gridspec
 import numpy as np
 import h5py
 
-aspect = [0.35, 0.35, 0.25, 0.25, 0.25, 0.25]
-CASES = [0.1, 0.5, 1, 2, 3, 4]
-ROOT_DIR='../weird_form_good_2D_runs/'
+#aspect = [0.35, 0.35, 0.25, 0.25, 0.25, 0.25]
+#CASES = [0.1, 0.5, 1, 2, 3, 4]
+#ROOT_DIR='../weird_form_good_2D_runs/'
+aspect = [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.2, 0.25]
+CASES = [0.1, 0.5, 1, 2, 3, 4, 5, 6]
+ROOT_DIR='../good_2D_runs/z_bot_zero/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
 CASES_3D = [0.5, 1, 2]
@@ -32,7 +35,7 @@ cax = plt.subplot(gs.new_subplotspec((30,   0), 50, 1000))
 ax1 = plt.subplot(gs.new_subplotspec((100,  0), 380, 1000))
 ax2 = plt.subplot(gs.new_subplotspec((620,  0), 380, 1000))
 
-norm = matplotlib.colors.Normalize(vmin=0, vmax=len(CASES))
+norm = matplotlib.colors.Normalize(vmin=0.8, vmax=len(CASES))
 sm   = plt.cm.ScalarMappable(cmap='viridis_r', norm=norm)
 sm.set_array([])
 
@@ -70,7 +73,7 @@ for i, direc in enumerate(DIRS):
             ax.set_xlabel('Time')
         elif j == 1:
             ax.set_xlim(0, 20)
-            ax.set_ylim(0.2, 1)
+            ax.set_ylim(0.2, 1.15)
             ax.set_yticks((0.5, 1))
             ax.set_ylabel('|w|')
             ax.set_xlabel('Depth')
