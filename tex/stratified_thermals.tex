@@ -430,7 +430,8 @@ In our nondimensional units, we also find that the circulation is O(-2) for each
 2	 	&  0.677	& 1.26	& -0.712 & -1.89 & 7.08	& 0.841 & 0.456	\\
 3	 	&  0.619	& 1.01	& -0.946 & -1.73 & 7.08	& 0.808	& 0.436	\\
 4	 	&  0.698	& 0.622	& -1.47	 & -1.59 & 7.10	& 0.793	& 0.422	\\
-5	 	& 			& 			&	 &	&	&	&	\\
+5	 	&  0.963	& 0.327	& -2.70	 & -1.49 & 7.15	& 0.786	& 0.414	\\
+6	 	&  1.57 	& 0.064	& -5.73	 & -1.43 & 7.16	& 0.787	& 0.408	\\
 \multicolumn{8}{l}{\textbf{3D Fully Compressible Simulations}}\\    
 0.5 	&  0.924	& 0.583	& -0.568 & -2.12 & 6.66	& 0.978	& 0.452	\\
 1	 	&  0.832	& 1.26	& -0.601 & -2.05 & 6.88	& 0.902	& 0.454	\\
@@ -483,6 +484,8 @@ We find differences in the radius of less than 1\% throughout the bulk of the th
 This gives us confidence that our high stratification anelastic simulations are producing reliable results.
 Furthermore, this close agreement between low Mach number Fully Compressible simulations and Anelastic simulations parallels the agreement between the equation sets seen in \citet{lecoanet&all2014}.
 
+For details on how measurements of thermal properties are conducted in our simulations, we refer the reader to appendix \ref{appendix:measurements}.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION SECTION
 \section{Conclusion \& Discussion}
@@ -520,8 +523,8 @@ Computations were conducted with support by the NASA High End Computing (HEC) Pr
 \end{acknowledgements}
 
 \appendix
-\section{Thermal Radius and Height measurements}
-\label{appendix:radius}
+\section{Thermal Measurements}
+\label{appendix:measurements}
 Throughout this work, we frequently report the thermal's radius or its depth.
 We measure the thermal's radius and height as the radius from the axis of symmetry and the height from the bottom of the domain at which the thermal's vortex core is located.
 To measure this, we locate the maxima of the entropy.
@@ -532,23 +535,31 @@ $$
 w_{\text{th}}(t) = \frac{d }{dt}d_{\text{th}}(t) = \frac{-d_{\text{th}}(x + 2\Delta t) + 8d_{\text{th}}(t + \Delta t) - 8 d_{\text{th}}(t - \Delta t) + d_{\text{th}}(t - 2\Delta t)}{12\Delta t}
 $$
 
+Integral quantities, such as the circulation, $\Gamma$, the buoyancy, $B$, and the volume, $\mathcal{V}$ require us to first determine what fraction of the domain constitutes the thermal.
+To do so, we use the thermal tracking algorithm described in appendix \ref{appendix:tracking} to determine the radial contour that outlines the thermal as a function of height, $\mathcal{C}$.
+We then use this contour to find our integral quantities,
+\begin{equation}
+\Gamma = \int_0^{\mathcal{C}}\int_0^{L_z} (\grad\times\bm{u})_\phi dz dr, \qquad
+B      = \int_0^{\mathcal{C}}\int_0^{L_z} \rho S_1 dz dr, \qquad
+\mathcal{V} = \int_0^{\mathcal{C}}\int_0^{L_z} 1\,dz dr.
+\end{equation}
+
 \section{Thermal Tracking}
 \label{appendix:tracking}
-We use a thermal tracking algorithm very similar to the one used in  \citet{lecoanet&jeevanjee2018} and inspired by the work of \citet{romps&all2015}. 
-
-We begin by measuring the thermal's height versus time. 
-To do so, we average the domain's entropy profile in radius and azimuth to create an average profile of entropy with height, and then assume that the thermal's vortex core is located at the entropy minima of each of those profiles.
-We numerically differentiate these found values of height vs. time using (insert numerical differentiation technique here) to get the velocity of the bulk of the thermal, $w_{\text{th}}$.
+We use a thermal tracking algorithm very similar to the one used in  \citet{lecoanet&jeevanjee2018} and inspired by the work of \citet{romps&all2015} in order to determine the full extent of the thermal, as pictured by the elliptical outlines in Fig.~\ref{fig:evolution_colormeshes} 
+We begin by measuring the thermal's velocity versus time, $w_{\text{th}}$, as described in appendix \ref{appendix:measurements}. 
 We then calculate the streamfunction of the velocity field as in \citet{romps&all2015},
 \begin{equation}
 \frac{\partial \psi}{\partial r} = 2\pi \rho r (w - w_{\text{th}}),
 \end{equation}
 with the boundary condition that $\psi = 0$ at $r = 0$. 
-The contour defined by $\psi = 0$ from this solution is taken to be the outline of the thermal, and the volume of the thermal is taken to be the volume contained in that contour.
+The contour defined by $\psi = 0$ from this solution is taken to be the contour bounding the thermal, $\mathcal{C}$.
 
 
 \section{Table of Simulations}
 \label{appendix:table}
+Information regarding the simulation resolution and CFL safety factor for each of the simulations presented in this work is contained in table \ref{table:simulation_info}.
+The Python scripts used to perform all simulations and analysis in this work are stored online in a Zenodo repository CITE.
 
 \begin{deluxetable*}{c c c c c c}
 \tabletypesize{\footnotesize}
@@ -556,20 +567,21 @@ The contour defined by $\psi = 0$ from this solution is taken to be the outline 
 \label{table:simulation_info}
 }
 \tablehead{																																															
-\colhead{$n_\rho$} & \colhead{$L_r$} & \colhead{nr or nx = ny} & \colhead{nz} & \colhead{$t_{evolution}$} & \colhead{safety}	}	
+\colhead{$n_\rho$} & \colhead{$L_r$} & \colhead{nr or nx = ny} & \colhead{nz} & \colhead{$t_{\text{evolution}}$} & \colhead{safety}	}	
 \startdata																																															
 \multicolumn{6}{l}{\textbf{2D Anelastic Simulations}}\\
-0.1 	& 	5				&	128			& 512			& 49 	&	0.2	\\
-0.5 	& 	5				&	128			& 512			& 42.5 	&	0.2	\\
-1	 	& 	5				&	128			& 512			& 38 	&	0.2	\\
-2	 	& 	5				&	128			& 512			& 31.75	&	0.2	\\
-3	 	& 	5				&	256			& 512			& 27.25	&	0.15	\\
-4	 	& 	5				&	256			& 512			& 25 	&	0.1	\\
-5	 	& 	5				&	256			& 512			& 22.8 	&	0.05	\\
+0.1 	& 	5				&	128			& 512			& 50 	&	0.6	\\
+0.5 	& 	5				&	128			& 512			& 45 	&	0.6	\\
+1	 	& 	5				&	128			& 512			& 41 	&	0.6	\\
+2	 	& 	5				&	256			& 1024			& 34	&	0.4	\\
+3	 	& 	5				&	256			& 1024			& 29	&	0.4	\\
+4	 	& 	5				&	256			& 1024			& 26 	&	0.3	\\
+5	 	& 	5				&	256			& 1536			& 25 	&	0.14	\\
+6	 	& 	5				&	256			& 1536			& 23 	&	0.08	\\
 \multicolumn{6}{l}{\textbf{3D Fully Compressible Simulations}}\\
-0.5 	& 	5				&	256			& 512			& 42.5 		&	0.8	\\
-1	 	& 	4				&	256			& 512			& 38 	 	&	0.8	\\
-2	 	& 	3.5				&	256			& 1536			& 31.75 	&	0.8	\\
+0.5 	& 	5				&	256			& 512			& 42.5 		&	0.2	\\
+1	 	& 	4				&	256			& 512			& 38 	 	&	0.2	\\
+2	 	& 	3.5				&	256			& 1536			& 31.75 	&	0.2	\\
 \enddata																																															
 \tablecomments{
 }
