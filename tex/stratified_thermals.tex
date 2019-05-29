@@ -65,12 +65,13 @@
 
 
 \begin{abstract}
-% first sentence should state the solar convective conundrum. Something like: Historically, the sun's luminosity was thought to be carried by large-scale convective flows, but recent observations show no such flow exists.
-% second paragraph should introduce entropy rain, e.g.: In place of large-scale flows, some have suggested the solar luminosity may be transported by small ``droplets'' of rapidly falling, low entropy fluid
+Historically, large-scale convective flows called ``giant cells'' were thought to transport the Sun's luminosity from deep in the solar convection zone, but recent observations show no such flow exists.
+In place of large-scale flows, some authors have suggested the solar luminosity may instead be transported by small ``droplets'' of rapidly falling, low entropy fluid.
 This ``entropy rain'' would propagate as dense vortex rings, analogous to rising buoyant ``thermals'' in the Earth's atmosphere.
 In this work, we develop an analytical theory describing the evolution of dense, negatively buoyant thermals.
 We verify the theory with 2D and 3D simulations of laminar, axisymmetric thermals in highly stratified atmospheres.
-We discuss what the evolution of these thermals implies for the entropy rain hypothesis. % should replace this with a summary of the implications
+Our results suggest that entropy rain driven at the surface of the Sun could fall into two categories: a \emph{stalling} regime in which the droplets slow down and expand, and a \emph{falling} regime in which the droplets accelerate and shrink as they propagate downwards.
+We briefly discuss difficulties for the entropy rain hypothesis in both of these regimes.
 \end{abstract}
 
 \keywords{hydrodynamics --- turbulence --- entrainment}
@@ -89,7 +90,7 @@ This discrepancy between theory and observations has called into question our fu
 Brandenburg's work includes a careful expansion of mixing length theory to incorporate flux contributions from nonlocal convective motions, and handles this theory in a horizontally-averaged sense.
 He includes some discussion of possible flow morphologies which could be manifestations of this entropy rain, and even includes some brief simulations of propagating Hill vortices. 
 However, these simulations and discussions did not include include a fundamental piece of entropy rain: its entropic signature deviates from the background atmosphere.
-Entropy rain is dense, and the effects of antibuoyant forces will modify its dynamics.
+Entropy rain is dense, and the effects of buoyancy forces will modify its dynamics.
 
 If entropy rain does evolve into downward propagating, dense vortex rings, it is important to understand how the filling factor of these basic convective elements is affected by their entropy signature. 
 In the context of Earth's atmosphere, ``thermals,'' or buoyant fluid regions which evolve into rising vortex rings, are thought to be the nucleus of cloud formation. 
@@ -241,7 +242,7 @@ As a result, we will treat the circulation of a developed vortex ring as a conse
 	Evolution traces are shown for  three quantities which we assume to be constant in our parameterized thermal theory. 
 	The circulation (a) and buoyancy (b), divided by their parameterized value for each case (see Table \ref{table:parameters}), are plotted vs. depth. 
 	We see that with increasing stratification, there is marginally more detrainment of both of these quantities, but to first order they are constant over the	thermal's transit time. 
-	In (c) the volumetric constant $f$ is shown; after significant noise during the development of the vortex ring, this quantity settles toward a value of O(7) throughout the thermal's transit.
+	In (c) the volumetric constant $f$ is shown; after significant noise during the development of the vortex ring, this quantity settles toward a value of $\mathcal{O}(7)$ throughout the thermal's transit.
     \label{fig:constants} }
 \end{figure}
 
@@ -254,7 +255,7 @@ We thus express the buoyancy as
 \begin{equation}
 B \approx \chi B_0,
 \end{equation}
-where $\chi$ is a constant of O(1) which represents this detrainment. 
+where $\chi$ is a constant of $\mathcal{O}$(1) which represents this detrainment. 
 We then integrate Eqn.~\ref{eqn:change_in_impulse} in time,
 \begin{equation*}
 I_z = \chi B_0 t + I_0.
@@ -291,7 +292,11 @@ Defining the thermal velocity $w_{\text{th}} \equiv dz_{\text{th}}/dt$, and maki
 \label{eqn:dz_theory}
 \end{equation}
 If the atmospheric stratification in which the thermal is falling is known, this result can be integrated with the known profile of $\rho(z_{\text{th}})$ in order to find the position of the thermal as a function of time. 
-We leave this result general for now, and will integrate it using the polytropic stratification used in our simulations in the next section.
+
+To summarize, we have modeled the evolved thermal as a \emph{thin-core, axisymmetric} vortex ring which is evolving in a plane-parallel, adiabatic atmosphere, and have assumed that the motions are low Mach number such that a linearized equation of state describes the thermal well.
+We have assumed that viscous and conductive effects are small and can be neglected, such that the total density-weighted specific entropy in the thermal is a conserved quantity.
+We assume that vortex ring's circulation is constant, that the thermal's volume is spheroidal, and that the effects of pressure and detrainment on impulse and momentum can be parameterized as constants.
+Under these assumptions, we arrived at Eqn.~\ref{eqn:dz_theory}, which we leave in its general form here, and which we will integrate using the polytropic stratification used in our simulations in the next section.
 
 \subsection{Solution for thermal evolution in a Polytrope}
 In this work, we study an ideal gas whose equation of state is $P = \rho T$ and whose stratification is a perfectly adiabatic polytrope,
@@ -365,15 +370,6 @@ The diffusivities $\nu$ and $\chi$ therefore scale inversely with the density.
 As the diffusivities scale with depth, Re is specified at the thermal's initial depth.
 All simulations conducted in this work use a value of Re = 600 and $\mbox{\text{Pr} = 1}$.
 
-\subsection{Initial conditions}
-To initialize the simulation, we specify a spherical initial specific entropy perturbation,
-\begin{equation}
-S_1 = - \frac{1}{2}\left[1 - \text{erf}\left(\frac{r' - r_{\text{th}}}{\delta}\right)\right].
-\label{eqn:thermal_IC}
-\end{equation}
-Here, $r' = \sqrt{r^2 + (z - z_0)^2}$, where $z_0 = L_z - 3r_{\text{th}}$, with the thermal radius set as $r_{\text{th}} = 0.5$, and a smoothing width, $\delta = 0.1$.
-As mentioned previously, Re = 600 and Pr = 1 are specified at the thermal's initial depth, $z = z_0$.
-
 \subsection{Fully Compressible Simulations}
 In order to verify the validity of our 2D Anelastic simulations, we evolve select thermals according to the 3D Navier Stokes equations in a cartesian domain. 
 We use the $(T, \ln\rho)$ formulation of the equations in which we have previously studied fully compressible convection at low and high Mach number \citep{lecoanet&all2014, anders&brown2017},
@@ -397,12 +393,21 @@ The set of initial conditions that achieves this is
 \ln\rho_1 = S_1/c_P, \qquad T_1 = T_0(e^{-\epsilon\ln\rho_1} - 1)/\epsilon.
 \end{equation}
 
+\subsection{Initial conditions}
+To initialize the simulation, we specify a spherical initial specific entropy perturbation,
+\begin{equation}
+S_1 = - \frac{1}{2}\left[1 - \text{erf}\left(\frac{r' - r_{\text{th}}}{\delta}\right)\right].
+\label{eqn:thermal_IC}
+\end{equation}
+Here, $r' = \sqrt{r^2 + (z - z_0)^2}$, where $z_0 = L_z - 3r_{\text{th}}$, with the thermal radius set as $r_{\text{th}} = 0.5$, and a smoothing width, $\delta = 0.1$.
+As mentioned previously, Re = 600 and Pr = 1 are specified at the thermal's initial depth, $z = z_0$.
+
 \subsection{Numerics}
-We evolve our simulations forward in time using the  Dedalus\footnote{\url{http://dedalus-project.org/}} pseudospectral framework \citep{burns&all2016} [CITE THE METHODS PAPER]. 
+We evolve our simulations forward in time using the  Dedalus\footnote{\url{http://dedalus-project.org/}} pseudospectral framework \citep{burns&all2016, burns&all2019}. 
 For our 2D simulations, we use using an implicit-explicit (IMEX), third-order, four-stage Runge-Kutta timestepping scheme RK443 \citep{ascher&all1997}, and for our 3D simulations we use the second-order semi-implicit backward differentiation formulation SBDF2 \citep{wang&ruuth2008}.
 
 Our 3D simulations are decomposed on Fourier bases in the horizontal directions ($x, y \in [-L_r, L_r]$) and Chebyshev bases vertically ($z \in [0, L_z]$) with impenetrable, stress free, fixed-temperature boundary conditions at the upper and lower boundaries ($T_1 = w = \partial_z u = \partial_z v = 0$ at $z = [0, L_z]$).
-Our 2D simulations are decomposed on a Fourier $(z \in [0, L_z])$ and Chebyshev $(r \in [0, L_r])$ domain, with boundary conditions of $\partial_r S_1 = w = (\grad\times\bm{u})_\phi = 0$ at $r = L_r$.
+Our 2D simulations are decomposed on a Fourier $(z \in [0, L_z])$ and Chebyshev $(r \in [0, L_r])$ domain, with boundary conditions of $\partial_r S_1 = w = (\grad\times\bm{u})_\phi = 0$ at $r = L_r$ and $u = \partial_r(w) = \partial_r(S_1) = 0$ at $r = 0$.
 
 All of the code used to perform the simulations in this work can be found online in the supplementary materials in a Zenodo repository (CREATE AND CITE REPO).
 
@@ -411,10 +416,53 @@ All of the code used to perform the simulations in this work can be found online
 %% RESULTS SECTION
 \section{Results}
 \label{sec:results}
+\begin{figure}[t!]
+    \includegraphics[width=\columnwidth]{results_panels.png}
+    \caption{
+	The measured depths of thermals as a function of time for all 2D Anelastic and 3D Fully compressible simulations conducted in this work are shown in (a).
+	The corresponding thermal velocities as a function of depth are shown in (b)
+	Overplotted in a thin solid line for each case are our theoretical predictions from section \ref{sec:theory} given the parameters in table \ref{table:parameters}.
+    \label{fig:results_panels} }
+\end{figure}
+
+\begin{figure}[t!]
+    \includegraphics[width=\columnwidth]{diff_AN_FC.png}
+    \caption{
+	Measured values of radius vs. depth are plotted for both the 2D anelastic and 3D fully compressible simulations in (a). 
+	For completeness, we also include the cases in which we only studied the 2D anelastic simulations.
+	For the cases in which only the anelastic equations were solved, the theory is overplotted in a thin solid line, and similar agreement between simulations and theory is found for the cases where both equations sets were used.
+	The fractional difference between anelastic and fully compressible results are shown in (b).
+    \label{fig:diff} }
+\end{figure}
+
+In Fig. \ref{fig:results_panels}a, we show the measured depth $d_{\text{th}} = L_z - z_{\text{th}}$ of the thermal as a function of time for low and high stratification. 
+At very low stratification (e.g., $n_\rho = 0.1$), the thermal is small compared to the local density scale height at all depths, and it evolves roughly according to the Boussinesq prediction of $d \propto \sqrt{t}$. 
+As the stratification increases, the thermal begins to transit the domain more quickly and approaches the limit of $d \propto t^2$ predicted in the highly stratified limit of Eqn.~\ref{eqn:theory_z}. 
+The theoretical fits for depth from the prediction of Eqn.~\ref{eqn:theory_z} are plotted over the measured data.
+Unsurprisingly, the theoretical fits are poor for early times when the thermal is spinning up from its initial spherical state into the vortex ring state.
+Once the thermal is spun up into a vortex ring, the theory shows remarkable agreement with the measured data.
+
+In Fig.~\ref{fig:results_panels}b, we show the corresponding thermal velocity as a function of depth with the theory overplotted again.
+As anticipated, low density ($n_\rho = 0.1$) thermals deccelerate with depth.
+We find that with increasing stratification, this decceleration stops and sufficiently stratified runs ($n_\rho \geq 3$) experience acceleration of the thermal.
+
+In Fig.~\ref{fig:diff}a, we display measured thermal radius vs. depth, with a detailed comparison of our 2D Anelastic and 3D Fully Compressible cases. 
+In the low stratification limit, the radius of the thermal grows linearly with depth, $r \propto d$, aligning with the Boussinesq limit shown in \citet{lecoanet&jeevanjee2018}.
+This growth of the thermal is the result of entrainment of environmental fluid and accompanies decceleration like $w \propto d^{-1}$ in the Boussinesq limit, as is shown in Fig.~\ref{fig:results_panels}b.
+However, as stratification increases, the thermal entrainment of environmental fluid decreases and it experiences less expansion.
+In the limit of large stratification ($n_\rho \geq 3$), thermals begin contracting with depth.
+This lessened entrainment is, unsurprisingly, accompanied by greater acceleration of the thermal (Fig.~\ref{fig:results_panels}).
+
+In Fig.~\ref{fig:diff}b, the fractional difference in radius vs. depth between 3D FC and 2D AN cases is shown for the $n_\rho = [0.5, 1, 2]$ cases studied here. 
+Aside from early in the simulation, when the thermal is spinning up, and late in the simulation, when the 3D simulations begin interacting with the impenetrable boundary at the bottom of the domain, the 2D anelastic and 3D fully compressible simulations agree surprisingly well.
+We find differences in the radius of less than 1\% throughout the bulk of the thermal evolution for the cases studied here.
+This gives us confidence that our high stratification anelastic simulations are producing reliable results.
+Furthermore, this close agreement between low Mach number Fully Compressible simulations and Anelastic simulations parallels the agreement between the equation sets seen in \citet{lecoanet&all2014}.
+
 The measured values of each of the parameters described in section \ref{sec:theory} for each of our simulations  \ref{sec:theory} for each of our simulations  \ref{sec:theory} for each of our simulations are presented in table \ref{table:parameters}.
-As anticipated, $\beta$ is O(0.5) and $\chi$ is O(1), with both decreasing slightly in value with increasing stratification, which is perhaps unsurprising in light of Fig.~\ref{fig:constants}.
+As anticipated, $\beta$ is $\mathcal{O}$(0.5) and $\chi$ is $\mathcal{0}$(1), with both decreasing slightly in value with increasing stratification, which is perhaps unsurprising in light of Fig.~\ref{fig:constants}.
 In all cases, the buoyancy $B_0$ is similar to the integrated buoyancy in the initial conditions, with some losses due to detrainment in the spin-up.
-In our nondimensional units, we also find that the circulation is O(-2) for each of our cases, and decreases with increasing stratification (and decreasing vortex size).
+In our nondimensional units, we also find that the circulation is $\mathcal{0}$(-2) for each of our cases, and decreases with increasing stratification (and decreasing vortex size).
 
 \begin{deluxetable*}{c c c c c c c c}
 \tabletypesize{\footnotesize}
@@ -441,51 +489,9 @@ In our nondimensional units, we also find that the circulation is O(-2) for each
 \tablecomments{ }
 \end{deluxetable*}
 
-\begin{figure}[t!]
-    \includegraphics[width=\columnwidth]{results_panels.png}
-    \caption{
-	The measured depths of thermals as a function of time for all 2D Anelastic and 3D Fully compressible simulations conducted in this work are shown in (a).
-	The corresponding thermal velocities as a function of depth are shown in (b)
-	Overplotted in a thin solid line for each case are our theoretical predictions from section \ref{sec:theory} given the parameters in table \ref{table:parameters}.
-    \label{fig:results_panels} }
-\end{figure}
-
-\begin{figure}[t!]
-    \includegraphics[width=\columnwidth]{diff_AN_FC.png}
-    \caption{
-	Measured values of radius vs. depth are plotted for both the 2D anelastic and 3D fully compressible simulations in (a). 
-	For completeness, we also include the cases in which we only studied the 2D anelastic simulations.
-	For the cases in which only the anelastic equations were solved, the theory is overplotted in a thin solid line, and similar agreement between simulations and theory is found for the cases where both equations sets were used.
-	The fractional difference between anelastic and fully compressible results are shown in (b).
-    \label{fig:diff} }
-\end{figure}
-
-
-
-In Fig. \ref{fig:results_panels}a, we show the measured depth $d_{\text{th}} = L_z - z_{\text{th}}$ of the thermal as a function of time for low and high stratification. 
-At very low stratification (e.g., $n_\rho = 0.1$), the thermal is small compared to the local density scale height at all depths, and it evolves roughly according to the Boussinesq prediction of $d \propto \sqrt{t}$. 
-As the stratification increases, the thermal begins to transit the domain more quickly and approaches the limit of $d \propto t^2$ predicted in the highly stratified limit of Eqn.~\ref{eqn:theory_z}. 
-The theoretical fits for depth from the prediction of Eqn.~\ref{eqn:theory_z} are plotted over the measured data and show remarkable agreement.
-
-In Fig.~\ref{fig:results_panels}b, we show the corresponding thermal velocity as a function of depth with the theory overplotted again.
-As anticipated, low density ($n_\rho = 0.1$) thermals deccelerate with depth.
-We find that with increasing stratification, this decceleration stops and sufficiently stratified runs ($n_\rho \geq 3$) experience acceleration of the thermal.
-
-In Fig.~\ref{fig:diff}a, we display measured thermal radius vs. depth, with a detailed comparison of our 2D Anelastic and 3D Fully Compressible cases. 
-In the low stratification limit, the radius of the thermal grows linearly with depth, $r \propto d$, aligning with the Boussinesq limit shown in \citet{lecoanet&jeevanjee2018}.
-This growth of the thermal is the result of entrainment of environmental fluid and accompanies decceleration like $w \propto d^{-1}$ in the Boussinesq limit, as is shown in Fig.~\ref{fig:results_panels}b.
-However, as stratification increases, the thermal entrainment of environmental fluid decreases and it experiences less expansion.
-In the limit of large stratification ($n_\rho \geq 3$), thermals begin contracting with depth.
-This lessened entrainment is, unsurprisingly, accompanied by greater acceleration of the thermal (Fig.~\ref{fig:results_panels}).
-
-
-In Fig.~\ref{fig:diff}b, the fractional difference in radius vs. depth between 3D FC and 2D AN cases is shown for the $n_\rho = [0.5, 1, 2]$ cases studied here. 
-Aside from early in the simulation, when the thermal is spinning up, and late in the simulation, when the 3D simulations begin interacting with the impenetrable boundary at the bottom of the domain, the 2D anelastic and 3D fully compressible simulations agree surprisingly well.
-We find differences in the radius of less than 1\% throughout the bulk of the thermal evolution for the cases studied here.
-This gives us confidence that our high stratification anelastic simulations are producing reliable results.
-Furthermore, this close agreement between low Mach number Fully Compressible simulations and Anelastic simulations parallels the agreement between the equation sets seen in \citet{lecoanet&all2014}.
-
-For details on how measurements of thermal properties are conducted in our simulations, we refer the reader to appendix \ref{appendix:measurements}.
+Throughout this section, the thermal's depth and radius refer respectively to the atmospheric depth and the radius from the axis of symmetry at which the vortex ring's entropy minimum is located.
+The velocity is simply the derivative with respect to time of that measured depth.
+For specifics on how these measurements are conducted in our simulations, we refer the reader to appendix \ref{appendix:measurements}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION SECTION
@@ -541,8 +547,8 @@ To do so, we use the thermal tracking algorithm described in appendix \ref{appen
 We then use this contour to find our integral quantities,
 \begin{equation}
 \Gamma = \int_0^{\mathcal{C}}\int_0^{L_z} (\grad\times\bm{u})_\phi dz dr, \qquad
-B      = \int_0^{\mathcal{C}}\int_0^{L_z} \rho S_1 dz dr, \qquad
-\mathcal{V} = \int_0^{\mathcal{C}}\int_0^{L_z} 1\,dz dr.
+B      = 2\pi \int_0^{\mathcal{C}}\int_0^{L_z} \rho S_1 r dz dr, \qquad
+\mathcal{V} = 2\pi \int_0^{\mathcal{C}}\int_0^{L_z} 1\,r dz dr.
 \end{equation}
 
 \section{Thermal Tracking}
@@ -588,7 +594,7 @@ The Python scripts used to perform all simulations and analysis in this work are
 }
 \end{deluxetable*}
 
-\bibliography{../tex/biblio.bib}
+\bibliography{biblio.bib}
 
 \listofchanges
 \end{document}

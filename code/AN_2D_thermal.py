@@ -70,13 +70,13 @@ Lz          = float(args['--Lz'])
 gamma     = 5./3                         #adiabatic index
 m_ad      = 1/(gamma-1)
 Cp        = gamma*m_ad
-Cv        = Cp/gamma
 grad_T_ad = -(np.exp(n_rho/m_ad) - 1)/Lz #adiabatic temperature gradient
-g         = (1 + m_ad) #* -grad_T_ad     #gravity
+g         = (1 + m_ad)                   #gravity
+logger.info('Creating polytrope with grad_T_ad: {:.4e}, g: {:.4e}'.format(grad_T_ad, g))
 
 Lr        = aspect*Lz
-radius    = 0.5       #Thermal radius, by definition, in nondimensionalization
-delta_r   = radius/5  #Thermal smoothing width
+radius    = 0.5       
+delta_r   = radius/5  
 
 #(r0, z0) is the midpoint of the (spherical) thermal
 r0        = 0
@@ -86,8 +86,6 @@ z0        = Lz - 3*radius
 # is the freefall Re at the height of the initial thermal
 if kappa_mu:
     Re /= (1 + grad_T_ad*(z0 - Lz))**m_ad
-
-logger.info('Creating polytrope with grad_T_ad: {:.4e}, g: {:.4e}'.format(grad_T_ad, g))
 
 ###################
 # Set up output dir
@@ -106,6 +104,8 @@ logger.info('saving files in {:s}'.format(data_dir))
 #####################
 # Dedalus simulation
 #####################
+# z-domain extends to -5 so that measurements can be made around z=0 
+#  before thermal gets to edge of periodic domain.
 z_basis = de.Fourier(  'z', nz, interval=(-5, Lz), dealias=3/2)
 r_basis = de.Chebyshev('r', nr, interval=(0, Lr), dealias=3/2)
 domain = de.Domain([z_basis, r_basis], grid_dtype=np.float64)
@@ -118,28 +118,19 @@ problem.parameters['Lz']         = Lz
 problem.parameters['Lr']         = Lr
 problem.parameters['m_ad']       = m_ad
 problem.parameters['Cp']         = Cp
-problem.parameters['Cv']         = Cv
 problem.parameters['grad_T_ad']  = grad_T_ad
-problem.parameters['g']          = g
 problem.parameters['Re']         = Re
 problem.parameters['Pr']         = Pr
-problem.parameters['Lnondim']    = -grad_T_ad #scaling factor from unscaled polytropes -- for viscous heating term.
 
+#Set up atmosphere
 problem.substitutions['T']            = '(1 + grad_T_ad*(z - Lz))'
 problem.substitutions['ln_rho0']      = '(m_ad*log(T))'              
 problem.substitutions['T0']           = '(T)'
 problem.substitutions['rho0']         = '(T**m_ad)'              
 problem.substitutions['ln_rho0_z']    = '(m_ad*grad_T_ad/T)'         
-problem.substitutions['ln_rho0_z_less_top']    = '(m_ad*grad_T_ad*(1/T - 1))'         
 problem.substitutions['ln_rho0_zz']   = '(-m_ad*grad_T_ad**2/T**2)'  
 problem.substitutions['ln_T0_z']      = '(grad_T_ad/T)'              
-problem.substitutions['T_bot']        = '(1 - grad_T_ad*Lz)'              
-problem.substitutions['rho_bot']      = '(T_bot**m_ad)'              
-problem.substitutions['ln_rho0_z_top']    = '(m_ad*grad_T_ad)'         
-problem.substitutions['ln_rho0_z_bot']    = '(m_ad*grad_T_ad/T_bot)'         
-problem.substitutions['ln_rho0_z_mid']    = '(m_ad*grad_T_ad/(1 - grad_T_ad*Lz/2))'         
 problem.substitutions['ln_T0_z_top']    = '(grad_T_ad)'         
-problem.substitutions['ln_T0_z_bot']    = '(grad_T_ad/T_bot)'         
 
 #Set up the diffusivity profile if nonconstant
 if kappa_mu:
@@ -155,11 +146,13 @@ else:
 problem.substitutions['UdotGrad(A, Ar)']    = '(u*Ar + w*dz(A))'
 problem.substitutions['UdotGradU_r']        = '(UdotGrad(u, ur))'
 problem.substitutions['Lap(A, Ar)']         = '(Ar/r + dr(Ar) + dz(dz(A)))'
-problem.substitutions['Lap_phi(A, Ar)']     = '(Lap(A, Ar) - A/r**2)'
 problem.substitutions['Lap_r(A, Ar)']       = '(Lap(A, Ar) - A/r**2)'
 problem.substitutions['DivU']               = '(u/r + ur + dz(w))'
 problem.substitutions['DivUr']              = '(ur/r - u/r**2 + dr(ur) + dz(wr))'
-problem.substitutions['DivUz']              = '(dz(u)/r + dz(ur) + dz(dz(w)))'#(-1)*(ln_rho0_z*dz(w) + w*ln_rho0_zz)' #This isn't stable as a natural dz(DivU)
+problem.substitutions['DivUz']              = '(dz(u)/r + dz(ur) + dz(dz(w)))'
+#Vorticity substitution
+problem.substitutions['V']                  = '(dz(u) - wr)'
+problem.substitutions['Vr']                 = '(dz(ur) - dr(wr))'
 
 #Stress Tensor Components
 problem.substitutions['t_rr']               = '(2*ur      - (2/3)*DivU)'
@@ -167,15 +160,11 @@ problem.substitutions['t_zz']               = '(2*dz(w)   - (2/3)*DivU)'
 problem.substitutions['t_phi2']             = '(2*u/r     - (2/3)*DivU)'
 problem.substitutions['t_rz']               = '(wr + dz(u))'
 
-problem.substitutions['t_rr_dr']            = '(2*dr(ur)  - (2/3)*DivUr)'
-problem.substitutions['t_rz_dr']            = '(dr(wr) + dz(ur))'
-
 #Momentum equation diffusivitiy substitutions
 problem.substitutions['visc_L_u']      = '((xi_L/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
 problem.substitutions['visc_L_w']      = '((xi_L/Re)*(Lap(w, wr)   + (1./3)*DivUz))'
 problem.substitutions['visc_R_u']      = '((xi_R/Re)*(Lap_r(u, ur) + (1./3)*DivUr))'
 problem.substitutions['visc_R_w']      = '((xi_R/Re)*(Lap(w, wr)   + (1./3)*DivUz))'
-
 
 #Energy equation diffusivity substitutions
 problem.substitutions['diff_L']        = '( ((Re*Pr*Cp)**(-1))*(ln_T0_z_top*dz(S1) + xi_L*Lap(S1, S1r) ))'
@@ -183,34 +172,23 @@ if kappa_mu:
     problem.substitutions['diff_R']    = '( ((Re*Pr*Cp)**(-1))*((xi*ln_T0_z - ln_T0_z_top)*dz(S1) + xi_R*Lap(S1, S1r)) )'
 else:
     problem.substitutions['diff_R']    = '( xi*((Re*Pr*Cp)**(-1))*(ln_T0_z+ln_rho0_z)*dz(S1) )'
-problem.substitutions['visc_heat']     = '(g*Lnondim*xi*(((Cp*Re*T0)**(-1))*(t_rr*dr(u) + t_rz*dz(u) + t_rz*dr(w) + t_zz*dz(w))))'
+problem.substitutions['visc_heat']     = '((-grad_T_ad)*xi*(((Re*T0)**(-1))*(t_rr*dr(u) + t_rz*dz(u) + t_rz*dr(w) + t_zz*dz(w))))'
 
-#Equation scaling, vorticity substitution
-problem.substitutions['V']             = '(dz(u) - wr)'
-problem.substitutions['Vr']            = '(dz(ur) - dr(wr))'
-
-
-#Defn
+#Equations
+# Note: weird DivU specification in continuity allows stability at nrho = 5, 6 and doesn't hurt low nrho.
 problem.add_equation("(S1r - dr(S1)) = 0")
 problem.add_equation("(ur  - dr(u))  = 0")
 problem.add_equation("(wr  - dr(w))  = 0")
-#Continuity
-problem.add_equation("r*(2*DivU) = (r)*(DivU - w*(ln_rho0_z))")
-#Momentum equations
-problem.add_equation("(r**2)*(dt(u) +  dr(p)      - visc_L_u) = (r**2)*(-UdotGradU_r     + visc_R_u    )", tau=False)
-problem.add_equation("(r)*(   dt(w) +  dz(p) - S1 - visc_L_w)    = (r)*(-UdotGrad(w, wr) + visc_R_w    )", tau=False)
-#Entropy equation             
-problem.add_equation("(r)*(   dt(S1)              - diff_L )     = (r)*(-UdotGrad(S1, S1r) + visc_heat + diff_R)", tau=False)
+problem.add_equation("r*(2*DivU) = (r)*(DivU - w*(ln_rho0_z))") #Continuity
+problem.add_equation("(r**2)*(dt(u) +  dr(p)      - visc_L_u) = (r**2)*(-UdotGradU_r     + visc_R_u    )", tau=False) #Momentum-x
+problem.add_equation("(r)*(   dt(w) +  dz(p) - S1 - visc_L_w)    = (r)*(-UdotGrad(w, wr) + visc_R_w    )", tau=False) #Momentum-z
+problem.add_equation("(r)*(   dt(S1)              - diff_L )     = (r)*(-UdotGrad(S1, S1r) + visc_heat + diff_R)", tau=False) #Entropy eqn
 
+#Boundary conditions
 problem.add_bc("right(S1r)    = 0")
 problem.add_bc("right(V)  = 0", condition="nz != 0") 
 problem.add_bc("right(w)    = 0") 
 problem.add_bc("left(p)  = 0", condition="nz == 0") 
-
-#Explicitly set r = 0 boundary conditions rather than tauing them out. At r = 0, these are explicitly true for the eqns.
-#problem.add_bc("left(u) = 0")#, condition="nz != 0")
-#problem.add_bc("left(wr) = 0")
-#problem.add_bc("left(S1r) = 0")
 
 #########################
 # Initialization of run
@@ -292,21 +270,16 @@ try:
         if (solver.iteration-1) % 1 == 0:
             logger.info('Iteration: {:.2e}, Time: {:.2e}, dt: {:.2e}'.format(solver.iteration, solver.sim_time, dt) +\
                         ' Max Re = {:.2e}, Circ = {:.2e}, tot_e = {:.2e}'.format(flow.max('Re'), flow.max('circ'), flow.max('tot_entropy')))
-
-
-
         if np.isnan(flow.max('v_rms')):
             logger.info('NaN, breaking.')
             break
-
-
 except:
     logger.error('Exception raised, triggering end of main loop.')
     raise
 finally:
     final_checkpoint = Checkpoint(data_dir, checkpoint_name='final_checkpoint')
     final_checkpoint.set_checkpoint(solver, wall_dt=1, mode="append")
-    solver.step(dt) #clean this up in the future...works for now.
+    solver.step(dt/1000) #clean this up in the future...works for now.
     for t in [checkpoint, final_checkpoint]:
         post.merge_process_files(t.checkpoint_dir, cleanup=False)
     for t in [slices, profiles, scalars]:
