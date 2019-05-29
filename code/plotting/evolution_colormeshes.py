@@ -69,14 +69,15 @@ for i, ax in enumerate(axs):
         x_max = 5
         if j == len(dirs[i])-2:
             max_contours = contours.max(axis=1)
-            good_a = (max_contours > 0)
+            good_a = (max_contours > 0)*(heights <= 14)
+            good_a[2] = True
 
             max_contours = max_contours[good_a]
             zs_contours = heights[good_a]
-            ax.plot( max_contours[:-1], zs_contours[:-1], c='k', lw=0.25)
-            ax.plot(-max_contours[:-1], zs_contours[:-1], c='k', lw=0.25)
-          
-            contour_f = interp1d(zs_contours, max_contours)
+            contour_f = interp1d(zs_contours, max_contours, bounds_error=False, fill_value='extrapolate')
+            ax.plot( contour_f(zs_contours[:-1]), zs_contours[:-1], c='k', lw=0.25)
+            ax.plot(-contour_f(zs_contours[:-1]), zs_contours[:-1], c='k', lw=0.25)
+         
             heights = [17, 14, 11, 8, 5, 2]
             dy = -0.5
             for h in heights:

@@ -12,7 +12,7 @@ RE=6e2
 
 date
 mpiexec_mpt -n 256 ~/.python3 AN_2D_thermal.py \
-    --nr=256 \
+    --nr=128 \
     --nz=1024 \
     --n_rho=$NRHO \
     --wall_hours=2.5 \

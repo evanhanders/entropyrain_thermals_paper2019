@@ -19,9 +19,9 @@ CASES = [0.5, 1, 2]
 ROOT_DIR='../good_2D_runs/z_bot_zero/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
-aspect_2D = [0.25, 0.25, 0.25, 0.2, 0.25]
-CASES_2D = [0.1, 3, 4, 5, 6]
-color_dir = [1, 5, 6, 7, 8]
+aspect_2D = [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.2, 0.25]
+CASES_2D = [0.1, 0.5, 1, 2, 3, 4, 5, 6]
+color_dir = [1, 2, 3, 4, 5, 6, 7, 8]
 DIRS_2D=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES_2D, aspect_2D)] 
 
 CASES_3D = [0.5, 1, 2]
@@ -77,7 +77,7 @@ for i, direc in enumerate(DIRS):
     color = sm.to_rgba(i+2)
     x2, y2, x3, y3 = d, r, d3, r3
     l = np.min((len(y2), len(y3)))
-    axs[0].plot(x2[:l], y2[:l], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.8), markerfacecolor=(*color[:-1], 0.2), markeredgewidth=0.5)
+#    axs[0].plot(x2[:l], y2[:l], marker='o', lw=0, markersize=3, markeredgecolor=(*color[:-1], 0.8), markerfacecolor=(*color[:-1], 0.2), markeredgewidth=0.5)
     axs[0].plot(x3[:l], y3[:l], marker='+', lw=0, markersize=2, markeredgecolor='k', markerfacecolor='k', markeredgewidth=0.5)
 
     axs[1].axhline(1e-2, c='k', lw=0.25)
@@ -93,27 +93,31 @@ for i, direc in enumerate(DIRS):
     axs[1].set_ylim(1e-3, 1e-1)
     axs[1].set_xlim(x2.min(), x2.max())
 
-axs[0].set_ylim(0.1, 2)
+axs[0].set_ylim(0.2, 2)
 axs[0].set_xlim(2, 20)
 axs[1].set_xlim(2, 20)
 axs[0].set_ylabel('Radius')
 axs[1].set_ylabel(r'$1 - \frac{\mathrm{AN}}{\mathrm{FC}}$')
 axs[1].set_xlabel('Depth')
-
+axs[0].set_yscale('log')
 axs[0].tick_params(labelbottom=False)
+axs[0].set_yticks((0.3, 0.6, 1, 2))
+axs[0].get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+axs[0].get_yaxis().set_minor_formatter(matplotlib.ticker.NullFormatter())
+
 
 axs[0].plot([100, 101], [100, 101], lw=0,markersize=3,  marker='o', c='k', markerfacecolor=(1,1,1,0.8), markeredgecolor='k', label='2D AN', markeredgewidth=0.5)
 axs[0].plot([100, 101], [100, 101], lw=0,markersize=2,  marker='+', c='k', label='3D FC', markeredgewidth=0.5)
-axs[0].plot([100, 101], [100, 101], lw=0.5, label='theory', c='k')
+#axs[0].plot([100, 101], [100, 101], lw=0.5, label='theory', c='k')
 axs[0].legend(loc='upper left', frameon=False, fontsize=8, handletextpad=0.5, handlelength=0.8)
 axs[1].plot([100, 101], [100, 101], lw=0,    markersize=3,  marker='o', c='k', markerfacecolor=(0,0,0,0), markeredgecolor=(0,0,0,1), label='< 0', markeredgewidth=0.35)
 axs[1].plot([100, 101], [100, 101], lw=0,    markersize=3,  marker='o', c='k', markerfacecolor=(0,0,0,1), markeredgecolor=(0,0,0,1), label='> 0', markeredgewidth=0.35)
 axs[1].legend(loc='upper center', frameon=False, fontsize=8, handletextpad=0, borderpad=0, ncol=2, borderaxespad=0.3)
 
-cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(1, NRUNS+1, NRUNS+1), ticks=np.arange(len(CASES)) + 2.5)
+cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(1, NRUNS+1, NRUNS+1), ticks=np.arange(NRUNS+1) + 0.5)
 cax.xaxis.set_ticks_position('top')
 #cax.xaxis.set_ticklabels([0.1, 0.5, 1, 2, 3, 4])
-cax.xaxis.set_ticklabels(CASES)
+cax.xaxis.set_ticklabels([0.1, 0.5, 1, 2, 3, 4, 5, 6])
 cb.set_label(r'$n_\rho$', labelpad=-30)
 
 

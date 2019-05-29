@@ -67,8 +67,8 @@ axs[2].set_ylim(0.8, 2)
 for i in (0, 1, 2):
     axs[i].set_xlim(2, 20)
 axs[2].set_ylabel('w')
-axs[0].set_ylabel(r'$\Gamma/\Gamma_{0}$')
-axs[1].set_ylabel(r'$B/B_{0}$')
+axs[0].set_ylabel(r'$\Gamma/\Gamma_{\mathrm{th}}$')
+axs[1].set_ylabel(r'$B/B_{\mathrm{th}}$')
 axs[2].set_ylabel(r'$f/7$')
 axs[2].set_xlabel('Depth')
 

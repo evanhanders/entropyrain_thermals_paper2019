@@ -171,18 +171,11 @@ class KappaMuFCE(FullyCompressibleEquations):
     set based on kappa and mu, not chi and nu.
     """
 
-    def __init__(self, de_domain, atmosphere, A=0.5, B=0.5, *args, **kwargs):
+    def __init__(self, de_domain, atmosphere, *args, **kwargs):
         """
         Construct the atmosphere.  See parent class init for some input defns.
-
-        Parameters
-        ----------
-        A, B   : Floats
-            Used in approximating rho^{-1} = (A/T0 + B/T0**2) to reduce bandwidth.
         """
         super(KappaMuFCE, self).__init__(de_domain, atmosphere, *args, **kwargs)
-        self.problem.parameters['A'] = A
-        self.problem.parameters['B'] = B
 
     def _set_diffusion_subs(self, viscous_heating=True):
         """
@@ -308,7 +301,7 @@ class ChiNuFCE(FullyCompressibleEquations):
 
         self.problem.substitutions['L_thermal']    = self.linear_thermal_diff
         self.problem.substitutions['R_thermal']    = self.nonlinear_thermal_diff
-        self.problem.parameters['source_terms'] = 0
+        self.problem.parameters['source_terms'] = 0 #Assumes thermal equilibrium of background state.
 #        self.source                   = " (Cv_inv*( chi*(T0_zz + ln_rho0_z*T0_z) + chi_z*T0_z) )"
 #        self.problem.substitutions['source_terms'] = self.source
 

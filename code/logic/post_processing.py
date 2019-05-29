@@ -81,7 +81,10 @@ class DedalusIntegrator():
         """
         self.Lz, self.Lr = Lz, Lr
         if r_cheby:
-            bounds = (0, Lz)
+            if twoD:
+                bounds = (-5, Lz)
+            else:
+                bounds = (0, Lz)
             self.r_basis = de.Chebyshev('r', nr, interval=(0,Lr))
             self.z_basis = de.Fourier('z', nz, interval=bounds)
             self.domain = de.Domain([self.z_basis, self.r_basis], grid_dtype=np.float64)

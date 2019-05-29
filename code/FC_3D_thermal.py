@@ -20,7 +20,7 @@ Options:
     --mesh=<mesh>                        Processor mesh
 
     --run_time=<run_time>                Run time, in hours [default: 7.5]
-    --run_time_buoy=<run_time_buoy>      Run time, in buoyancy times
+    --run_time_buoy=<run_time_buoy>      Run time, in buoyancy times [default: 50]
 
     --restart=<restart_file>             Restart from checkpoint
 
@@ -28,7 +28,7 @@ Options:
 
     --label=<label>                      Additional label for run output directory
     --join                               If flagged, join files at end of run
-    --out_cadence=<cadence>              Fraction of a buoyancy time on which to output [default: 0.08]                    
+    --out_cadence=<cadence>              Fraction of a buoyancy time on which to output [default: 0.35]                    
 
     --chi_nu                             If flagged, do chi/nu formulation
 
@@ -52,11 +52,11 @@ from dedalus.extras import flow_tools
 from dedalus.tools  import post
 
 from logic.checkpointing import Checkpoint
-from logic.output import *
-from logic.domains import *
-from logic.atmospheres import *
-from logic.equations import *
-from logic.thermal import *
+from logic.output import initialize_output
+from logic.domains import DedalusDomain
+from logic.atmospheres import Polytrope
+from logic.equations import KappaMuFCE, ChiNuFCE
+from logic.thermal import Thermal
 
 logger = logging.getLogger(__name__)
 checkpoint_min = 30
@@ -118,58 +118,29 @@ if mpi4py.MPI.COMM_WORLD.rank == 0:
 
 nx = int(args['--nx'])
 ny = int(args['--ny'])
-nz = args['--nz']
-if ',' in nz:
-    nz = [int(n) for n in nz.split(',')]
-    tot_nz = np.sum(nz)
-#    if n_rho > 2:
-#        L_top = np.exp(2/m) - 1
-#    else:
-    L_top = 0.1*Lz + 2*radius
-    L_bot = Lz - L_top
-    Lz_domain = [L_bot, L_top]
-else:
-    nz = int(nz)
-    tot_nz = nz
-    Lz_domain = Lz
-
-
-
-
+nz = int(args['--nz'])
 mesh = args['--mesh']
 if mesh is not None:
     mesh = mesh.split(',')
     mesh = [int(mesh[0]), int(mesh[1])]
 
-
 #################################################################
 # Create atmosphere, equations, and domain
-domain = DedalusDomain(nx, ny, nz, Lx, Ly, Lz_domain, threeD=threeD, mesh=mesh)
+domain = DedalusDomain(nx, ny, nz, Lx, Ly, Lz, threeD=threeD, mesh=mesh)
 atmosphere = Polytrope(domain, n_rho=n_rho, aspect_ratio=aspect_ratio, gamma=gamma, R=1)
-buoyancy_time = np.sqrt((Lz)*atmosphere.params['Cp']/(epsilon*atmosphere.params['g']))
+buoyancy_time = np.sqrt((2*radius)*atmosphere.params['Cp']/(epsilon*atmosphere.params['g']))
+#buoyancy_time = np.sqrt((Lz)*atmosphere.params['Cp']/(epsilon*atmosphere.params['g']))
 if args['--chi_nu']:
     equations = ChiNuFCE(domain, atmosphere)
     Re_adjust = 1
 else:
-#    if n_rho <= 2:
-#        A = 0.5
-#    elif n_rho <= 3:
-#        A = 1./3
-#    elif n_rho <= 4:
-#        A = 1./4
-#    elif n_rho <= 5:
-#        A = 1./5 
-    A = 0.5
-    B = 1 - A
-    equations = KappaMuFCE(domain, atmosphere, A=A, B=B)
+    equations = KappaMuFCE(domain, atmosphere)
     Re_adjust = 1/(1 + 3*radius)**(m_ad) #rho_top / rho_therm
 equations.set_operators()
-
 equations.set_equations(Reynolds*Re_adjust, Prandtl, epsilon, radius, viscous_heating=not(args['--no_VH']))
 equations.set_BC() #Fixed T
 
 # Build solver
-
 if args['--SBDF2']:
     solver = equations.problem.build_solver(de.timesteppers.SBDF2)
     safety = 1
@@ -186,7 +157,7 @@ logger.info('Solver built')
 logger.info("buoyancy_time = {}".format(buoyancy_time))
 
 output_cadence = float(args['--out_cadence'])*buoyancy_time
-max_dt = safety * 0.025 * buoyancy_time / 4#np.sqrt(Reynolds)  
+max_dt = safety * 0.1 * buoyancy_time / 4#np.sqrt(Reynolds)  
 dt = max_dt/10
 
 #########################################################
@@ -194,7 +165,6 @@ dt = max_dt/10
 T1      = solver.state['T1']
 T1_z    = solver.state['T1_z']
 ln_rho1 = solver.state['ln_rho1']
-w       = solver.state['w']
 
 logger.info('checkpointing in {}'.format(data_dir))
 checkpoint = Checkpoint(data_dir)
@@ -215,12 +185,11 @@ analysis_tasks = initialize_output(data_dir, solver, threeD=threeD, output_caden
 
 # Flow properties
 flow = flow_tools.GlobalFlowProperty(solver, cadence=1)
-#flow.add_property("sqrt(u**2 + v**2 +  w**2)*L/nu", name='Re')
 flow.add_property("vol_avg(rho_fluc*phi)", name='PE_fluc')
 flow.add_property("vel_rms*L/nu", name='Re')
 flow.add_property("Ma_rms", name='Ma')
 flow.add_property("integ(rho_full*s1)", name='integ_s')
-flow.add_property("((dz(T_full)/T_full)**2 - (dz(T0)/T0)**2)", name='dissipation')
+flow.add_property("((dz(T_full)/T_full)**2 - (dz(T0)/T0)**2)", name='dissipation') # good for seeing if the solution isn't resolved.
 
 ################################################
 # CFL and sim stop conditions
@@ -229,7 +198,7 @@ CFL = flow_tools.CFL(solver, initial_dt=dt, cadence=1, safety=safety*float(args[
 CFL.add_velocities(('u', 'v', 'w'))
 
 if N_buoyancy is None:
-    solver.stop_sim_time = buoyancy_time*15 + solver.initial_sim_time
+    solver.stop_sim_time = buoyancy_time*50 + solver.initial_sim_time
 else:
     solver.stop_sim_time = N_buoyancy*buoyancy_time + solver.initial_sim_time
 solver.stop_wall_time = float(args['--run_time'])*3600
@@ -251,7 +220,7 @@ try:
             logger_string = 'iter: {:05d}, t/tb: {:.2e}, dt/tb: {:.2e}'.format(int(solver.iteration), solver.sim_time/buoyancy_time, dt/buoyancy_time)
             Re_avg = flow.grid_average('Re')
             logger_string += ' Integ_s = {:.2e}, PE_fluc = {:.2e}, Max Re = {:.2e}, Max Ma = {:.2e}'.format(flow.max('integ_s'), flow.max('PE_fluc'), flow.max('Re'), flow.max('Ma'))
-            logger_string += '\n\t\t Dissipation min/max: {:.2e} / {:.2e}'.format(flow.min('dissipation'), flow.max('dissipation'))
+            logger_string += ', Dissipation min/max: {:.2e} / {:.2e}'.format(flow.min('dissipation'), flow.max('dissipation'))
             logger.info(logger_string)
             if not np.isfinite(Re_avg):
                 good_solution = False
@@ -289,7 +258,7 @@ except:
 finally:
     final_checkpoint = Checkpoint(data_dir, checkpoint_name='final_checkpoint')
     final_checkpoint.set_checkpoint(solver, wall_dt=1, mode="append")
-    solver.step(dt) #clean this up in the future...works for now.
+    solver.step(dt/100) #clean this up in the future...works for now.
 
     if args['--join']:
         logger.info('beginning join operation')
