@@ -129,197 +129,165 @@ Finally, in section \ref{sec:discussion}, we discuss what our results imply for 
 \label{sec:theory}
 
 \subsection{Phenomenological description of thermal evolution}
-We show pictorally the evolution of cold thermals from rest in Fig.~\ref{fig:evolution_colormeshes} for two different domains which span a different number of density scale heights ($n_\rho$). 
-In Fig.~\ref{fig:evolution_colormeshes}a, the evolution of a thermal in a weakly stratified domain with $n_\rho = 0.5$ is shown. 
-In Fig.~\ref{fig:evolution_colormeshes}b, the evolution of a thermal in an appreciably stratified domain with $n_\rho = 3$ is shown. 
-In both cases, the thermal's initial conditions are spherical, dense, low entropy perturbations of equal magnitude whose diameters are 5\% of the domain depth.
-This dense sphere spins up into an axisymmetric vortex ring, and the vertical cross section through this vortex ring shows two circular vorticity and entropy minima.
-We find that the $n_\rho = 0.5$ case entrains and grows with depth similarly to thermal behavior in the Boussinesq regime.
-On the other hand, the $n_\rho = 3$ case has a radius which remains approximately constant over time.
+Fig.~\ref{fig:evolution_colormeshes} depicts the descent of 3D cold thermals released from rest in domains which span a different number of density scale heights ($n_\rho$).
+The left panel shows a weakly stratified domain with $n_\rho=0.5$, whereas the right panel shows a strongly stratified domain with $n_\rho=3$.
+In both cases, the thermal is initialized with a spherical negative entropy perturbation, which a diameter of 5\% of the domain depth.
+This dense sphere spins up into an axisymmetric vortex ring, and the vertical cross section through this vortex ring shows two circular vorticity and entropy extrema.
+In the $n_\rho = 0.5$ simulation, the thermal grows with depth, similar to thermals in the Boussinesq regime.
+On the other hand, in the $n_\rho = 3$ simulation, the thermal's radius remains approximately constant.
 
 The goal of this paper is to understand the evolution of the thermal in the vortex ring stage.
 All of the thermals studied in this work are laminar, similar to the Hill vortices studied by \citet{brandenburg2016}.
-Fortunately, \LJ\, showed that laminar theory describes the evolution of turbulent thermals well.
-As a result, we reserve studies of turbulent thermals in stratified domains for future work.
+Crucially, \LJ\, showed little difference between the evolution of laminar and turbulent thermals in the Boussinesq limit.
+As a result, we leave studies of turbulent thermals in stratified domains for future work.
 
-In the following sections, we will use a description of the impulse and momentum of dense vortex rings to describe the evolution of their depth and radii with time.
+In the following sections, we will use the impulse of dense vortex rings derive their depth and radii with time.
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{evolution_colormeshes.png}
     \caption{
-	The evolution of $\rho S_1 r^3$, the mass-weighted entropy scaled by the thermal volume, is shown for two thermals. 
-	On the left is a thermal in a weakly stratified domain with $n_\rho = 1/2$ density scale heights and on the right is a thermal in a strongly stratified domain with $n_\rho = 3$.
-	While both start with precisely the same initial condition, the case with low stratification expands with depth like the boussinesq case, whereas the strongly stratified thermal compresses with depth.
+	The mass-weighted entropy perturbation, $\rho S_1 r^3$, for two thermals. 
+	(left) a thermal in a weakly stratified domain with $n_\rho = 1/2$ density scale heights; (right) a thermal in a strongly stratified domain with $n_\rho = 3$.
+	While both start with precisely the same initial condition, the thermal in low stratification expands with depth, whereas the thermal in strong stratification compresses with depth.
     \label{fig:evolution_colormeshes} }
 \end{figure}
 
 
-\subsection{Evolution of momentum and impulse}
-The evolution of thermals as buoyant vortex rings has been well described in the unstratified, Boussinesq limit for decades (see e.g.,~\LJ\,for a description and references).
-While many descriptions of vortex rings assume that they evolve in a self-similar state, we will lay out a description of the momentum and impulse of the thermal and show how these quantities control the evolution of the vortex ring.
+\subsection{Impulse}
 
-We study a fluid characterized by an ideal gas equation of state and focus on the ideal, low Mach number regime in an adiabatically stratified atmosphere. 
-In this regime, a linearized equation of state describes the thermodynamics well, and the fully compressible Euler momentum equation takes the form \citep{brown&all2012},
-\begin{equation}
-\frac{\partial \bm{u}}{\partial t} + \bm{u}\cdot\grad\bm{u} = 
--\grad\varpi - \frac{S_1}{c_P}\bm{g},
-\label{eqn:euler_momentum}
-\end{equation}
-where $\bm{u}$ is the velocity, $\varpi = P_1 / \rho_0$ is the reduced pressure, $S = c_V\ln T - R\ln\rho$ is the specific entropy, and thermodynamics are broken down into background (subscript 0) and fluctuating (subscript 1) components.
-In this limit where the linearized equation of state is valid, $S_1 \approx c_V T_1/T_0 - R \rho_1/\rho_0$.
-In this work we find it instructive to examine the full momentum, and so multiplying this equation by the full density, we obtain,
-\begin{equation}
-\frac{\partial (\rho\bm{u})}{\partial t} + \bm{u}\cdot\grad(\rho\bm{u}) + \rho\bm{u}(\DivU)
-= -\rho\grad\varpi - \rho\frac{S_1}{c_P}\bm{g}.
-\label{eqn:rho_euler_momentum}
-\end{equation}
-Hereafter we will define the total derivative, $D/Dt \equiv \partial/\partial t + \bm{u}\cdot\grad$, and we acknowledge that the Langrangian derivative commutes with a volume integral according to 
-\begin{equation*}
-\frac{d}{dt}\int_{\mathcal{V}} f dV = \int_{\mathcal{V}} \left[\frac{Df}{Dt} + f(\DivU)\right]dV,
-\end{equation*}
-for a volume, $\mathcal{V}$, which is advected with the fluid.
-Volume-integrating Eqn.~\ref{eqn:rho_euler_momentum}, we thus find
-\begin{equation}
-\frac{d\bm{M}}{dt} = \int_{\mathcal{V}}\left(-\rho\grad\varpi - \rho\frac{S_1}{c_P}\bm{g}\right)dV,
-\label{eqn:int_momentum_eqn}
-\end{equation}
-where the volume-integrated momentum is defined $\bm{M} \equiv \int_{\mathcal{V}}\rho\bm{u} dV$.
-At this point we will make the assumption of a plane-parallel atmosphere in which the gravity is constant, $\bm{g} = -g\hat{z}$, and note that the z-component of the volume-integrated momentum evolves according to
-\begin{equation}
-\frac{d M_z}{dt} = \int_{\mathcal{V}}\left( -\rho\frac{\partial \varpi}{\partial z} + \rho g \frac{S_1}{c_P} \right)dV.
-\label{eqn:Mz_definition}
-\end{equation}
-At this stage, it is useful to define the total buoyancy,
-\begin{equation}
-B \equiv \int_{\mathcal{V}} \rho\, S_1\, \frac{g}{c_P}\, dV,
-\label{eqn:tot_buoyancy}
-\end{equation}
-as in the absence of viscosity and detrainment, this is a conserved quantity during thermal evolution (see e.g., Fig.~\ref{fig:constants}a). 
-Furthermore, in the Boussinesq limit, the work of \citet{tarshish&all2018} shows that pressure terms reduce the efficacy of the buoyancy in changing the momentum by effectively reducing the buoyant acceleration by some factor $\beta \sim 0.5$. 
-As a result, we approximate the growth of a thermal's vertical momentum according to
-\begin{equation}
-\frac{d M_z}{dt} \approx \beta B.
-\label{eqn:theory_momentum}
-\end{equation}
+The evolution of thermals in the Boussinesq limit has been understood for decades (see e.g.,~\LJ\, for a description and references).
+While many theoretical descriptions rely on self-similarity arguments, we will show how the impulse of a thermal controls its evolution.
 
-We now turn our attention to the hydrodynamic impulse, which in the stratified limit can be expressed as \citep{shivamoggi2010},
+The hydrodynamic impulse is defined as \citep{shivamoggi2010},
 \begin{equation}
 \bm{I} = \frac{1}{2}\int_{\mathcal{V}} \bm{x}\times(\grad\times(\rho\bm{u}))dV,
 \end{equation}
 where $\bm{x}$ is the position vector. 
-The hydrodynamic impulse is the time-integrated work which has acted on the fluid to result in the current fluid motion. 
-Per \citet{shivamoggi2010}, changes in the impulse can be expressed as
+The impulse is the time-integrated work which has acted on the fluid to result in the current fluid motion.
+It is thus unaffected by internal forces (e.g., pressure or viscous).
+Upon integration by parts, it is obvious that the impulse encompasses the momentum of the fluid within the volume $\mathcal{V}$.
+However, one can also show that the surface terms correspond to the momentum outside the volume $\mathcal{V}$ \citep[e.g.][]{Akhmetov2009}.
+A thermal with volume $\mathcal{V}$, density $\rho$, and translating with velocity $w_{\text{th}} \hat{z}$ thus has an impulse \dl{note that 1+beta is the inverse of your old beta}
+\begin{equation}\label{eqn:momentum}
+I_z = (1+\beta) \rho \mathcal{V} w_{\text{th}},
+\end{equation}
+where $\beta$ is due to the ``virtual mass effect'' in which the thermal drags environment air along with it \citep{tarshish&all2018}.
+
+We now restrict our study to an ideal gas in the low Mach-number regime, in an adiabatic background.
+Due to rapid pressure equilibration in for low Mach-number flows, we can approximate \dl{Don't know if this is actually a good idea...}
 \begin{equation*}
-\frac{d\bm{I}}{d t} = \int_{\mathcal{V}}\frac{\partial(\rho\bm{u})}{\partial t}dV
-= B\hat{z} - \int_{\mathcal{V}}\left[\rho\grad\varpi + \Div{\rho\bm{u}\bm{u}}\right]dV ,
+\frac{\rho_1}{\rho_0} \approx \frac{S_1}{c_P},
 \end{equation*}
-where, importantly, the \emph{eulerian} time derivative of the momentum is inside of the volume integral here. 
-Under the proper specification of volumetric boundaries, the integral term is zero, and the vertical impulse of a thermal thus straightforwardly changes in time as
+where $S_1$ is the specific entropy perturbation and $c_P$ is the specific heat at constant pressure; thermodynamic variables are decomposed into background (subscript 0) and fluctuating (subscript 1) components.
+
+The rate of change of change of the impulse is
+\begin{equation*}
+\frac{d\bm{I}}{d t} = \int_\mathcal{V} \rho_1 \bm{g} dV,
+\end{equation*}
+because the surface terms completely cancel.
+It is useful to define the buoyancy perturbation,
+\begin{equation}
+B \equiv \int_{\mathcal{V}} \rho\, S_1\, \frac{g}{c_P}\, dV.
+\label{eqn:tot_buoyancy}
+\end{equation}
+such that
 \begin{equation}
 \frac{d I_z}{d t} = B.
 \label{eqn:change_in_impulse}
 \end{equation}
-We have thus retrieved the two findings on which our theory of thermal evolution will be built: \emph{both the impulse and momentum experience constant changes in time determined by the buoyant nature of the thermal}.
 
-In the low-Mach number limit in which changes in density from the background are negligible, and in the limit of a thin-core vortex ring, the impulse of a vortex ring can be approximated as
+In the limit of a low Mach-number, thin-core vortex ring, the impulse can be approximated as
 \begin{equation}
 I_z \approx \pi \rho r^2 \Gamma,
 \label{eqn:impulse_approx}
 \end{equation}
-where $r$ is the radius of the thermal from its axis of symmetry to the maxima of its buoyant signature, and $\Gamma = \int_{\mathcal{A}} (\grad\times\bm{u})dA$ is the circulation in a cross-section of the vortex ring.
-Integrating Eqn.~\ref{eqn:euler_momentum} reveals that changes in circulation can be calculated as
+where $r$ is the radius of the thermal from its axis of symmetry to its vorticity maximum, and $\Gamma = \int_{\mathcal{A}} (\grad\times\bm{u})dA$ is the circulation in a cross-section of the vortex ring.
+The circulation can change due to baroclinic torques,
 \begin{equation}
 \frac{d\Gamma}{dt} = \oint_{\mathcal{C}} g \frac{S_1}{c_P}\hat{z} \cdot d\bm{x},
 \label{eqn:circulation}
 \end{equation}
-where $\mathcal{C}$ is the contour around the area $\mathcal{A}$ in which the circulation is contained and $d\bm{x}$ is the line integral element around that contour.
-For the case of a vortex core in which the entropic signature is contained tightly in the core, as in Fig.~\ref{fig:evolution_colormeshes}, any contour which is drawn around the vortex core should conserve circulation in the absence of viscosity.
-As a result, we will treat the circulation of a developed vortex ring as a conserved quantity.
+where $\mathcal{C}=\partial \mathcal{A}$ is the contour around the thermal's vorticity.
+For the case of a vortex core in which the entropy perturbation is contained tightly in the core, as in Fig.~\ref{fig:evolution_colormeshes}, a contour can be drawn for which $S_1\approx0$.
+Thus, there are no net baroclinic torques, and we will treat the circulation of a developed vortex ring as a conserved quantity.
 
 
-\subsection{Parameterized description of thermal evolution}
+\subsection{Model of thermal evolution}
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{constants.png}
     \caption{
-	Evolution traces are shown for  three quantities which we assume to be constant in our parameterized thermal theory. 
-	The circulation (a) and buoyancy (b), divided by their parameterized value for each case (see Table \ref{table:parameters}), are plotted vs. depth. 
-	We see that with increasing stratification, there is marginally more detrainment of both of these quantities, but to first order they are constant over the	thermal's transit time. 
-	In (c) the volumetric constant $f$ is shown; after significant noise during the development of the vortex ring, this quantity settles toward a value of $\mathcal{O}(7)$ throughout the thermal's transit.
+	Evolution of circulation, buoyancy perturbation, and volume factor in thermal simulations.
+	All are nearly constant after an initial spin-up phase.
+	With increasing stratification, we see marginally more detrainment (middle panel).
+	The volume factor can be approximated to be $\mathcal{O}(7)$ for all of our simulations.
     \label{fig:constants} }
 \end{figure}
 
-After spinning up, we assume that the thermal is characterized by a constant buoyant signature, $B_{\text{th}}$, and constant circulation, $\Gamma_{\text{th}}$.
-While these thermals began as initial spherical perturbations, they can be modeled as having always been vortex rings which evolved from a ``virtual origin'' where the vortex ring is characterized by having a radius of zero. 
-From this virtual origin, the vortex ring's momentum and impulse grow to a value of $M_0$ and $I_0$ at time $t = 0$ when the true thermal is released from rest.
+After spinning up, we assume that the thermal has a negative buoyancy, $B_{\text{th}}$, and circulation, $\Gamma_{\text{th}}$.
+While these thermals began as initial spherical perturbations, they act like vortex rings which evolved from a ``virtual origin'' where the vortex ring had zero radius.
+From this virtual origin, the vortex ring's impulse grows $I_0$ at time $t = 0$ when the true thermal is released from rest.
 
-We first note, as in Fig.~\ref{fig:constants}a, that the buoyancy in our thermals is not necessarily perfectly constant in time, and that effects like detrainment result in a minor reduction of the buoyant signature of our thermals. 
-We thus express the buoyancy as 
+We find the thermal undergoes weak detrainment, so the negative buoyancy of the thermal decreases slightly in time (Fig.~\ref{fig:constants}a).
+We thus express the negative buoyancy as 
 \begin{equation}
 B \approx \chi B_{\text{th}},
 \end{equation}
 where $\chi$ is a constant of $\mathcal{O}$(1) which represents this detrainment. 
-We then integrate Eqn.~\ref{eqn:change_in_impulse} in time,
+We then integrate Eqn.~\ref{eqn:change_in_impulse},
 \begin{equation*}
 I_z = \chi B_{\text{th}} t + I_0.
 \end{equation*}
 
-Combining this result with Eqn.~\ref{eqn:impulse_approx}, we retrieve our first result,
+Combining this with Eqn.~\ref{eqn:impulse_approx}, we retrieve our first main result,
 \begin{equation}
 r = \sqrt{\frac{\chi B_{\text{th}} t + I_0}{\pi\rho\Gamma_{\text{th}}}}.
 \label{eqn:r_theory}
 \end{equation}
-Following Eqn.~\ref{eqn:circulation} and taking $\Gamma_{\text{th}}$ to be constant (which is a decent assumption in our numerical experiments, as in Fig.~\ref{fig:constants}b), we find that the radius grows with time but this growth is damped by increasing atmospheric density.
-In the Boussinesq limit where $\rho \rightarrow \text{constant}$, we retrieve the $r \propto \sqrt{t}$ scaling found in the Boussinesq regime in \LJ. 
-We find that the inclusion of stratification adds the additional complexity of $r \propto \rho^{-1/2}$, such that downward-propagating vortex rings (as studied here) will entrain less than boussinesq thermals, and upward-propagating rings will entrain more. 
-In the absence of buoyancy ($B = 0$), this result aligns with the prediction for purely horizontal compression noted by \citet{brandenburg2016} of $r^2 \propto \rho^{-1}$.
+Recall there are no net baroclinic torques, so stays $\Gamma_{\text{th}}$ nearly constant (Fig.~\ref{fig:constants}b).
+In the Boussinesq limit where $\rho \rightarrow \text{constant}$, we retrieve the $r \propto \sqrt{t}$ scaling found in \LJ.
+In the limit of strong stratification, $r \propto \rho^{-1/2}$. 
+In the absence of buoyancy ($B_{\text{th}} = 0$), this corresponds to purely horizontal compression, with $r^2 \propto \rho^{-1}$ \citep{brandenburg2016}.
 
-The momentum can likewise be simply integrated,
-\begin{equation*}
-M_z = \beta\chi B_{\text{th}} t + M_0.
-\end{equation*}
-For the proper choice of vertical velocity, $w_{\text{th}}$, and volume, $\mathcal{V}$, the momentum is also precisely 
-\begin{equation*}
-M_z = \rho \mathcal{V} w_{\text{th}}.
-\end{equation*}
-We approximate the volume as $\mathcal{V} = f r^3$, where $f$ is a parameter which we take to be constant. 
-This assumption is perhaps not as perfect as the assumptions of constant $B_{\text{th}}$ or $\Gamma_{\text{th}}$ (see Fig.~\ref{fig:constants}c), but it is nevertheless not a bad assumption. 
-Combining our approximate expressions, and using our theoretical description of $r$ (Eqn.~\ref{eqn:r_theory}), we retrieve
+To solve for the vertical evolution of the thermal, we can use equation~\ref{eqn:momentum}.
+We approximate the volume as $\mathcal{V} = f r^3$, where $f$ is a parameter which we take to be constant.
+We find \dl{fix this equation}
 \begin{equation}
-\rho^{-1/2} w_{\text{th}} = \left(\frac{(\pi \Gamma_{\text{th}})^{3/2}}{f}\right)\frac{\beta\chi B_{\text{th}} t + M_0}{(\chi B_{\text{th}} t + I_0)^{3/2}}.
+\rho^{-1/2} w_{\text{th}} = \left(\frac{(\pi \Gamma_{\text{th}})^{3/2}}{f}\right)\frac{\beta\chi B_{\text{th}} t + I_0}{(\chi B_{\text{th}} t + I_0)^{3/2}}.
 \end{equation}
-Defining the thermal velocity $w_{\text{th}} \equiv dz_{\text{th}}/dt$, and making the assumption that the vortex ring is at the virtual origin at $t = 0$ so that $I_0 = M_0 = 0$, an integrable expression for the evolution of thermal position over time can be retrieved,
+Defining the thermal velocity $w_{\text{th}} \equiv dz_{\text{th}}/dt$, and assuming $I_0$ is small so can be neglected, we have \dl{fix this equation}
 \begin{equation}
 \frac{dz_{\text{th}}}{\rho(z_{\text{th}})^{1/2}} =
 \left(\frac{\beta(\pi\Gamma_{\text{th}})^{3/2}}{f(\chi B_{\text{th}})^{1/2}}\right)\frac{dt}{t^{1/2}}.
 \label{eqn:dz_theory}
 \end{equation}
-If the atmospheric stratification in which the thermal is falling is known, this result can be integrated with the known profile of $\rho(z_{\text{th}})$ in order to find the position of the thermal as a function of time. 
+This can be easily integrated given an atmospheric stratification $\rho(z)$.
 
 To summarize, we have modeled the evolved thermal as a \emph{thin-core, axisymmetric} vortex ring which is evolving in a plane-parallel, adiabatic atmosphere, and have assumed that the motions are low Mach number such that a linearized equation of state describes the thermal well.
 We have assumed that viscous and conductive effects are small and can be neglected, such that the total density-weighted specific entropy in the thermal is a conserved quantity.
-We assume that vortex ring's circulation is constant, that the thermal's volume is spheroidal, and that the effects of pressure and detrainment on impulse and momentum can be parameterized as constants.
-Under these assumptions, we arrived at Eqn.~\ref{eqn:dz_theory}, which we leave in its general form here, and which we will integrate using the polytropic stratification used in our simulations in the next section.
+We assume the thermal's volume is spheroidal, and that the virtual mass effect and detrainment can be parameterized as constants.
+Under these assumptions, we arrive at Eqn.~\ref{eqn:dz_theory}.
 
-\subsection{Solution for thermal evolution in a Polytrope}
-In this work, we study an ideal gas with an adiabatic index of $\gamma = 5/3$, whose equation of state is $P = \rho T$, and whose stratification is a perfectly adiabatic polytrope,
+\subsection{Solution polytrope atmospheres}
+In this work, we study an ideal gas with an adiabatic index of $\gamma = 5/3$.
+An adiabatic polytrope satisfies
 \begin{gather}
 T_0 = 1 + (\grad_{\text{ad}})(z - L_z), \\
 \rho_0 = T_0^{\,m_{\text{ad}}},
 \label{eqn:polytrope}
 \end{gather}
-where $m_{\text{ad}} = (\gamma-1)^{-1}$, and where the adiabatic temperature gradient in our nondimensional systems (see section \ref{sec:experiment}) is $\grad_{\text{ad}} \equiv g(e^{n_\rho/m_{\text{ad}}} - 1)/(L_z c_P)$, with $g = m_{\text{ad}} + 1$ and $L_z = 20$ is the nondimensional depth of the atmosphere in units of thermal diameters.
+where $m_{\text{ad}} = (\gamma-1)^{-1}$.
 All thermodynamic quantities are nondimensionalized such that $\rho_0 = T_0 = 1$ at $z = L_z$.
  
-Integrating Eqn.~\ref{eqn:dz_theory} under this polytropic density stratification and assuming $m_{\text{ad}} < 2$, we find
+Integrating Eqn.~\ref{eqn:dz_theory} under this polytropic density stratification, we find
 \begin{equation}
 z_{\text{th}} = \grad_{\text{ad}}^{-1}\left[\left(\frac{2C}{ \alpha } \sqrt{t + t_{\text{off}}} + T_{\text{th},0}^{1/\alpha}  \right)^{\alpha} - 1\right] + L_z,
 \label{eqn:theory_z}
 \end{equation}
 where $C \equiv \beta \pi^{3/2} \grad_{\text{ad}} / f \sqrt{\Gamma_{\text{th}}^3/(\chi B_{\text{th}})}$ and the temperature at the virtual origin is $T_{\text{th},0} = 1 + \grad_{\text{ad}}(z_{\text{th},0} - L_z)$.
-The virtual origin is located at $z = z_0$ and $t = -t_{\text{off}}$ in simulation units, which are the height and time at which the vortex ring would have had zero radius in the absence of a spin-up phase.
+The thermal is at the virtual origin, $z=z_0$, at time $t=-t_{\text{off}}$.
 The constant $\alpha^{-1} = 1 - m_{\text{ad}}/2$, and in the limit of large stratification, we find that $z_{\text{th}} \propto t^2$ for our case of $\alpha = 4$. 
 
-The thermal is initialized as a uniform sphere of dense fluid, and it quickly spins up into a vortex ring. 
+In our simulations, the thermal is initialized as a uniform sphere of dense fluid but it quickly spins up into a vortex ring. 
 While we do not attempt to model the spin-up phase in this paper, it can be parameterized by the buoyancy $B_{\text{th}}$, circulation $\Gamma_{\text{th}}$, as well as the virtual origin $z_{\text{th,0}}$, and temporal offset $t_{\text{off}}$. 
 Our theory also involves the volumetric aspect ratio of the thermal $f$, the detrainment fraction $\chi$, and the effective buoyancy $\beta$. 
 These appear to be constant or only weakly dependent on the stratification for the thermals we have simulated.
