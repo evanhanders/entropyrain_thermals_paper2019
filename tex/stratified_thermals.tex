@@ -289,24 +289,22 @@ The constant $\alpha^{-1} = 1 - m_{\text{ad}}/2$, and in the limit of large stra
 In our simulations, the thermal is initialized as a uniform sphere of dense fluid but it quickly spins up into a vortex ring. 
 While we do not attempt to model the spin-up phase in this paper, it can be parameterized by the buoyancy $B_{\text{th}}$, circulation $\Gamma_{\text{th}}$, as well as the virtual origin $z_{\text{th,0}}$, and temporal offset $t_{\text{off}}$. 
 Our theory also involves the volumetric aspect ratio of the thermal $f$, the detrainment fraction $\chi$, and the effective buoyancy $\beta$. 
-These appear to be constant or only weakly dependent on the stratification for the thermals we have simulated.
+These appear to be only weakly dependent on the stratification for the thermals we have simulated.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% EXPERIMENT SECTION
 \section{Numerical Experiment} 
 \label{sec:experiment}
-%In this work, we primarily study the evolution of 2D, azimuthally symmetric, anelastic thermals in cylindrical coordinates. 
-As a result of our theory being largely derived in the anelastic, axisymmetric limit, we have chosen to focus the bulk of our attention on our 2D, axisymmetric anelastic simulations.
-We choose to focus on 2D simulations, as they allow us to more easily study high density stratifications using highly reproducible simulations whose computational expense is low.
-We verify that select anelastic simulations produce the same results as 3D fully compressible simulations in cartesian domains. 
+To test our theory, we run a series of simulations of the 3D fully compressible equations, as well as 2D simulations of the anelastic equations.
+We verify the 3D and 2D simulations produce the same results when run with the same parameters.
+Because 2D simulations are less computationally expensive, we cover a broader parameter regime.
 
-While natural processes are very turbulent, we have chosen to study the evolution of laminar thermals here. 
-As we are not aware of a developed laminar theory in the stratified regime in the literature, like the one developed here, it is useful to restrict our study to the laminar case to determine the validity of our theory.
-Furthermore, \LJ\, showed in the Boussinesq limit that the measured entrainment of turbulent thermal vortex rings is well described by laminar theory, and we have no reason to believe that result should not hold for the stratified case.
-As a result, we leave studies of turbulent thermals to future work.
+While solar convection is very turbulent, we restrict our study to laminar thermals. 
+In the Boussinesq limit, \LJ\, showed the evolution of turbulent vortex rings is well described by laminar theory; we expect this will also hold in the stratified case.
+In future work, we will apply this laminar theory to turbulent thermals with density stratification, which necessitates 3D simulations.
 
-\subsection{Anelastic Simulations}
+\subsection{2D Anelastic Simulations}
 The LBR anelastic equations are \citep{lecoanet&all2014},
 \begin{gather}
 \DivU = -w \partial_z \ln\rho_0, \\
@@ -322,10 +320,9 @@ The LBR anelastic equations are \citep{lecoanet&all2014},
 \end{split}
 \end{gather}
 where $\lilstressT$ is the viscous stress tensor in units of inverse time.
-In our azimuthally symetric, cylindrical domain, we assume that $\partial_\phi = 0$; as the initial conditions of our simulations are at rest and have no azimuthal velocity, $u_\phi$, we explicitly impose that $u_\phi = 0$; therefore $\bm{u} = u_r \hat{r} + w\hat{z}$. 
+We solve these equations in cylindrical geometry, assuming axisymmetry.
 
-These equations have been nondimensionalized in the same manner as in \LJ\, such that the length scale is the diameter of the initial thermal perturbation and the velocity scale is the freefall velocity. 
-The timescale is thus the freefall crossing time of this unit length. 
+Following \LJ\,, we non-dimensionalize the equations with the initial diameter of the thermal and its freefall velocity.
 These equations are then fully specified in terms of the Reynolds number and Prandtl number,
 \begin{equation}
 \text{Re} = \frac{ u_{\text{th}} L_{\text{th}}}{\nu}, \qquad
@@ -334,6 +331,7 @@ u_{\text{th}}^2 = \frac{g L_{\text{th}} \Delta s}{c_P},
 \end{equation}
 where $u_{\text{th}}$ is the freefall velocity, $L_{th}$ is the thermal length scale, and
 $\Delta s$ is the magnitude of the specific entropy signature of the thermal.
+The adiabatic temperature gradient is $\nabla_{\text{ad}}=g(e^{n_\rho/m_{\text{ad}}}-1)/(L_z c_P)$, where $L_z$ is the height of the domain.
 
 We choose an atmospheric model in which the dynamic viscosity, $\mu = \rho_0 \nu$, and the thermal conductivity, $\kappa = \rho_0 \chi$, are both uniform and constant in time.
 We make this choice as the mass-weighted diffusivities, $\mu$ and $\kappa$, appear in the density-weighted momentum and entropy equations, and we find the density-weighted entropy and momentum to be key quantities in our thermal theory.
@@ -341,9 +339,9 @@ The diffusivities $\nu$ and $\chi$ therefore scale inversely with the density.
 As the diffusivities scale with depth, Re is specified at the thermal's initial depth.
 All simulations conducted in this work use a value of Re = 600 and $\mbox{\text{Pr} = 1}$.
 
-\subsection{Fully Compressible Simulations}
-In order to verify the validity of our 2D Anelastic simulations, we evolve select thermals according to the 3D Navier Stokes equations in a cartesian domain. 
-We use the $(T, \ln\rho)$ formulation of the equations in which we have previously studied fully compressible convection at low and high Mach number \citep{lecoanet&all2014, anders&brown2017},
+\subsection{3D Fully Compressible Simulations}
+In order to verify our 2D anelastic simulations, we also simulate thermals with the 3D Navier Stokes equations. 
+We use the $(T, \ln\rho)$ formulation of the equations \citep{lecoanet&all2014, anders&brown2017},
 \begin{gather}
 \frac{\partial \ln\rho_1}{\partial t} + \epsilon^{-1}\left(\bm{u}\cdot\grad\ln\rho_0 + \DivU\right) = -\bm{u}\cdot\grad\ln\rho_1, \\
 \begin{split}
@@ -355,17 +353,11 @@ We use the $(T, \ln\rho)$ formulation of the equations in which we have previous
 -\left[\bm{u}\cdot\grad T_1 + (\gamma-1)T_1\DivU\right] + \frac{1}{\rho c_V\text{Re}}\left[\frac{1}{\text{Pr}}\grad^2 T_1 + \sigma_{ij}\partial_{x_i}u_j\right].
 \end{split}
 \end{gather}
-These equations have been nondimensionalized on the same length and time scales as the anelastic equations, use the same atmospheric profiles and assumptions, and we have explicitly assumed that the background atmosphere ($T_0, \ln\rho_0$) is in hydrostatic and thermal equilibrium in the writing of these equations. 
-The new parameter $\epsilon = u_{\text{th}}^2$ is the magnitude of entropy perturbations and sets the Mach number of the thermal flows, and we use $\epsilon = 10^{-4}$ in this work. 
-
-In setting the specific entropy to an equivalent condition to that specified in Eqn.~\ref{eqn:thermal_IC}, we note that it is essential that the initial perturbation be in pressure equilibrium. 
-The set of initial conditions that achieves this is
-\begin{equation}
-\ln\rho_1 = S_1/c_P, \qquad T_1 = T_0(e^{-\epsilon\ln\rho_1} - 1)/\epsilon.
-\end{equation}
+These equations are non-dimensionalized in the same way as the anelastic equations, and use the same background atmosphere.
+The new parameter $\epsilon = u_{\text{th}}^2$ is the magnitude of entropy perturbations and sets the Mach number of the thermal flows; we use $\epsilon = 10^{-4}$ in this work. 
 
 \subsection{Initial conditions}
-To initialize the simulation, we specify a spherical initial specific entropy perturbation,
+The simulations is initialized with a spherical specific entropy perturbation,
 \begin{equation}
 S_1 = \frac{1}{2}\left[\text{erf}\left(\frac{r' - r_{\text{th}}}{\delta}\right) - 1\right].
 \label{eqn:thermal_IC}
@@ -373,12 +365,21 @@ S_1 = \frac{1}{2}\left[\text{erf}\left(\frac{r' - r_{\text{th}}}{\delta}\right) 
 Here, $r' = \sqrt{r^2 + (z - z_0)^2}$, where $z_0 = L_z - 3r_{\text{th}}$, with the thermal radius set as $r_{\text{th}} = 0.5$, and a smoothing width, $\delta = 0.1$.
 As mentioned previously, Re = 600 and Pr = 1 are specified at the thermal's initial depth, $z = z_0$.
 
-\subsection{Numerics}
-We evolve our simulations forward in time using the  Dedalus\footnote{\url{http://dedalus-project.org/}} pseudospectral framework \citep{burns&all2016, burns&all2019}. 
-For our 2D simulations, we use using an implicit-explicit (IMEX), third-order, four-stage Runge-Kutta timestepping scheme RK443 \citep{ascher&all1997}, and for our 3D simulations we use the second-order semi-implicit backward differentiation formulation SBDF2 \citep{wang&ruuth2008}.
+For the fully compressible simulations, we must also specify the density perturbation $\rho_1$.
+We pick perturbations that are in pressure equilibrium,
+\begin{equation}
+\ln\rho_1 = S_1/c_P, \qquad T_1 = T_0(e^{-\epsilon\ln\rho_1} - 1)/\epsilon.
+\end{equation}
 
-Our 3D simulations are decomposed on Fourier bases in the horizontal directions ($x, y \in [-L_r, L_r]$) and Chebyshev bases vertically ($z \in [0, L_z]$) with impenetrable, stress free, fixed-temperature boundary conditions at the upper and lower boundaries ($T_1 = w = \partial_z u = \partial_z v = 0$ at $z = [0, L_z]$).
-Our 2D simulations are decomposed on a Fourier $(z \in [0, L_z])$ and Chebyshev $(r \in [0, L_r])$ domain, with boundary conditions of $\partial_r S_1 = w = (\grad\times\bm{u})_\phi = 0$ at $r = L_r$ and $u = \partial_r(w) = \partial_r(S_1) = 0$ at $r = 0$.
+
+\subsection{Numerics}
+We simulate the thermals using the  Dedalus\footnote{\url{http://dedalus-project.org/}} pseudospectral framework \citep{burns&all2016, burns&all2019}.
+The 2D simulations use using an implicit-explicit (IMEX), third-order, four-stage Runge-Kutta timestepping scheme RK443 \citep{ascher&all1997}, and the 3D simulations use the second-order semi-implicit backward differentiation formulation SBDF2 \citep{wang&ruuth2008}.
+
+The 2D simulation domain is the direct product of a Fourier basis $(z \in [0, L_z])$ and a Chebyshev basis $(r \in [0, L_r])$.
+The boundary conditions are $\partial_r S_1 = w = (\grad\times\bm{u})_\phi = 0$ at $r = L_r$, and the regularity of the equations automatically impose $u = \partial_r(w) = \partial_r(S_1) = 0$ at $r = 0$.
+The 3D simulation domain is the direct product of Fourier bases in the horizontal directions ($x, y \in [-L_r, L_r]$) and a Chebyshev basis ($z \in [0, L_z]$).
+We impose impenetrable, stress free, fixed-temperature boundary conditions at the upper and lower boundaries.
 
 All of the code used to perform the simulations in this work can be found online in the supplementary materials in a Zenodo repository (CREATE AND CITE REPO).
 
