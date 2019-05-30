@@ -171,7 +171,7 @@ A thermal with volume $\mathcal{V}$, density $\rho$, and translating with veloci
 \begin{equation}\label{eqn:momentum}
 I_z = (1+\beta) \rho \mathcal{V} w_{\text{th}},
 \end{equation}
-where $\beta$ is due to the ``virtual mass effect'' in which the thermal drags environment air along with it \citep{tarshish&all2018}.
+where $\beta$ is due to the ``virtual mass effect'' from the environmental fluid moving together with the thermal \citep{tarshish&all2018}.
 
 We now restrict our study to an ideal gas in the low Mach-number regime, in an adiabatic background.
 Due to rapid pressure equilibration in for low Mach-number flows, we can approximate \dl{Don't know if this is actually a good idea...}
@@ -225,10 +225,10 @@ Thus, there are no net baroclinic torques, and we will treat the circulation of 
 
 After spinning up, we assume that the thermal has a negative buoyancy, $B_{\text{th}}$, and circulation, $\Gamma_{\text{th}}$.
 While these thermals began as initial spherical perturbations, they act like vortex rings which evolved from a ``virtual origin'' where the vortex ring had zero radius.
-From this virtual origin, the vortex ring's impulse grows $I_0$ at time $t = 0$ when the true thermal is released from rest.
+From this virtual origin, the vortex ring's impulse would have been $I_0$ at time $t = 0$ when the true thermal is released from rest.
 
-We find the thermal undergoes weak detrainment, so the negative buoyancy of the thermal decreases slightly in time (Fig.~\ref{fig:constants}a).
-We thus express the negative buoyancy as 
+We find the thermal undergoes weak detrainment, so the negative buoyancy of the thermal decreases slightly in time (Fig.~\ref{fig:constants}b).
+We thus express the buoyancy perturbation as 
 \begin{equation}
 B \approx \chi B_{\text{th}},
 \end{equation}
@@ -243,10 +243,9 @@ Combining this with Eqn.~\ref{eqn:impulse_approx}, we retrieve our first main re
 r = \sqrt{\frac{\chi B_{\text{th}} t + I_0}{\pi\rho\Gamma_{\text{th}}}}.
 \label{eqn:r_theory}
 \end{equation}
-Recall there are no net baroclinic torques, so stays $\Gamma_{\text{th}}$ nearly constant (Fig.~\ref{fig:constants}b).
+Recall there are no net baroclinic torques, so stays $\Gamma_{\text{th}}$ nearly constant (Fig.~\ref{fig:constants}a).
 In the Boussinesq limit where $\rho \rightarrow \text{constant}$, we retrieve the $r \propto \sqrt{t}$ scaling found in \LJ.
-In the limit of strong stratification, $r \propto \rho^{-1/2}$. 
-In the absence of buoyancy ($B_{\text{th}} = 0$), this corresponds to purely horizontal compression, with $r^2 \propto \rho^{-1}$ \citep{brandenburg2016}.
+In the limit of strong stratification, $r \propto \rho^{-1/2}$, corresponding to purely horizontal compression, with $r^2 \propto \rho^{-1}$ \citep{brandenburg2016}.
 
 To solve for the vertical evolution of the thermal, we can use equation~\ref{eqn:momentum}.
 We approximate the volume as $\mathcal{V} = f r^3$, where $f$ is a parameter which we take to be constant.
@@ -254,7 +253,7 @@ We find \dl{fix this equation}
 \begin{equation}
 \rho^{-1/2} w_{\text{th}} = \left(\frac{(\pi \Gamma_{\text{th}})^{3/2}}{f}\right)\frac{\beta\chi B_{\text{th}} t + I_0}{(\chi B_{\text{th}} t + I_0)^{3/2}}.
 \end{equation}
-Defining the thermal velocity $w_{\text{th}} \equiv dz_{\text{th}}/dt$, and assuming $I_0$ is small so can be neglected, we have \dl{fix this equation}
+Defining the thermal velocity $w_{\text{th}} \equiv dz_{\text{th}}/dt$, and assuming $I_0$ is small, we have \dl{fix this equation}
 \begin{equation}
 \frac{dz_{\text{th}}}{\rho(z_{\text{th}})^{1/2}} =
 \left(\frac{\beta(\pi\Gamma_{\text{th}})^{3/2}}{f(\chi B_{\text{th}})^{1/2}}\right)\frac{dt}{t^{1/2}}.
@@ -262,10 +261,10 @@ Defining the thermal velocity $w_{\text{th}} \equiv dz_{\text{th}}/dt$, and assu
 \end{equation}
 This can be easily integrated given an atmospheric stratification $\rho(z)$.
 
-To summarize, we have modeled the evolved thermal as a \emph{thin-core, axisymmetric} vortex ring which is evolving in a plane-parallel, adiabatic atmosphere, and have assumed that the motions are low Mach number such that a linearized equation of state describes the thermal well.
-We have assumed that viscous and conductive effects are small and can be neglected, such that the total density-weighted specific entropy in the thermal is a conserved quantity.
-We assume the thermal's volume is spheroidal, and that the virtual mass effect and detrainment can be parameterized as constants.
-Under these assumptions, we arrive at Eqn.~\ref{eqn:dz_theory}.
+To summarize, we model thermals as thin-core vortex rings.
+The vortex ring is parameterized by its buoyancy perturbation and circulation, which are assumed to be nearly constant after spin-up.
+The impulse increases in magnitude due to buoyancy forces (Eqn.~\ref{eqn:change_in_impulse}), and allows us to relate the size of the vortex ring (Eqn.~\ref{eqn:impulse_approx}) to the momentum of the thermal and its ambient fluid (Eqn.~\ref{eqn:momentum}).
+Assuming the thermals' volume is spheroidal and that the virtual mass effect and detrainment can be parameterized as constants, we arrive at Eqn.~\ref{eqn:dz_theory}.
 
 \subsection{Solution polytrope atmospheres}
 In this work, we study an ideal gas with an adiabatic index of $\gamma = 5/3$.
