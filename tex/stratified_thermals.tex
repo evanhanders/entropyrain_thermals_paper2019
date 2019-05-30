@@ -26,7 +26,7 @@
 \newcommand{\con}{\ensuremath{\text{Ro}_{\text{c}}}}
 
 \usepackage{color}
-\newcommand{\gv}[1]{{\color{blue} #1}}
+\newcommand{\dl}[1]{{\color{blue} #1}}
 
 %% Tells LaTeX to search for image files in the 
 %% current directory as well as in the figures/ folder.
@@ -65,13 +65,13 @@
 
 
 \begin{abstract}
-Historically, large-scale convective flows called ``giant cells'' were thought to transport the Sun's luminosity from deep in the solar convection zone, but recent observations show no such flow exists.
-In place of large-scale flows, some authors have suggested the solar luminosity may instead be transported by small ``droplets'' of rapidly falling, low entropy fluid.
-This ``entropy rain'' would propagate as dense vortex rings, analogous to rising buoyant ``thermals'' in the Earth's atmosphere.
+Large-scale convective flows called giant cells were once thought to transport the Sun's luminosity in the solar convection zone, but recent observations have called their existence into question.
+In place of large-scale flows, some authors have suggested the solar luminosity may instead be transported by small droplets of rapidly falling, low entropy fluid.
+This ``entropy rain'' would propagate as dense vortex rings, analogous to rising buoyant thermals in the Earth's atmosphere.
 In this work, we develop an analytical theory describing the evolution of dense, negatively buoyant thermals.
 We verify the theory with 2D and 3D simulations of laminar, axisymmetric thermals in highly stratified atmospheres.
 Our results suggest that entropy rain driven at the surface of the Sun could fall into two categories: a \emph{stalling} regime in which the droplets slow down and expand, and a \emph{falling} regime in which the droplets accelerate and shrink as they propagate downwards.
-We briefly discuss difficulties for the entropy rain hypothesis in both of these regimes.
+We briefly discuss difficulties for the entropy rain hypothesis in both of these regimes. \dl{This last sentence could be clarified, but I don't know what we're trying to say here}
 \end{abstract}
 
 \keywords{hydrodynamics --- turbulence --- entrainment}
@@ -83,38 +83,40 @@ We briefly discuss difficulties for the entropy rain hypothesis in both of these
 \label{sec:intro}
 Recent observations of solar convection have revealed a convective conundrum.
 Power spectra of horizontal velocities show weaker flows than anticipated at large length scales \citep{hanasoge&all2012, greer&all2015}.
-These observations cast doubt on the existence of ``giant cells'' driven by deep convection which should manifest as powerful, large-scale motions at the solar surface and throughout the solar convection zone. 
-This discrepancy between theory and observations has called into question our fundamental understanding of convection, sparking numerous targeted investigations the nature of convection in the Sun  \citep{featherstone&hindman2016, omara&all2016, cossette&rast2016, kapyla&all2017, hotta2017}.
+These observations cast doubt on the existence of giant cells driven by deep convection which should manifest as powerful, large-scale motions at the solar surface. 
+This discrepancy between theory and observations has called into question our fundamental understanding of convection, sparking numerous targeted investigations into the nature of solar convection  \citep{featherstone&hindman2016, omara&all2016, cossette&rast2016, kapyla&all2017, hotta2017}.
 
-\cite{spruit1997} hypothesized that convective motions in the Sun may be driven entirely by cooling at the solar surface, and \citet{brandenburg2016} expanded upon this ``entropy rain'' hypothesis. 
-Brandenburg's work includes a careful expansion of mixing length theory to incorporate flux contributions from nonlocal convective motions, and handles this theory in a horizontally-averaged sense.
-He includes some discussion of possible flow morphologies which could be manifestations of this entropy rain, and even includes some brief simulations of propagating Hill vortices. 
-However, these simulations and discussions did not include include a fundamental piece of entropy rain: its entropic signature deviates from the background atmosphere.
-Entropy rain is dense, and the effects of buoyancy forces will modify its dynamics.
+Rather than appealing to giant cells, \cite{spruit1997} hypothesized that convective motions in the Sun may be primarily driven by cooling in narrow downflow lanes at the solar surface.
+\citet{brandenburg2016} incorporated this ``entropy rain'' concept into a non-local mixing length theory, and suggested the entropy rain could take the form of propagating vortex rings. 
+However, \citet{brandenburg2016} does not include a fundamental aspect of entropy rain: it has lower entropy than the background atmosphere.
+Entropy rain is dense, and buoyancy forces will modify its dynamics.
 
-If entropy rain does evolve into downward propagating, dense vortex rings, it is important to understand how the filling factor of these basic convective elements is affected by their negative buoyancy. 
-In the context of Earth's atmosphere, ``thermals,'' or buoyant fluid regions which evolve into rising vortex rings, are thought to be the nucleus of cloud formation. 
-Atmospheric cloud-forming thermals always rise, but the term is also used for the reverse, falling process.
-The evolution of thermals in the Boussinesq limit has been well studied in the laboratory for decades \citep[see e.g.][]{morton&all1956, scorer1957}, and more recently have been studied through Direct Numerical Simulation (DNS) in the laminar and turbulent regime \citep{lecoanet&jeevanjee2018}. 
-One fundamental result of these studies of thermals is that they experience a large degree of entrainment characterized by radial expansion and decceleration of propagation velocity.
-However, we do not know of a study in which the propagation of these thermals, and thus the nature of their entrainment, is affected by a significant atmospheric stratification.
+It is important to understand how the filling factor of these basic convective elements is affected by their negative buoyancy. 
+In the context of Earth's atmosphere, ``thermals,'' or buoyant fluid regions which evolve into rising vortex rings, are thought to be basic unit of convection \citep[e.g.,][]{romps2015}. 
+Atmospheric thermals are buoyant and rise, but the term is also used for dense, falling fluid.
+We thus study the entropy rain hypothesis by investigating the evolution of individual dense thermals.
+
+Thermals in the Boussinesq limit have been well studied in the laboratory for decades \citep[see e.g.][]{morton&all1956, scorer1957}, and more recently through Direct Numerical Simulation (DNS) \citep{lecoanet&jeevanjee2018}. 
+These studies find that thermals expand radially and decelerate as they propagate.
+Such an expansion may prevent entropy rain from reaching the bottom of the solar convection.
+However, this work does not include the effects of density stratification.
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{overview_fig.png}
     \caption{
-	The evolution of the filling factor, or radius squared, of a buoyant vortex ring with depth is shown in an atmosphere which spans three density scale heights (the $n_\rho = 3$ case examined later in this work). 
-	Overplotted in thin solid lines are the predictions for filling factor growth in the Boussinesq case (as in \LJ) and the prediction for pure horizontal compression (as in \citet{brandenburg2016}).
+	The filling factor of a dense thermal as a function of depth in an atmosphere which spans three density scale heights (the $n_\rho = 3$ case examined later in this work). 
+	Thin solid lines are the predictions for filling factor growth for the Boussinesq case (\LJ) and for pure horizontal compression \citep{brandenburg2016}.
     \label{fig:overview} }
 \end{figure}
 
-In the absence of buoyantly-induced entrainment, \citet{brandenburg2016} suggests that the filling factor, $f$, of convective elements should decrease like $f \propto \rho^{-1}$ for horizontal compression and $f \propto \rho^{-2/3}$ for spherical compression. 
-On the other hand, the filling factor of Boussinesq thermals \emph{increases} like $f \propto d^2$, where $d$ is the depth propagated.
-These regimes are shown in Fig.~\ref{fig:overview}, and compared to the true propagation of a numerically simulated thermal in an appreciably stratified environment.
+Ignoring entropy variations, \citet{brandenburg2016} suggests the filling fraction $f$ of entropy rain should decrease like $f \propto \rho^{-1}$ for horizontal compression and $f \propto \rho^{-2/3}$ for spherical compression.
+On the other hand, the filling factor of Boussinesq thermals \emph{increases} like $f \propto d^2$, where $d$ is the depth of the thermal.
+These regimes are shown in Fig.~\ref{fig:overview}, and compared to the true propagation of a numerically simulated dense thermal including both entropy variations and density stratification.
 
-In this paper, we extend the study of \citet{lecoanet&jeevanjee2018} (hereafter \LJ) to study the propagation of low-Mach number, cold thermals in stratified domains. 
-We are specifically interested in how buoyant entrainment affects the scaling of the thermal radius, or filling factor, with depth. 
-If buoyant entrainment is a dominant effect, it is possible that entropy rain would simply grow too large and stall before reaching the bottom of the solar convection zone.
-On the other hand, if the compression effects suggested by \citet{brandenburg2016} are the dominant effect, then it is possible that these thermals could propagate to the bottom of the solar convection zone, and perhaps could be the nucleus of entropy rain.
+In this paper, we extend \citet{lecoanet&jeevanjee2018} (hereafter \LJ) to study the propagation of low-Mach number, low-entropy thermals in stratified domains. 
+We are specifically interested in how the buoyancy force affects the scaling of the thermal radius, or filling factor, with depth. 
+If buoyancy dominant, it is possible that entropy rain would simply grow too large and stall before reaching the bottom of the solar convection zone.
+On the other hand, if the compression effects of \citet{brandenburg2016} are dominant, then these thermals could propagate to the bottom of the solar convection zone, validating the entropy rain picture.
 
 In section \ref{sec:theory}, we develop a theoretical description of thermals in a stratified domain. 
 In section \ref{sec:experiment}, we describe the numerical experiments conducted in this work. 
