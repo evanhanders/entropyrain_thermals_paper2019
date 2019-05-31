@@ -167,14 +167,15 @@ The impulse is the time-integrated work which has acted on the fluid to result i
 It is thus unaffected by internal forces (e.g., pressure or viscous).
 Upon integration by parts, it is obvious that the impulse encompasses the momentum of the fluid within the volume $\mathcal{V}$.
 However, one can also show that the surface terms correspond to the momentum outside the volume $\mathcal{V}$ \citep[e.g.][]{Akhmetov2009}.
-A thermal with volume $\mathcal{V}$, density $\rho$, and translating with velocity $w_{\text{th}} \hat{z}$ thus has an impulse \dl{note that 1+beta is the inverse of your old beta}
+A thermal with volume $\mathcal{V}$, density $\rho$, and translating with velocity $w_{\text{th}} \hat{z}$ thus has an impulse
 \begin{equation}\label{eqn:momentum}
-I_z = (1+\beta) \rho \mathcal{V} w_{\text{th}},
+I_z = (1+k) \rho \mathcal{V} w_{\text{th}},
 \end{equation}
-where $\beta$ is due to the ``virtual mass effect'' from the environmental fluid moving together with the thermal \citep{tarshish&all2018}.
+where $k$ is due to the ``virtual mass effect'' from the environmental fluid moving together with the thermal \citep{tarshish&all2018}.
 
 We now restrict our study to an ideal gas in the low Mach-number regime, in an adiabatic background.
 Due to rapid pressure equilibration in for low Mach-number flows, we can approximate \dl{Don't know if this is actually a good idea...}
+%Need to do test of pomega magnitude, or see if this eqn is pretty true.
 \begin{equation*}
 \frac{\rho_1}{\rho_0} \approx \frac{S_1}{c_P},
 \end{equation*}
@@ -248,15 +249,15 @@ In the Boussinesq limit where $\rho \rightarrow \text{constant}$, we retrieve th
 In the limit of strong stratification, $r \propto \rho^{-1/2}$, corresponding to purely horizontal compression, with $r^2 \propto \rho^{-1}$ \citep{brandenburg2016}.
 
 To solve for the vertical evolution of the thermal, we can use equation~\ref{eqn:momentum}.
-We approximate the volume as $\mathcal{V} = f r^3$, where $f$ is a parameter which we take to be constant.
-We find \dl{fix this equation}
+We approximate the volume as $\mathcal{V} = m r^3$, where $m$ is a parameter which we take to be constant.
+We find
 \begin{equation}
-\rho^{-1/2} w_{\text{th}} = \left(\frac{(\pi \Gamma_{\text{th}})^{3/2}}{f}\right)\frac{\beta\chi B_{\text{th}} t + I_0}{(\chi B_{\text{th}} t + I_0)^{3/2}}.
+\rho^{-1/2} w_{\text{th}} = \left(\frac{(\pi \Gamma_{\text{th}})^{3/2}}{(1 + k) m}\right)(\chi B_{\text{th}} t + I_0)^{-1/2}.
 \end{equation}
-Defining the thermal velocity $w_{\text{th}} \equiv dz_{\text{th}}/dt$, and assuming $I_0$ is small, we have \dl{fix this equation}
+Defining the thermal velocity $w_{\text{th}} \equiv dz_{\text{th}}/dt$, and assuming $I_0$ is small, we have
 \begin{equation}
 \frac{dz_{\text{th}}}{\rho(z_{\text{th}})^{1/2}} =
-\left(\frac{\beta(\pi\Gamma_{\text{th}})^{3/2}}{f(\chi B_{\text{th}})^{1/2}}\right)\frac{dt}{t^{1/2}}.
+\left(\frac{(\pi\Gamma_{\text{th}})^{3/2}}{m(1 + k)(\chi B_{\text{th}})^{1/2}}\right)\frac{dt}{t^{1/2}}.
 \label{eqn:dz_theory}
 \end{equation}
 This can be easily integrated given an atmospheric stratification $\rho(z)$.
@@ -282,13 +283,13 @@ Integrating Eqn.~\ref{eqn:dz_theory} under this polytropic density stratificatio
 z_{\text{th}} = \grad_{\text{ad}}^{-1}\left[\left(\frac{2C}{ \alpha } \sqrt{t + t_{\text{off}}} + T_{\text{th},0}^{1/\alpha}  \right)^{\alpha} - 1\right] + L_z,
 \label{eqn:theory_z}
 \end{equation}
-where $C \equiv \beta \pi^{3/2} \grad_{\text{ad}} / f \sqrt{\Gamma_{\text{th}}^3/(\chi B_{\text{th}})}$ and the temperature at the virtual origin is $T_{\text{th},0} = 1 + \grad_{\text{ad}}(z_{\text{th},0} - L_z)$.
+where $C \equiv \pi^{3/2} \grad_{\text{ad}} / (1 + k) / m \sqrt{\Gamma_{\text{th}}^3/(\chi B_{\text{th}})}$ and the temperature at the virtual origin is $T_{\text{th},0} = 1 + \grad_{\text{ad}}(z_{\text{th},0} - L_z)$.
 The thermal is at the virtual origin, $z=z_0$, at time $t=-t_{\text{off}}$.
 The constant $\alpha^{-1} = 1 - m_{\text{ad}}/2$, and in the limit of large stratification, we find that $z_{\text{th}} \propto t^2$ for our case of $\alpha = 4$. 
 
 In our simulations, the thermal is initialized as a uniform sphere of dense fluid but it quickly spins up into a vortex ring. 
 While we do not attempt to model the spin-up phase in this paper, it can be parameterized by the buoyancy $B_{\text{th}}$, circulation $\Gamma_{\text{th}}$, as well as the virtual origin $z_{\text{th,0}}$, and temporal offset $t_{\text{off}}$. 
-Our theory also involves the volumetric aspect ratio of the thermal $f$, the detrainment fraction $\chi$, and the effective buoyancy $\beta$. 
+Our theory also involves the volumetric aspect ratio of the thermal $f$, the detrainment fraction $\chi$, and the effective buoyancy $k$. 
 These appear to be only weakly dependent on the stratification for the thermals we have simulated.
 
 
@@ -437,7 +438,7 @@ This gives us confidence that our high stratification anelastic simulations are 
 \citet{lecoanet&all2014} also found close agreement between low Mach-number anelastic and fully compressible simulations.
 
 The values of the parameters described in section \ref{sec:theory} for each of our simulations are presented in table \ref{table:parameters}.
-As anticipated, $\beta$ is $\mathcal{O}$(0.5) and $\chi$ is $\mathcal{O}$(1), with both decreasing slightly in value with increasing stratification, consistent with Fig.~\ref{fig:constants}.
+As anticipated, $k$ is $\mathcal{O}$(0.5) and $\chi$ is $\mathcal{O}$(1), with both decreasing slightly in value with increasing stratification, consistent with Fig.~\ref{fig:constants}.
 In all cases, the buoyancy $B_{\text{th}}$ is similar to the integrated buoyancy in the initial conditions, with some losses due to detrainment in the spin-up.
 We also find that the non-dimensional circulation is $\mathcal{O}$(-2) for each of our cases, and decreases with increasing stratification.
 
@@ -447,21 +448,21 @@ We also find that the non-dimensional circulation is $\mathcal{O}$(-2) for each 
 \label{table:parameters}
 }
 \tablehead{																																															
-\colhead{$n_\rho$} & \colhead{$z_{\text{th},0}$} & \colhead{$t_{\text{off}}$} & \colhead{$B_{\text{th}}$} & \colhead{$\Gamma_{\text{th}}$} & \colhead{$f$} & \colhead{$\chi$} & \colhead{$\beta$}	}	
+\colhead{$n_\rho$} & \colhead{$z_{\text{th},0}$} & \colhead{$t_{\text{off}}$} & \colhead{$B_{\text{th}}$} & \colhead{$\Gamma_{\text{th}}$} & \colhead{$m$} & \colhead{$\chi$} & \colhead{$k$}	}	
 \startdata																																															
 \multicolumn{8}{l}{\textbf{2D Anelastic Simulations}}\\
-0.1 	&  24.4 	& 0.166	& -0.547 & -2.17 & 7.01	& 1.04	& 0.499	\\
-0.5 	&  24.1 	& 0.704	& -0.568 & -2.12 & 7.04	& 0.976	& 0.490	\\
-1	 	&  23.7 	& 1.09 	& -0.601 & -2.05 & 7.07	& 0.915	& 0.480	\\
-2	 	&  22.3 	& 1.26	& -0.712 & -1.89 & 7.08	& 0.841 & 0.456	\\
-3	 	&  21.2 	& 1.01	& -0.946 & -1.73 & 7.08	& 0.808	& 0.436	\\
-4	 	&  20.5 	& 0.622	& -1.47	 & -1.59 & 7.10	& 0.793	& 0.422	\\
-5	 	&  20	    & 0.327	& -2.70	 & -1.49 & 7.15	& 0.786	& 0.414	\\
-6	 	&  19.8 	& 0.064	& -5.73	 & -1.43 & 7.16	& 0.787	& 0.408	\\
+0.1 	&  24.6 	& 0.144	& -0.548 & -2.17 & 8.05	& 1.04	& 0.732	\\
+0.5 	&  24.2 	& 0.695	& -0.569 & -2.12 & 8.34	& 0.977	& 0.715	\\
+1	 	&  23.7 	& 1.11 	& -0.602 & -2.05 & 8.65	& 0.915	& 0.703	\\
+2	 	&  22.3 	& 1.27	& -0.713 & -1.89 & 9.23	& 0.842 & 0.682	\\
+3	 	&  21.2 	& 1.01	& -0.947 & -1.73 & 9.81	& 0.807	& 0.654	\\
+4	 	&  20.5 	& 0.615	& -1.47	 & -1.59 & 10.2	& 0.794	& 0.642	\\
+5	 	&  20.0	    & 0.425	& -2.70	 & -1.49 & 10.7	& 0.781	& 0.609	\\
+6	 	&  19.8 	& 0.041	& -5.73	 & -1.43 & 10.8	& 0.787	& 0.616	\\
 \multicolumn{8}{l}{\textbf{3D Fully Compressible Simulations}}\\    
-0.5 	&  23.8 	& 0.583	& -0.568 & -2.12 & 6.66	& 0.978	& 0.452	\\
-1	 	&  23.5 	& 1.26	& -0.601 & -2.05 & 6.88	& 0.902	& 0.454	\\
-2	 	&  22.4 	& 1.53	& -0.711 & -1.89 & 7.08	& 0.822	& 0.450	\\
+0.5 	&  23.8 	& 0.583	& -0.568 & -2.12 & 	& 0.978	& 	\\
+1	 	&  23.5 	& 1.26	& -0.601 & -2.05 & 	& 0.902	& 	\\
+2	 	&  22.4 	& 1.53	& -0.711 & -1.89 & 	& 0.822	& 	\\
 \enddata																																															
 \tablecomments{ }
 \end{deluxetable*}
@@ -494,6 +495,8 @@ For example, it is possible that these thermals could shrink to the point where 
 In Fig.~\ref{fig:discussion}, we extrapolate the results of our simulations to solar convection.
 For each simulation performed, we show the behavior of our thermals if they were to fall the first $n_\rho = 10$ density scale heights of the solar convection zone, rather than the few that we were able to simulate here.
 We see blahblahblah.
+%Does thermal conduct away its buoyancy? If so, we're left with Axel's case
+%What radius does it have when it's at the bottom?
 
 
 \begin{acknowledgements}
@@ -509,7 +512,7 @@ Throughout this work, we frequently report the thermal's radius or its depth.
 We measure the thermal's radius and height as the radius from the axis of symmetry and the height from the bottom of the domain at which the thermal's vortex core is located.
 To measure this, we locate the maxima of the entropy.
 To find the entropy maxima vertically, we integrate $\int\rho S_1 r dr$ in our Dedalus domain, then use the spectral data of that profile to sample it on a 4096 point grid vertically, and we take the location of the minima on that grid to be the thermal height.
-To find the entropy maxima horizontally, we integrate $int \rho S_1 dz$ in our Dedalus domain, then sample the spectral data onto a 2048-point radial grid, and take the minima of that profile to be the radius of the thermal.
+To find the entropy maxima horizontally, we integrate $\int \rho S_1 dz$ in our Dedalus domain, then sample the spectral data onto a 2048-point radial grid, and take the minima of that profile to be the radius of the thermal.
 In order to find the thermal's velocity as a function of time, we use a five-point stencil to differentiate the thermal's depth, $d$,
 $$
 w_{\text{th}}(t) = \frac{d }{dt}d_{\text{th}}(t) = \frac{-d_{\text{th}}(x + 2\Delta t) + 8d_{\text{th}}(t + \Delta t) - 8 d_{\text{th}}(t - \Delta t) + d_{\text{th}}(t - 2\Delta t)}{12\Delta t}
