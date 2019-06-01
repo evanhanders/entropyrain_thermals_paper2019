@@ -146,9 +146,16 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     (chi, I0_div_B), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], I_B[fit_t])
     fit_chi = chi
 
-    p_B = int_mom/fit_B0/fit_chi
-    (beta, M0_div_B), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], p_B[fit_t])
-    fit_beta = beta 
+#    p_B = int_mom/fit_B0/fit_chi
+#    (beta, M0_div_B), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], p_B[fit_t])
+#    fit_beta = beta 
+
+    I_Iz = (int_impulse / (rho0 * volumes))[2:-2] / vortex_w
+    (slope, beta_plus_one), pcov = scop.curve_fit(linear_fit, scale_t[2:-2][fit_t[2:-2]], I_Iz[fit_t[2:-2]])
+    fit_beta = beta_plus_one - 1
+    print(fit_beta, 'fit beta')
+
+
 
     f = volumes/therm_radius**3
     (dfdt, f0), pcov = scop.curve_fit(linear_fit, scale_t[fit_t], f[fit_t])

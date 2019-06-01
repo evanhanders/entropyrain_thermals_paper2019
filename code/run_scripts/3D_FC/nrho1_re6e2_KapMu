@@ -1,6 +1,6 @@
 #PBS -S /bin/bash
-#PBS -N FC_thermal_KapMu_Re6e2_nrho1
-#PBS -l select=74:ncpus=28:mpiprocs=28:model=bro
+#PBS -N FC_thermal_KapMu_Re6e2_nrho1_has
+#PBS -l select=86:ncpus=24:mpiprocs=24:model=has
 #PBS -l walltime=8:00:00
 #PBS -j oe
 #PBS -q normal
@@ -25,6 +25,7 @@ mpiexec_mpt -n 2048 ~/.python3 FC_3D_thermal.py \
         --n_rho=1 \
         --aspect=0.5 \
         --SBDF2 \
+        --label=has \
         > $dedalus_dir/out.3D.nrho1.Re$RE.Eps$EPS.$PBS_JOBID
 
 date

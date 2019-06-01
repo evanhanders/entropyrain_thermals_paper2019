@@ -14,9 +14,9 @@ import h5py
 #aspect = [0.35, 0.35, 0.25, 0.25, 0.25, 0.25]
 #CASES = [0.1, 0.5, 1, 2, 3, 4]
 #ROOT_DIR='../weird_form_good_2D_runs/'
-aspect = [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.2, 0.25]
+aspect = [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
 CASES = [0.1, 0.5, 1, 2, 3, 4, 5, 6]
-ROOT_DIR='../good_2D_runs/z_bot_zero/'
+ROOT_DIR='../'#good_2D_runs/z_bot_zero/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
 CASES_3D = [0.5, 1, 2]
@@ -84,7 +84,7 @@ ax1.plot([100, 101], [100, 101], lw=0, marker='o', c='k', markersize=3, markerfa
 ax1.plot([100, 101], [100, 101], lw=0, marker='+', c='k', markersize=2, label='3D FC', markeredgewidth=0.5)
 ax1.legend(loc='lower right', frameon=False, fontsize=8, handletextpad=0)
 
-cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(1, len(CASES)+1, len(CASES)+1), ticks=np.arange(len(CASES)+1) + 0.5)
+cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(1, len(CASES)+1, len(CASES)+1)-0.5, ticks=np.arange(len(CASES)+1))
 cax.xaxis.set_ticks_position('top')
 cax.xaxis.set_ticklabels(CASES)
 cb.set_label(r'$n_\rho$', labelpad=-40)

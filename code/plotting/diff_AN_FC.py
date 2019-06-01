@@ -16,10 +16,10 @@ NRUNS=8
 
 aspect = [0.25, 0.25, 0.25]
 CASES = [0.5, 1, 2]
-ROOT_DIR='../good_2D_runs/z_bot_zero/'
+ROOT_DIR='../'#good_2D_runs/z_bot_zero/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
-aspect_2D = [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.2, 0.25]
+aspect_2D = [0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
 CASES_2D = [0.1, 0.5, 1, 2, 3, 4, 5, 6]
 color_dir = [1, 2, 3, 4, 5, 6, 7, 8]
 DIRS_2D=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES_2D, aspect_2D)] 
@@ -84,7 +84,7 @@ for i, direc in enumerate(DIRS):
     axs[1].axhline(10**(-1.5), c='k', lw=0.25)
     axs[1].axhline(10**(-2.5), c='k', lw=0.25)
 
-    diff = (1 - y2/y3)[:l]
+    diff = (1 - y2[:l]/y3[:l])
     pos  = diff > 0
     neg  = diff < 0
     axs[1].plot(x2[:l][pos], diff[pos], markerfacecolor=color, markeredgecolor=color, marker='o', lw=0, markersize=2, markeredgewidth=0.35)
@@ -114,7 +114,7 @@ axs[1].plot([100, 101], [100, 101], lw=0,    markersize=3,  marker='o', c='k', m
 axs[1].plot([100, 101], [100, 101], lw=0,    markersize=3,  marker='o', c='k', markerfacecolor=(0,0,0,1), markeredgecolor=(0,0,0,1), label='> 0', markeredgewidth=0.35)
 axs[1].legend(loc='upper center', frameon=False, fontsize=8, handletextpad=0, borderpad=0, ncol=2, borderaxespad=0.3)
 
-cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(1, NRUNS+1, NRUNS+1), ticks=np.arange(NRUNS+1) + 0.5)
+cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(1, NRUNS+1, NRUNS+1)-0.5, ticks=np.arange(NRUNS+1))
 cax.xaxis.set_ticks_position('top')
 #cax.xaxis.set_ticklabels([0.1, 0.5, 1, 2, 3, 4])
 cax.xaxis.set_ticklabels([0.1, 0.5, 1, 2, 3, 4, 5, 6])

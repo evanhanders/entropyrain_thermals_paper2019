@@ -40,7 +40,7 @@ def linear_fit(x, a, b):
 
 def theory_C(B0, Gamma0, f, chi, beta, grad_T_ad=-1):
     """ The constant in stratified thermals theory """
-    return (beta * grad_T_ad * Gamma0 * np.pi**(3./2) / f) * np.sqrt(Gamma0/(B0 * chi))
+    return (grad_T_ad * Gamma0 * np.pi**(3./2) / f / (1 + beta)) * np.sqrt(Gamma0/(B0 * chi))
 
 def theory_r(t, B0, Gamma0, chi, t_off, rho_f=None):
     """ The temperature profile (vs time) from stratified thermals theory """
