@@ -1,7 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 matplotlib.rcParams['font.family'] = 'DejaVu Serif'
-matplotlib.rcParams['mathtext.fontset'] = 'custom'
+#matplotlib.rcParams['mathtext.fontset'] = 'custom'
 matplotlib.rcParams['mathtext.rm'] = 'DejaVu Serif'
 matplotlib.rcParams['mathtext.it'] = 'DejaVu Serif:italic'
 matplotlib.rcParams['mathtext.bf'] = 'DejaVu Serif:bold'
@@ -12,8 +12,8 @@ from scipy.interpolate import interp1d
 import numpy as np
 import h5py
 
-dirs = [    ('../good_2D_runs/z_bot_zero/AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20', (1, 0), (2, 18), (5, 17)) ,
-            ('../good_2D_runs/z_bot_zero/AN_2D_thermal_nrho3_Re6e2_Pr1_aspect0.25_Lz20' , (1,0), (2, 12),  (4, 5))]
+dirs = [    ('../AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20', (1, 0), (2, 18), (5, 17)) ,
+            ('../AN_2D_thermal_nrho3_Re6e2_Pr1_aspect0.25_Lz20' , (1,0), (2, 12),  (4, 5))]
 
 
 gs = gridspec.GridSpec(1000, 1000)
@@ -28,35 +28,52 @@ cax = plt.subplot(gs.new_subplotspec( (50, 50),    50, 950 ))
 plot_count = 0
 for i, ax in enumerate(axs):
     this_dir = dirs[i][0]
+    if i == 0:
+        B = -0.568
+    else:
+        B = -0.946
     for j, info in enumerate(dirs[i][1:]):
+
         filenum, imgnum = info
         print('opening file ', this_dir, filenum, imgnum)
         f  = h5py.File('{:s}/slices/slices_s{}.h5'.format(this_dir, filenum), 'r')
         cf = h5py.File('{:s}/thermal_analysis/contour_file.h5'.format(this_dir), 'r')
         ff = h5py.File('{:s}/thermal_analysis/final_outputs.h5'.format(this_dir), 'r')
+        pf = h5py.File('{:s}/thermal_analysis/post_analysis.h5'.format(this_dir), 'r')
 
         r = f['scales']['r']['1.0'].value
         z = f['scales']['z']['1.0'].value
         rr, zz = np.meshgrid(r.flatten(), z.flatten())
         t = f['scales']['sim_time'].value[imgnum]
 
+        volumes = pf['int_vol'].value
+        this_volume = volumes[(filenum-1)*20+imgnum]
+
         n_rho = float(this_dir.split('_nrho')[-1].split('_Re')[0])
         grad_T = -(np.exp(n_rho/1.5)-1)/20
         rho = (1 + grad_T*(zz-20))**1.5
+        rho0 = (1 + grad_T*(18.5-20))**1.5
 
         contour = cf['contours'].value[20*(filenum-1)+imgnum,:]
         contours = cf['contours'].value 
         heights  = 20 - ff['d_measured'].value
+        radius   = ff['r_measured'].value
 
+        this_r = radius[20*(filenum-1) + imgnum]
+        torus_r = this_r/5
+
+        print(np.max(contour))
         if j > 0:
-            rho *= np.max(contour)**3
+            rho *= this_volume/np.abs(B)#np.pi * this_r**3 /np.abs(B)
+        else:
+            rho *= 5*(4./3)*np.pi*(0.5)**3/ np.abs(B)
         
         field = f['tasks']['S1'].value[imgnum,:]
         f.close()
         ff.close()
         cf.close()
 
-        minval = -1 
+        minval = -5
         breaks = len(dirs[i]) - 1
         good   = (zz > (breaks-1-j)/breaks * 20)*(zz <= (breaks-j)/breaks * 20)
         z_shape = np.sum((z > (breaks-1-j)/breaks * 20)*(z <= (breaks-j)/breaks * 20))
@@ -65,7 +82,7 @@ for i, ax in enumerate(axs):
         if i == 0 and j == 0:
             bar = plt.colorbar(c, cax=cax, orientation='horizontal')
             cax.xaxis.set_ticks_position('top')
-            bar.set_label(r'$\rho S_1 r^3$', labelpad=-38)
+            bar.set_label(r'$\frac{\rho S_1 \mathcal{V}}{B_{\mathrm{th}}}$', labelpad=-38)
         x_max = 5
         if j == len(dirs[i])-2:
             max_contours = contours.max(axis=1)

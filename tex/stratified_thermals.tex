@@ -492,9 +492,29 @@ On the other hand, if solar convection is comprised of thermals in the falling r
 While vortex rings in the falling regime would theoretically be able to reach the bottom of the solar convection zone, the compression effects that occur as they shrink could cause problems.
 For example, it is possible that these thermals could shrink to the point where conductivity becomes important, or as their length scales decrease and velocities increase, viscous heating could become an important effect and essentially erase the buoyant signature of these entropy rain droplets.
 
-In Fig.~\ref{fig:discussion}, we extrapolate the results of our simulations to solar convection.
-For each simulation performed, we show the behavior of our thermals if they were to fall the first $n_\rho = 10$ density scale heights of the solar convection zone, rather than the few that we were able to simulate here.
-We see blahblahblah.
+We now make an attempt to roughly estimate what simulation regime presented here would correspond to dynamics of thermals on the Sun.
+We estimate that thermal diameters would be roughly the width of solar downflows, or $0.1$ Mm.
+Using the VAL atmosphere of \citet{avrett&loeser2008}, we estimate the solar surface to have a temperature of $T_0 = 6000$ K, a density of $1.74 \times 10^{-7}$ g/cm$^3$, a sound speed of $c_s = 9.5 \times 10^5$ cm/s, and the average density of the thermal's initial depth is $\bar{\rho} = 1.17\rho_0$.
+Estimating that solar downflows have a temperature deviation of $T_1 = -500$ K \citep{borrero&bellotrubio2002}, the nondimensional entropy signature of solar downflows is $S_1/c_p \sim \gamma^{-1}\ln(1 + T1/T0) = -5.22 \times 10^{-2}$.
+Estimating solar surface gravity as $g = 2.74 \times 10^4$ cm/s$^2$, the buoyancy of such a thermal is $\tilde{B} = (4\pi/3) (L/2)^3\bar{\rho}g (S_1/c_p) = -1.52 \times 10^{17}$ g cm$^4$/s$^2$.
+Nondimensionalizing this by $N = (S_1/c_P) L^2 u_{\text{th}}^2 \rho_0$ with $u_{\text{th}} = np.sqrt{S_1/c_P} c_s$, we find $B = \tilde{B}/N = -3.57$, which lies between the $n_\rho = 5$ and $n_\rho = 6$ simulations we studied here.
+We assume therefore that the dynamics of such thermals in the Sun can be described as being bracketed in the range $B/2$ and $2B$.
+Interpolating and extrapolating the data in Table \ref{table:parameters}, we calculate theoretical predictions for how thermals with these buoyancies would evolve in the solar convection zone.
+
+We plot these estimates of thermal evolution in the solar convection zone in Fig. \ref{fig:thermal_sun_comparison}, using a simple solar interior model calculated using MESA \citep{paxton&all2011} to map the density profiles of our simulation domains onto the density profiles of the Sun.
+In Fig. \ref{fig:thermal_sun_comparison}a\&b, we respectively show the evolution of these thermals' radii and velocities inside of the Sun -- on both ends of our estimate window, the thermal is in the falling regime and experiences compression of its radius with corresponding increases in velocity.
+In Fig. \ref{fig:thermal_sun_comparison}c, we use the solar diffusivity models shown in \citet{brown2011} to estimate the timescale over which the thermal would diffuse its entropy signature ($\tau_\kappa = \chi/r^2$) and the thermal freefall timescale over 1 Mm ($\tau_{\text{ff}} = (1\,\text{Mm})/w_{\text{th}}$), and we plot the ratio of these two timescales over the thermal's evolution.
+Throughout the thermal's fall, we find that $\tau_\kappa \gg \tau_{\text{ff}}$, and thus we do not expect the thermal to diffuse its entropic signature.
+We find a fractional diffusion rate over the thermal's transit of the solar convection zone of $\int_{R_\odot}^{0.7 R_\odot} \tau_\kappa^{-1} dR/w_{th} = 6.55\times 10^{-3}$ for the $B/2$ estimate, and $1.57 \times 10^{-3}$ for the $2B$ estimate.
+In either case, we estimate that the thermal loses less than 1\% of its entropic signature due to diffusion alone.
+We also estimate the amount of entropy that the thermal should lose due to viscous heating as $\int_{R_\odot}^{0.7 R_\odot} \nu w_{th}^2 / (r^2 \rho T c_P) dr / w_{th}$, and after normalizing by $S_1/c_p$, we find that the thermal generates $\mathcal{O}(10^{-4}-10^{-5})$ of its initial entropic signature.
+
+\begin{figure}[t!]
+    \includegraphics[width=\columnwidth]{thermal_sun_comparison.png}
+    \caption{
+    \label{fig:thermal_sun_comparison} }
+\end{figure}
+
 %Does thermal conduct away its buoyancy? If so, we're left with Axel's case
 %What radius does it have when it's at the bottom?
 
