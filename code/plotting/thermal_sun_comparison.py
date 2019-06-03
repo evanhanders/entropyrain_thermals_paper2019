@@ -160,10 +160,14 @@ for i in range(2):
     solar_radii.append(rho2r(rho_outs[i]*(rho_top/rho_outs[i][0])))
     plt.plot(solar_radii[i]/(Rsun2Mm), r_outs[i]*(L/2/r_outs[i][0]), c='k', lw=0.5*(i+1))
 
+plt.plot(solar_radii[0]/(Rsun2Mm), (L/2)/(rho_outs[0]/rho_outs[0][0])**(1./2), c='k', lw=2)
+ax.text(0.69, 8e-5, r'$r \propto \rho^{-1/2}$')
+ax.text(0.69, 7e-3, 'thermals')
+
 #Make plot pretty
 plt.xlim(0.68, 0.995)
 plt.yscale('log')
-plt.ylim(1e-3, 1e-1)
+plt.ylim(1e-5, 1e-1)
 plt.ylabel('radius (Mm)')
 
 ax = fig.add_subplot(3,1,2)

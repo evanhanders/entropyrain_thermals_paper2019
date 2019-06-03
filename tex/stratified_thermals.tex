@@ -71,7 +71,7 @@ This ``entropy rain'' would propagate as dense vortex rings, analogous to rising
 In this work, we develop an analytical theory describing the evolution of dense, negatively buoyant thermals.
 We verify the theory with 2D and 3D simulations of laminar, axisymmetric thermals in highly stratified atmospheres.
 Our results suggest that entropy rain driven at the surface of the Sun could fall into two categories: a \emph{stalling} regime in which the droplets slow down and expand, and a \emph{falling} regime in which the droplets accelerate and shrink as they propagate downwards.
-We briefly discuss difficulties for the entropy rain hypothesis in both of these regimes. \dl{This last sentence could be clarified, but I don't know what we're trying to say here}
+We estimate that solar downflows should be in the falling regime, but should remain large enough to shield their entropic signature until they reach the base of the solar convective zone.
 \end{abstract}
 
 \keywords{hydrodynamics --- turbulence --- entrainment}
@@ -125,7 +125,7 @@ Finally, in section \ref{sec:discussion}, we discuss what our results imply for 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% THEORY SECTION
-\section{Theory}
+\section{Model of thermal evolution}
 \label{sec:theory}
 
 \subsection{Phenomenological description of thermal evolution}
@@ -272,10 +272,10 @@ In this work, we study an ideal gas with an adiabatic index of $\gamma = 5/3$.
 An adiabatic polytrope satisfies
 \begin{gather}\label{eqn:T0}
 T_0 = 1 + (\grad_{\text{ad}})(z - L_z), \\
-\rho_0 = T_0^{\,m_{\text{ad}}},
+\rho_0 = T_0^{\,n_{\text{ad}}},
 \label{eqn:polytrope}
 \end{gather}
-where $m_{\text{ad}} = (\gamma-1)^{-1}$.
+where $n_{\text{ad}} = (\gamma-1)^{-1}$.
 All thermodynamic quantities are nondimensionalized such that $\rho_0 = T_0 = 1$ at $z = L_z$, the top of the domain.
 
 Integrating Eqn.~\ref{eqn:dz_theory} under this polytropic density stratification, we find
@@ -285,7 +285,7 @@ z_{\text{th}} = \grad_{\text{ad}}^{-1}\left[\left(\frac{2C}{ \alpha } \sqrt{t + 
 \end{equation}
 where $C \equiv \pi^{3/2} \grad_{\text{ad}} / (1 + k) / m \sqrt{\Gamma_{\text{th}}^3/(\chi B_{\text{th}})}$ and the temperature at the virtual origin is $T_{\text{th},0} = 1 + \grad_{\text{ad}}(z_{\text{th},0} - L_z)$.
 The thermal is at the virtual origin, $z=z_0$, at time $t=-t_{\text{off}}$.
-The constant $\alpha^{-1} = 1 - m_{\text{ad}}/2$, and in the limit of large stratification, we find that $z_{\text{th}} \propto t^2$ for our case of $\alpha = 4$. 
+The constant $\alpha^{-1} = 1 - n_{\text{ad}}/2$, and in the limit of large stratification, we find that $z_{\text{th}} \propto t^2$ for our case of $\alpha = 4$. 
 
 In our simulations, the thermal is initialized as a uniform sphere of dense fluid but it quickly spins up into a vortex ring. 
 While we do not attempt to model the spin-up phase in this paper, it can be parameterized by the buoyancy $B_{\text{th}}$, circulation $\Gamma_{\text{th}}$, as well as the virtual origin $z_{\text{th,0}}$, and temporal offset $t_{\text{off}}$. 
@@ -295,7 +295,7 @@ These appear to be only weakly dependent on the stratification for the thermals 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% EXPERIMENT SECTION
-\section{Numerical Experiment} 
+\section{Simulation setup} 
 \label{sec:experiment}
 To test our theory, we run a series of simulations of the 3D fully compressible equations, as well as 2D simulations of the anelastic equations.
 We verify the 3D and 2D simulations produce the same results when run with the same parameters.
@@ -334,7 +334,7 @@ where $u_{\text{th}}$ is the freefall velocity, $L_{th}$ is the thermal length s
 $\Delta s$ is the magnitude of the specific entropy signature of the thermal.
 
 The background density and temperature are given by Eqs.~\ref{eqn:T0} \& \ref{eqn:polytrope}.
-The adiabatic temperature gradient is $\nabla_{\text{ad}}=g(e^{n_\rho/m_{\text{ad}}}-1)/(L_z c_P)$, where $L_z=20$ is the height of the domain.
+The adiabatic temperature gradient is $\nabla_{\text{ad}}=g(e^{n_\rho/n_{\text{ad}}}-1)/(L_z c_P)$, where $L_z=20$ is the height of the domain.
 
 We choose an atmospheric model in which the dynamic viscosity, $\mu = \rho_0 \nu$, and the thermal conductivity, $\kappa = \rho_0 \chi$, are both uniform and constant in time.
 We make this choice as the mass-weighted diffusivities, $\mu$ and $\kappa$, appear in the density-weighted momentum and entropy equations, and we find the density-weighted entropy and momentum to be key quantities in our thermal theory.
@@ -379,17 +379,20 @@ We pick perturbations that are in pressure equilibrium,
 We simulate the thermals using the  Dedalus\footnote{\url{http://dedalus-project.org/}} pseudospectral framework \citep{burns&all2016, burns&all2019}.
 The 2D simulations use using an implicit-explicit (IMEX), third-order, four-stage Runge-Kutta timestepping scheme RK443 \citep{ascher&all1997}, and the 3D simulations use the second-order semi-implicit backward differentiation formulation SBDF2 \citep{wang&ruuth2008}.
 
-The 2D simulation domain is the direct product of a Fourier basis $(z \in [0, L_z])$ and a Chebyshev basis $(r \in [0, L_r])$.
+The 2D simulation domain is the direct product of a Fourier basis $(z \in [-L_z/4, L_z])$ and a Chebyshev basis $(r \in [0, L_r])$.
 The boundary conditions are $\partial_r S_1 = w = (\grad\times\bm{u})_\phi = 0$ at $r = L_r$, and the regularity of the equations automatically impose $u = \partial_r(w) = \partial_r(S_1) = 0$ at $r = 0$.
 The 3D simulation domain is the direct product of Fourier bases in the horizontal directions ($x, y \in [-L_r, L_r]$) and a Chebyshev basis ($z \in [0, L_z]$).
 We impose impenetrable, stress free, fixed-temperature boundary conditions at the upper and lower boundaries.
+In all of our simulations we specify $L_z = 20$ and $L_r = 5$.
+We extend our 2D simulation domains to $z = -L_z/4$ because those simulations are vertically periodic.
+This extension allows us to study the full transit of the thermal above $z = 0$ and terminate the simulation before it begins to wrap through the bottom of the periodic domain.
 
 All of the code used to perform the simulations in this work can be found online in the supplementary materials in a Zenodo repository (CREATE AND CITE REPO).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% RESULTS SECTION
-\section{Results}
+\section{Model verification}
 \label{sec:results}
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{results_panels.png}
@@ -460,16 +463,17 @@ We also find that the non-dimensional circulation is $\mathcal{O}$(-2) for each 
 5	 	&  20.0	    & 0.425	& -2.70	 & -1.49 & 10.7	& 0.781	& 0.609	\\
 6	 	&  19.8 	& 0.041	& -5.73	 & -1.43 & 10.8	& 0.787	& 0.616	\\
 \multicolumn{8}{l}{\textbf{3D Fully Compressible Simulations}}\\    
-0.5 	&  23.8 	& 0.583	& -0.568 & -2.12 & 	& 0.978	& 	\\
-1	 	&  23.5 	& 1.26	& -0.601 & -2.05 & 	& 0.902	& 	\\
-2	 	&  22.4 	& 1.53	& -0.711 & -1.89 & 	& 0.822	& 	\\
+0.1 	&  23.4 	& -0.337& -0.547 & -2.17 & 8.98	& 1.06	& 0.636	\\
+0.5 	&  23.8 	& 0.572	& -0.568 & -2.12 & 8.79	& 0.978	& 0.678	\\
+1	 	&  23.6 	& 1.15	& -0.601 & -2.05 & 8.87	& 0.907	& 0.689	\\
+2	 	&  22.9 	& 2.88	& -0.699 & -1.89 & 9.24	& 0.776	& 0.706	\\
 \enddata																																															
 \tablecomments{ }
 \end{deluxetable*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION SECTION
-\section{Conclusion \& Discussion}
+\section{Discussion \& Conclusion}
 \label{sec:discussion}
 In this paper we developed a simple theory of the evolution of negatively buoyant vortex rings in stratified atmospheres.
 We showed that this theory predicts that dense thermals will experience less entrainment than boussinesq thermals due to increasing atmospheric density with depth.
@@ -484,34 +488,46 @@ Rather, results fall somewhere in between, and theory and simulations suggest th
 \end{enumerate}
 
 However, we note that both the falling and stalling regimes observed here could result in interesting problems for the entropy rain hypothesis. 
-If solar convection were comprised of thermals in the stalling regime, it is unlikely that such elements would ever make it to the base of the solar convection zone.
-Rather, we expect that they would stall closer to the solar surface and deposit their entropy signature there. 
-This could be seen as agreeing with the hypothesis of supergranulation as the largest buoyantly driven scale of solar motion.
+If solar convection were comprised of thermals in the stalling regime, such convective elements would grow enormously in size and slow down very close to the solar surface.
+In a perfectly quiescent atmosphere, these very slow, very large convective elements would propagate to the base of the convection zone over enormous timescales, but their large length scales would likely shield them from any dissipative effects.
+However, the solar convection zone is highly turbulent, and we expect that any large, coherent, and slowly propagating structures would be torn apart by turbulent motions.
 
 On the other hand, if solar convection is comprised of thermals in the falling regime, then it is not out of the question for solar surface elements to reach deep into the Sun.
-While vortex rings in the falling regime would theoretically be able to reach the bottom of the solar convection zone, the compression effects that occur as they shrink could cause problems.
-For example, it is possible that these thermals could shrink to the point where conductivity becomes important, or as their length scales decrease and velocities increase, viscous heating could become an important effect and essentially erase the buoyant signature of these entropy rain droplets.
+Such vortex rings in the falling regime would theoretically be able to reach the bottom of the solar convection zone, and the effects of buoyancy which counteract some of the natural compressional effects of the atmosphere, could shield the thermal from dissipative effects.
+In this absence of this buoyant expansion, we anticipate that falling vortices in the solar convection zone would shrink to the point where conductivity could become important.
+However, due to the presence of buoyant entrainment, thermals in nature are likely shielded from conductive effects.
 
-We now make an attempt to roughly estimate what simulation regime presented here would correspond to dynamics of thermals on the Sun.
-We estimate that thermal diameters would be roughly the width of solar downflows, or $0.1$ Mm.
-Using the VAL atmosphere of \citet{avrett&loeser2008}, we estimate the solar surface to have a temperature of $T_0 = 6000$ K, a density of $1.74 \times 10^{-7}$ g/cm$^3$, a sound speed of $c_s = 9.5 \times 10^5$ cm/s, and the average density of the thermal's initial depth is $\bar{\rho} = 1.17\rho_0$.
-Estimating that solar downflows have a temperature deviation of $T_1 = -500$ K \citep{borrero&bellotrubio2002}, the nondimensional entropy signature of solar downflows is $S_1/c_p \sim \gamma^{-1}\ln(1 + T1/T0) = -5.22 \times 10^{-2}$.
-Estimating solar surface gravity as $g = 2.74 \times 10^4$ cm/s$^2$, the buoyancy of such a thermal is $\tilde{B} = (4\pi/3) (L/2)^3\bar{\rho}g (S_1/c_p) = -1.52 \times 10^{17}$ g cm$^4$/s$^2$.
-Nondimensionalizing this by $N = (S_1/c_P) L^2 u_{\text{th}}^2 \rho_0$ with $u_{\text{th}} = np.sqrt{S_1/c_P} c_s$, we find $B = \tilde{B}/N = -3.57$, which lies between the $n_\rho = 5$ and $n_\rho = 6$ simulations we studied here.
-We assume therefore that the dynamics of such thermals in the Sun can be described as being bracketed in the range $B/2$ and $2B$.
+In order to determine what behavioral regime thermals would occupy in the Sun, we will now estimate which of the simulations presented in this work could most accurately describe entropy rain in the Sun.
+We estimate that thermal diameters would be roughly the width of solar downflows, or $L = 0.1$ Mm.
+Using the VAL atmosphere of \citet{avrett&loeser2008}, we estimate the solar surface to have a temperature of $T_0 = 6000$ K, a density of $\rho_0 = 1.74 \times 10^{-7}$ g/cm$^3$, a sound speed of $c_s = 9.5 \times 10^5$ cm/s, and the average density over the radial extent of the thermal is $\bar{\rho} = 1.17\rho_0$.
+Estimating that solar downflows have a temperature deviation of $T_1 = -500$ K \citep{borrero&bellotrubio2002}, the nondimensional entropy signature of solar downflows is $S_1/c_p \sim \gamma^{-1}\ln(1 + T_1/T_0) = -5.22 \times 10^{-2}$.
+Using a solar surface gravity value of $g = 2.74 \times 10^4$ cm/s$^2$, the buoyancy of such a thermal is $\tilde{B} \approx (4\pi/3) (L/2)^3\bar{\rho}g (S_1/c_p) = -1.52 \times 10^{17}$ g cm$^4$/s$^2$.
+Nondimensionalizing this by $N = (S_1/c_P) L^2 u_{\text{th}}^2 \rho_0$ with $u_{\text{th}} = c_s \sqrt{S_1/c_P}$, we find $B = \tilde{B}/N = -3.57$, which lies between the $n_\rho = 5$ and $n_\rho = 6$ simulations we studied here.
+
+We assume that our estimate for $B$ could be off by a factor of two, and thus bracket the behavior of solar thermals as having $[B_\ell, B_u] = 0.5B, 2B$.
 Interpolating and extrapolating the data in Table \ref{table:parameters}, we calculate theoretical predictions for how thermals with these buoyancies would evolve in the solar convection zone.
+We plot these estimates of thermal evolution in the solar convection zone in Fig. \ref{fig:thermal_sun_comparison}, using a simple solar interior model calculated using MESA \citep{paxton&all2011} to map the density profiles of our simulation domains onto the density profile of the Sun.
+In Fig. \ref{fig:thermal_sun_comparison}a\&b, we respectively show the evolution of these thermals' radii and velocities inside of the Sun, and compare their evolution to pure horizontal compression.
+We use the solar diffusivity models shown in \citet{brown2011} to estimate the timescale over which the thermal would diffuse its entropy signature ($\tau_\kappa = \chi/r^2$) and the thermal freefall timescale over 1 Mm ($\tau_{\text{ff}} = (1\,\text{Mm})/w_{\text{th}}$).
+In Fig. \ref{fig:thermal_sun_comparison}c, we plot the ratio of these two timescales over the thermal's evolution.
 
-We plot these estimates of thermal evolution in the solar convection zone in Fig. \ref{fig:thermal_sun_comparison}, using a simple solar interior model calculated using MESA \citep{paxton&all2011} to map the density profiles of our simulation domains onto the density profiles of the Sun.
-In Fig. \ref{fig:thermal_sun_comparison}a\&b, we respectively show the evolution of these thermals' radii and velocities inside of the Sun -- on both ends of our estimate window, the thermal is in the falling regime and experiences compression of its radius with corresponding increases in velocity.
-In Fig. \ref{fig:thermal_sun_comparison}c, we use the solar diffusivity models shown in \citet{brown2011} to estimate the timescale over which the thermal would diffuse its entropy signature ($\tau_\kappa = \chi/r^2$) and the thermal freefall timescale over 1 Mm ($\tau_{\text{ff}} = (1\,\text{Mm})/w_{\text{th}}$), and we plot the ratio of these two timescales over the thermal's evolution.
-Throughout the thermal's fall, we find that $\tau_\kappa \gg \tau_{\text{ff}}$, and thus we do not expect the thermal to diffuse its entropic signature.
-We find a fractional diffusion rate over the thermal's transit of the solar convection zone of $\int_{R_\odot}^{0.7 R_\odot} \tau_\kappa^{-1} dR/w_{th} = 6.55\times 10^{-3}$ for the $B/2$ estimate, and $1.57 \times 10^{-3}$ for the $2B$ estimate.
-In either case, we estimate that the thermal loses less than 1\% of its entropic signature due to diffusion alone.
-We also estimate the amount of entropy that the thermal should lose due to viscous heating as $\int_{R_\odot}^{0.7 R_\odot} \nu w_{th}^2 / (r^2 \rho T c_P) dr / w_{th}$, and after normalizing by $S_1/c_p$, we find that the thermal generates $\mathcal{O}(10^{-4}-10^{-5})$ of its initial entropic signature.
+In general, we find that our entire estimated window for our thermals exists in the falling regime and these thermals experience radial compression with corresponding increases in velocity.
+Furthermore, throughout the thermal's fall, we find that $\tau_\kappa \gg \tau_{\text{ff}}$, and thus we do not expect the thermal to diffuse its entropic signature.
+We find a fractional diffusion rate over the thermal's transit of the solar convection zone of $\int_{R_\odot}^{0.7 R_\odot} \tau_\kappa^{-1} dR/w_{th} = [6.55, 1.57]\times 10^{-3}$ for $[B_\ell, B_u]$.
+In other words, throughout our bracketing interval, we estimate that the thermal loses less than 1\% of its entropic signature to diffusion.
+We similarly estimate the amount of entropy that the thermal should lose due to viscous heating as $(S_1/c_p)^{-1}\int_{R_\odot}^{0.7 R_\odot} \nu w_{th}^2 / (r^2 \rho T c_P) dr / w_{th} = [1.17, 0.17] \times 10^{-4}$ for $[B_\ell, B_u]$.
+
+``Entropy rain'' is the hypothesis that narrow downflows can transport the luminosity of the Sun via enthalpy fluxes.
+If the rain's entropy diffuses away before it hits the bottom, then it cannot transport the flux.
+We find that with our more accurate model for thermal propagation, the thermal maintains its entropy all the way to the base of the convection zone, and entropy rain is a possible mechanism for transporting the solar luminosity.
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{thermal_sun_comparison.png}
     \caption{
+	(a) Bounds on the evolution of the radii of entropy rain in the Sun are shown and compared to what the radii would be under purely horizontal compression.
+	(b) The velocities of the thermals in the estimated boundaries are shown. 
+	(c) The estimated ratio of the thermal diffusion timescale of the thermals normalized by the thermal's freefall timescale over 1 Mm is shown.
+	Diffusivities are calculated using the realistic solar-like diffusion profiles of \citet{brown2011}.
     \label{fig:thermal_sun_comparison} }
 \end{figure}
 
@@ -564,27 +580,28 @@ The contour defined by $\psi = 0$ from this solution is taken to be the contour 
 Information regarding the simulation resolution and CFL safety factor for each of the simulations presented in this work is contained in table \ref{table:simulation_info}.
 The Python scripts used to perform all simulations and analysis in this work are stored online in a Zenodo repository CITE.
 
-\begin{deluxetable*}{c c c c c c}
+\begin{deluxetable*}{c c c c c }
 \tabletypesize{\footnotesize}
 \caption{Table of simulation information
 \label{table:simulation_info}
 }
 \tablehead{																																															
-\colhead{$n_\rho$} & \colhead{$L_r$} & \colhead{nr or nx = ny} & \colhead{nz} & \colhead{$t_{\text{evolution}}$} & \colhead{safety}	}	
+\colhead{$n_\rho$} & \colhead{nr or nx = ny} & \colhead{nz} & \colhead{$t_{\text{evolution}}$} & \colhead{safety}	}	
 \startdata																																															
-\multicolumn{6}{l}{\textbf{2D Anelastic Simulations}}\\
-0.1 	& 	5				&	128			& 512			& 50 	&	0.6	\\
-0.5 	& 	5				&	128			& 512			& 45 	&	0.6	\\
-1	 	& 	5				&	128			& 512			& 41 	&	0.6	\\
-2	 	& 	5				&	256			& 1024			& 34	&	0.4	\\
-3	 	& 	5				&	256			& 1024			& 29	&	0.4	\\
-4	 	& 	5				&	256			& 1024			& 26 	&	0.3	\\
-5	 	& 	5				&	256			& 1536			& 25 	&	0.14	\\
-6	 	& 	5				&	256			& 1536			& 23 	&	0.08	\\
-\multicolumn{6}{l}{\textbf{3D Fully Compressible Simulations}}\\
-0.5 	& 	5				&	256			& 512			& 42.5 		&	0.2	\\
-1	 	& 	4				&	256			& 512			& 38 	 	&	0.2	\\
-2	 	& 	3.5				&	256			& 1536			& 31.75 	&	0.2	\\
+\multicolumn{5}{l}{\textbf{2D Anelastic Simulations}}\\
+0.1 	& 		128			& 512			& 50 	&	0.6	\\
+0.5 	& 		128			& 512			& 45 	&	0.6	\\
+1	 	& 		128			& 512			& 41 	&	0.6	\\
+2	 	& 		128			& 1024			& 34	&	0.4	\\
+3	 	& 		192			& 1024			& 29	&	0.4	\\
+4	 	& 		256			& 1024			& 26 	&	0.3	\\
+5	 	& 		256			& 1536			& 25 	&	0.14	\\
+6	 	& 		256			& 1536			& 23 	&	0.08	\\
+\multicolumn{5}{l}{\textbf{3D Fully Compressible Simulations}}\\
+0.1 	& 		256			& 512			& 50 		&	0.15	\\
+0.5 	& 		256			& 512			& 45 		&	0.15	\\
+1	 	& 		256			& 512			& 41	 	&	0.15	\\
+2	 	& 		256			& 1536			& 34    	&	0.1	\\
 \enddata																																															
 \tablecomments{
 }
