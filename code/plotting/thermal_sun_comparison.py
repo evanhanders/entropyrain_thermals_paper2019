@@ -1,10 +1,19 @@
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+matplotlib.rcParams['font.family'] = 'DejaVu Serif'
+matplotlib.rcParams['mathtext.fontset'] = 'dejavuserif'
+matplotlib.rcParams['mathtext.rm'] = 'DejaVu Serif'
+matplotlib.rcParams['mathtext.it'] = 'DejaVu Serif:italic'
+matplotlib.rcParams['mathtext.bf'] = 'DejaVu Serif:bold'
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
+
 
 cm2Mm = 1e-8 #Mm / cm
 Rsun2cm = 6.957e10 #cm / Rsun
 Rsun2Mm = 6.957e2 #Mm / Rsun
+
 
 def theory_C(B0, Gamma0, f, chi, beta, grad_T_ad=-1):
     """ The constant in stratified thermals theory """
@@ -162,8 +171,8 @@ for i in range(2):
     plt.plot(solar_radii[i]/(Rsun2Mm), r_outs[i]*(L/2/r_outs[i][0]), c='k', lw=0.5*(i+1))
 
 plt.plot(solar_radii[0]/(Rsun2Mm), (L/2)/(rho_outs[0]/rho_outs[0][0])**(1./2), c='k', lw=2)
-ax.text(0.69, 8e-5, r'$r \propto \rho^{-1/2}$')
-ax.text(0.69, 7e-3, 'thermals')
+ax.text(0.69, 8e-5, r'$r \propto \rho^{-1/2}$', rotation=3)
+ax.text(0.69, 7e-3, 'thermals', rotation=2.5)
 
 #Make plot pretty
 plt.xlim(0.68, 0.995)
