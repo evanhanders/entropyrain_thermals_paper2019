@@ -147,12 +147,13 @@ for Buoy in (B_nondim/2, 2*B_nondim):
 
 fig = plt.figure(figsize=(3.25, 6))
 ax = fig.add_subplot(3,1,1)
+axs = [ax]
 
 #Plot radius grey band
 x_values = rho_outs[0]*(rho_top/rho_outs[0][0])
 upper_y_values = r_outs[0]*(L/2/r_outs[0][0])
 lower_y_values = interp1d(rho_outs[1]*(rho_top/rho_outs[1][0]), r_outs[1]*(L/2/r_outs[1][0]))(x_values)
-plt.fill_between(rho2r(x_values)/(Rsun2Mm), lower_y_values, upper_y_values, color='black', alpha=0.4)
+plt.fill_between(rho2r(x_values)/(Rsun2Mm), lower_y_values, upper_y_values, color='black', alpha=0.4, rasterized=True)
 
 #plot actual radius measurements
 solar_radii = []
@@ -168,14 +169,15 @@ ax.text(0.69, 7e-3, 'thermals')
 plt.xlim(0.68, 0.995)
 plt.yscale('log')
 plt.ylim(1e-5, 1e-1)
-plt.ylabel('radius (Mm)')
+plt.ylabel(r'$r_{\mathrm{th}}$ (Mm)')
 
 ax = fig.add_subplot(3,1,2)
+axs += [ax]
 #Plot radius grey band
 x_values = solar_radii[0] 
 upper_y_values = w_outs[0]*(u_th/w_outs[0][0])
 lower_y_values = interp1d(solar_radii[1], w_outs[1]*(u_th/w_outs[1][0]))(x_values)
-plt.fill_between(x_values/(Rsun2Mm), lower_y_values, upper_y_values, color='black', alpha=0.4)
+plt.fill_between(x_values/(Rsun2Mm), lower_y_values, upper_y_values, color='black', alpha=0.4, rasterized=True)
 
 #plot actual velocity measurements
 for i in range(2):
@@ -185,10 +187,11 @@ for i in range(2):
 plt.xlim(0.68, 0.995)
 plt.ylim(1e-3, 1e-1)
 plt.yscale('log')
-plt.ylabel('velocity (Mm/s)')
+plt.ylabel(r'$w_{\mathrm{th}}$ (Mm/s)')
 
 
 ax = fig.add_subplot(3,1,3)
+axs += [ax]
 
 #Plot grey band
 tau_ratios = []
@@ -211,7 +214,7 @@ for i in range(2):
 x_values = solar_radii[0] 
 upper_y_values = tau_ratios[0]
 lower_y_values = interp1d(solar_radii[1], tau_ratios[1])(x_values)
-plt.fill_between(x_values/Rsun2Mm, lower_y_values, upper_y_values, color='black', alpha=0.4)
+plt.fill_between(x_values/Rsun2Mm, lower_y_values, upper_y_values, color='black', alpha=0.4, rasterized=True)
 for i in range(2):
     plt.plot(solar_radii[i]/(Rsun2Mm), tau_ratios[i] , c='k', lw=(0.5)*(i+1))
 
@@ -221,5 +224,10 @@ plt.ylabel(r'$\tau_\kappa/\tau_{\mathrm{ff}}$')
 plt.xlabel(r'radius $(R_{\odot})$')
 #plt.legend(loc='best', fontsize=9, frameon=False)
 
+axs[0].text(0.685, 4e-2, 'a', fontsize=12)
+axs[1].text(0.685, 6e-2, 'b', fontsize=12)
+axs[2].text(0.685, 1.5e7, 'c', fontsize=12)
+
 plt.savefig('thermal_sun_comparison.png', dpi=300, bbox_inches='tight')
+plt.savefig('thermal_sun_comparison.pdf', dpi=600, bbox_inches='tight')
 

@@ -64,16 +64,21 @@ for i, ax in enumerate(axs):
 
         print(np.max(contour))
         if j > 0:
-            rho *= this_volume/np.abs(B)#np.pi * this_r**3 /np.abs(B)
+            if i == 0:
+                #Estimate of torus volume
+                rho *= 2*np.pi**2 * this_r**3 / 4**2 /np.abs(B)
+            else:
+                rho *= 2*np.pi**2 * this_r**3 / 3**2 /np.abs(B)
+#            rho *= this_volume/np.abs(B)
         else:
-            rho *= 5*(4./3)*np.pi*(0.5)**3/ np.abs(B)
+            rho *= (4./3)*np.pi*(0.5)**3/ np.abs(B)
         
         field = f['tasks']['S1'].value[imgnum,:]
         f.close()
         ff.close()
         cf.close()
 
-        minval = -5
+        minval = -1
         breaks = len(dirs[i]) - 1
         good   = (zz > (breaks-1-j)/breaks * 20)*(zz <= (breaks-j)/breaks * 20)
         z_shape = np.sum((z > (breaks-1-j)/breaks * 20)*(z <= (breaks-j)/breaks * 20))
@@ -81,6 +86,7 @@ for i, ax in enumerate(axs):
         c = ax.pcolormesh(-rr[good].reshape(z_shape, len(r)), zz[good].reshape(z_shape, len(r)), (rho*field)[good].reshape(z_shape, len(r)), cmap='Blues_r', rasterized=True, vmin=minval, vmax=0)
         if i == 0 and j == 0:
             bar = plt.colorbar(c, cax=cax, orientation='horizontal')
+            bar.solids.set_rasterized(True)
             cax.xaxis.set_ticks_position('top')
             bar.set_label(r'$\frac{\rho S_1 \mathcal{V}}{B_{\mathrm{th}}}$', labelpad=-38)
         x_max = 5
@@ -120,13 +126,16 @@ for i, ax in enumerate(axs):
             ax.set_xlim(-x_max, x_max)
             ax.set_yticklabels([])
             ax.set_xticks((0, x_max))
-            ax.text(-0.97*x_max, 18.7, r'$n_\rho = 3$', size=9)
+            ax.text(-0.97*x_max, 18.5, r'$n_\rho = 3$', size=9)
+            ax.text(-4.7, 0.3, 'b', fontsize=12)
         else:
             ax.set_xlim(-x_max, x_max)
             ax.set_xticks((-x_max, 0, x_max))
-            ax.text(-0.97*x_max, 18.7, r'$n_\rho = \frac{1}{2}$', size=9)
+            ax.text(-0.97*x_max, 18.5, r'$n_\rho = \frac{1}{2}$', size=9)
             ax.set_ylabel('z')
+            ax.text(-4.7, 0.3, 'a', fontsize=12)
         ax.set_xlabel('x')
 
 
 fig.savefig('evolution_colormeshes.png', dpi=300, bbox_inches='tight')
+fig.savefig('evolution_colormeshes.pdf', dpi=600, bbox_inches='tight')
