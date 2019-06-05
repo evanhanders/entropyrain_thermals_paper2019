@@ -233,9 +233,9 @@ plt.ylabel(r'$\tau_\kappa/\tau_{\mathrm{ff}}$')
 plt.xlabel(r'radius $(R_{\odot})$')
 #plt.legend(loc='best', fontsize=9, frameon=False)
 
-axs[0].text(0.685, 4e-2, 'a', fontsize=12)
-axs[1].text(0.685, 6e-2, 'b', fontsize=12)
-axs[2].text(0.685, 1.5e7, 'c', fontsize=12)
+#axs[0].text(0.685, 4e-2, 'a', fontsize=12)
+#axs[1].text(0.685, 6e-2, 'b', fontsize=12)
+#axs[2].text(0.685, 1.5e7, 'c', fontsize=12)
 
 plt.savefig('thermal_sun_comparison.png', dpi=300, bbox_inches='tight')
 plt.savefig('thermal_sun_comparison.pdf', dpi=600, bbox_inches='tight')

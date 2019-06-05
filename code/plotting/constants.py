@@ -87,9 +87,9 @@ cax.xaxis.set_ticks_position('top')
 cax.xaxis.set_ticklabels(CASES)
 cb.set_label(r'$n_\rho$', labelpad=-35)
 
-axs[0].text(19, 1.03, 'a', fontsize=12)
-axs[1].text(19, 1.03, 'b', fontsize=12)
-axs[2].text(19, 1.03, 'c', fontsize=12)
+#axs[0].text(19, 1.03, 'a', fontsize=12)
+#axs[1].text(19, 1.03, 'b', fontsize=12)
+#axs[2].text(19, 1.03, 'c', fontsize=12)
 
 
 

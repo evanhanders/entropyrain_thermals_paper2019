@@ -133,8 +133,8 @@ cax.xaxis.set_ticklabels([0.1, 0.5, 1, 2, 3, 4, 5, 6])
 cb.set_label(r'$n_\rho$', labelpad=-30)
 
 
-axs[0].text(2.25, 0.21, 'a', fontsize=10)
-axs[1].text(2.25, 1.3e-4, 'b', fontsize=10)
+#axs[0].text(2.25, 0.21, 'a', fontsize=10)
+#axs[1].text(2.25, 1.3e-4, 'b', fontsize=10)
 
 
 fig.savefig('diff_AN_FC.png', dpi=300, bbox_inches='tight')

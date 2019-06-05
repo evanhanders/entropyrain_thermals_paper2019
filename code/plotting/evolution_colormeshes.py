@@ -127,13 +127,13 @@ for i, ax in enumerate(axs):
             ax.set_yticklabels([])
             ax.set_xticks((0, x_max))
             ax.text(-0.97*x_max, 18.5, r'$n_\rho = 3$', size=9)
-            ax.text(-4.7, 0.3, 'b', fontsize=12)
+#            ax.text(-4.7, 0.3, 'b', fontsize=12)
         else:
             ax.set_xlim(-x_max, x_max)
             ax.set_xticks((-x_max, 0, x_max))
             ax.text(-0.97*x_max, 18.5, r'$n_\rho = \frac{1}{2}$', size=9)
             ax.set_ylabel('z')
-            ax.text(-4.7, 0.3, 'a', fontsize=12)
+#            ax.text(-4.7, 0.3, 'a', fontsize=12)
         ax.set_xlabel('x')
 
 

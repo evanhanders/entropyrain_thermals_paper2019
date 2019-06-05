@@ -90,8 +90,8 @@ cax.xaxis.set_ticks_position('top')
 cax.xaxis.set_ticklabels(CASES)
 cb.set_label(r'$n_\rho$', labelpad=-40)
 
-ax1.text(0.5, 18.5, 'a', fontsize=12)
-ax2.text(0.2, 0.225, 'b', fontsize=12)
+#ax1.text(0.5, 18.5, 'a', fontsize=12)
+#ax2.text(0.2, 0.225, 'b', fontsize=12)
 
 fig.savefig('results_panels.png', dpi=300, bbox_inches='tight')
 fig.savefig('results_panels.pdf', dpi=600, bbox_inches='tight')
