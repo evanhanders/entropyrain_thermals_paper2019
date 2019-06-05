@@ -1,0 +1,17 @@
+#PBS -S /bin/bash
+#PBS -N FC_post
+#PBS -l select=1:ncpus=28:mpiprocs=28:model=bro
+#PBS -l walltime=4:00:00
+#PBS -j oe
+#PBS -q normal
+
+
+DIR01=./FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho0.1_aspect0.5/
+DIR05=./FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho0.5_aspect0.5/
+DIR1=./FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho1_aspect0.5/
+DIR2=./FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho2_aspect0.5/
+
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR01 > out.post.FC.nrho0.1.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR05 > out.post.FC.nrho0.5.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR1 > out.post.FC.nrho1.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR2 > out.post.FC.nrho2.txt

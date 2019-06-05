@@ -1,0 +1,38 @@
+_____________________________________________________________
+Title: Code used for simulations in "Entropy Rain: Dilution and Compression of Thermals in Stratified Domains"
+Authors: Evan Anders, Daniel Lecoanet, Ben Brown, the exoweather team
+_____________________________________________________________
+
+-----
+Description of contents:
+This tarball contains all of the code used in the production of simulations in the paper, "Entropy Rain: Dilution and Compression of Thermals in Stratified Domains."
+
+In the top-level directory, we have included the main driving scripts:
+AN_2D_thermal.py (for running 2D, anelastic, azimuthally symmetric thermal sims)
+FC_3D_thermal.py (for running 3D, fully compressible thermal sims)
+thermal_analysis.py (for post-processing thermal simulations)
+join_data.py (for joining output data from 3D FC runs)
+
+Inside of the logic/ directory, the driving logic for 3D sims and post-processing can be found:
+
+logic/atmospheres.py (Polytropic atmosphere information)
+logic/checkpointing.py (Simulation checkpointing information)
+logic/domain.py (Dedalus domain information)
+logic/equations.py (Fully compressible equations implementation)
+logic/output.py (Specifies output tasks of 3D simulations)
+logic/post_processing.py (Function definitions for post-processing)
+logic/thermal.py (Specifies thermal initial conditions)
+
+We note that the form of the fully compressible equations that we solve in the code is slightly different from the one presented in our paper. 
+The code implementation is nondimensionalized on the temperature gradient length scale at the top of the atmosphere and the isothermal sound crossing timescale of that unit length.
+The script post_processing.py appropriately scales all outputs from the 3D simulations into the form presented in our paper and into a form that is directly comparable to the 2D sims.
+
+For details on how to run simulations, we have included sample simulation job scripts in the run_scripts/ folder for the NASA Pleiades supercomputer.
+
+We further include the driving scripts used to make the figures in our paper in the paper_plots directory. 
+
+-----
+System requirements:
+This code must be run using python3 on a computer with the open-source
+Dedalus pseudospectral framework installed. See http://dedalus-project.org/
+for more information.
