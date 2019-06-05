@@ -32,8 +32,7 @@ logger.info("joining data from Dedalus run {:s}".format(data_dir))
 if args['--data_type'] is not None:
     data_types=[args['--data_type']]
 else:
-#    data_types = ['slices', 'profiles']
-    data_types = ['final_checkpoint', 'checkpoint']#, 'volumes', 'profiles', 'slices', 'scalars']
+    data_types = ['slices', 'profiles', 'final_checkpoint', 'checkpoint', 'volumes', 'scalars']
 
 for data_type in data_types:
     logger.info("merging {}".format(data_type))

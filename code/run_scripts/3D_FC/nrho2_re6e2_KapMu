@@ -1,19 +1,15 @@
 #PBS -S /bin/bash
 #PBS -N FC_thermal_KapMu_Re6e2_nrho2
 #PBS -l select=205:ncpus=40:mpiprocs=40:model=sky_ele
-#PBS -l walltime=8:00:00
+#PBS -l walltime=24:00:00
 #PBS -j oe
-#PBS -q normal 
+#PBS -q long
 
 cd $PBS_O_WORKDIR
 
 RE=6e2
 EPS=1.00e-4
 dedalus_dir=./
-
-# select=205:ncpus=40:mpiprocs=40:model=sky_ele
-# select=293:ncpus=28:mpiprocs=28:model=bro
-# run 34 from start. STarting at 24 = run 10.
 
 date
 mpiexec_mpt -n 8192 ~/.python3 FC_3D_thermal.py \
@@ -24,13 +20,11 @@ mpiexec_mpt -n 8192 ~/.python3 FC_3D_thermal.py \
         --Re=$RE \
         --epsilon=$EPS \
         --run_time_buoy=10 \
-        --run_time=19.9 \
+        --run_time=23.9 \
         --n_rho=2 \
         --aspect=0.5 \
         --safety_factor=0.1 \
         --SBDF2 \
-        --label=restarted_1024x384x384 \
-        --restart=FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho2_aspect0.5/checkpoint/checkpoint_s25.h5 \
         > $dedalus_dir/out.3D.nrho2.Re$RE.Eps$EPS.$PBS_JOBID
 
 date
