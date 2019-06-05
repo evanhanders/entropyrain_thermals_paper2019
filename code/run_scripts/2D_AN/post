@@ -1,0 +1,29 @@
+#PBS -S /bin/bash
+#PBS -N AN_post
+#PBS -l select=1:ncpus=28:mpiprocs=28:model=bro
+#PBS -l walltime=5:00:00
+#PBS -j oe
+#PBS -q normal
+
+
+DIR01=./AN_2D_thermal_nrho0.1_Re6e2_Pr1_aspect0.25_Lz20/
+DIR05=./AN_2D_thermal_nrho0.5_Re6e2_Pr1_aspect0.25_Lz20/
+DIR1=./AN_2D_thermal_nrho1_Re6e2_Pr1_aspect0.25_Lz20/
+DIR2=./AN_2D_thermal_nrho2_Re6e2_Pr1_aspect0.25_Lz20/
+DIR3=./AN_2D_thermal_nrho3_Re6e2_Pr1_aspect0.25_Lz20/
+DIR4=./AN_2D_thermal_nrho4_Re6e2_Pr1_aspect0.25_Lz20/
+DIR5=./AN_2D_thermal_nrho5_Re6e2_Pr1_aspect0.25_Lz20/
+DIR6=./AN_2D_thermal_nrho6_Re6e2_Pr1_aspect0.25_Lz20/
+
+
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR01 > out.post.nrho0.1.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR05 > out.post.nrho0.5.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR1 > out.post.nrho1.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR2 > out.post.nrho2.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR3 > out.post.nrho3.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR4 > out.post.nrho4.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR5 > out.post.nrho5.txt
+mpiexec_mpt -n 1 python3 thermal_analysis.py --plot --get_contour --root_dir=$DIR6 > out.post.nrho6.txt
+
+date
+
