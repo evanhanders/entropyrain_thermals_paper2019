@@ -161,6 +161,7 @@ In the following sections, we will use the impulse of dense vortex rings to deri
 
 The evolution of thermals in the Boussinesq limit has been understood for decades (see e.g.,~\LJ\, for a description and references).
 While many theoretical descriptions rely on self-similarity arguments, we will show how the impulse of a thermal controls its evolution.
+This section parallels a similar analysis for the Boussinesq case, presented in McKim et al (in prep).
 
 The hydrodynamic impulse is defined as \citep{shivamoggi2010},
 \begin{equation}
@@ -485,24 +486,26 @@ We also find that the non-dimensional circulation is $\mathcal{O}$(-2) for each 
 \label{sec:implications}
 Our theory shows that the evolution of dense thermals in stratified domains is complex.
 Neither the assumption of pure compression \citep[as in e.g.,][]{brandenburg2016} nor the evolution of thermals in the Boussinesq regime (\LJ) fully describes thermal behavior.
-Rather, results fall somewhere in between, and theory and simulations suggest that there are two regimes of downflowing thermal behavior:
+Rather, the results fall somewhere in between, and theory and simulations suggest that there are two regimes of downflowing thermal behavior:
 \begin{enumerate}
 \item A low-stratification ``stalling'' regime, in which the thermal entrains environmental fluid and slows down, acting much like the Boussinesq regime, and
 \item A high-stratification ``falling'' regime, in which the thermal falls sufficiently fast that atmospheric compression dominates over entrainment and the thermal accelerates as it falls deeper into the atmosphere.
 \end{enumerate}
 We note that both of these regimes could have interesting implications for the entropy rain hypothesis.
 
-If the nucleus of solar convection were thermals in the stalling regime, convective elements would grow enormously in size and slow down very close to the solar surface.
+If the solar downflows are in the stalling regime, convective elements would grow enormously in size and slow down very close to the solar surface.
 In a perfectly quiescent atmosphere, these slow, large convective elements would eventually propagate to the base of the convection zone over long timescales.
 In fact, their large length scales would likely help shield them from any dissipative effects despite their low velocities.
 However, the solar convection zone is highly turbulent, and we expect that a more likely outcome for such large, coherent, and slowly propagating structures is that they would be torn apart by turbulent motions.
 
 On the other hand, if solar convection is comprised of thermals in the falling regime, then it is likely that solar surface elements would reach deep into the Sun.
 Neglecting buoyancy, we expect that downward propagating vortex rings in the solar convection zone would likely compress to sizes on which conductivity could become important.
-Our theory of thermals suggests that, instead, buoyancy counteracts some of the compressional effects of stratification, and could help convective elements maintain coherency as they cross the solar convection zone.
+Our theory of thermals suggests that, instead, buoyancy counteracts some of the compressional effects of stratification, and could help convective elements maintain their entropy perturbation as they cross the solar convection zone.
 
-We now estimate what the behavior of thermals in the Sun would be based on the simulations presented in this work.
-To do so, we will approximate the dimensional buoyancy perturbation of Eqn.~\ref{eqn:tot_buoyancy} as $\tilde{B} = \rho \mathcal{V} g (S_1/c_p)$, and calculate this quantity for thermals launched from the solar photosphere, assuming that solar downflow lanes quickly break up into thermals.
+We now estimate the behavior of thermals in the Sun based on the simulations presented in this work.
+The thermal evolution depends on a variety of parameters (see table table:parameters).
+However, we find the only parameter which changes appreciably as we increase the stratification is the normalized buoyancy $B_\text{th}$.
+To estimate $B_\text{th}$ in the sun, we approximate the dimensional buoyancy perturbation of Eqn.~\ref{eqn:tot_buoyancy} as $\tilde{B} = \rho \mathcal{V} g (S_1/c_p)$, and calculate this quantity for thermals launched from the solar photosphere, assuming that solar downflow lanes quickly break up into thermals.
 Using the VAL atmospheric data of \citet{avrett&loeser2008}, we estimate the solar surface to have a temperature of $T_0 \approx 6000$ K, a density of $\rho_0 \approx 1.74 \times 10^{-7}$ g/cm$^3$, and a sound speed of $c_s = 9.5 \times 10^5$ cm/s.
 We estimate that thermal diameters would be roughly the width of downflow lanes ($L_{\text{th}} = 0.1$ Mm), and the average atmospheric density over the first $L_{\text{th}}$ of the solar interior is $\bar{\rho} = 1.17\rho_0$.
 Estimating downflows to have a temperature deviation of $T_1 = -500$ K \citep{borrero&bellotrubio2002}, the nondimensional entropy signature of solar downflows is $S_1/c_p \sim \gamma^{-1}\ln(1 + T_1/T_0) = -5.22 \times 10^{-2}$.
@@ -510,7 +513,7 @@ Using a solar surface gravity value of $g = 2.74 \times 10^4$ cm/s$^2$, the buoy
 $$
 \tilde{B} \approx \bar{\rho}\left[\frac{4\pi}{3} \left(\frac{L}{2}\right)^3\right] g \frac{S_1}{c_P} = -1.52 \times 10^{17} \text{g cm}^4/\text{s}^2.
 $$
-Nondimensionalizing this by $N = (S_1/c_P) L^2 u_{\text{th}}^2 \rho_0$ with $u_{\text{th}} = c_s \sqrt{S_1/c_P}$, we find $B = \tilde{B}/N = -3.57$, which lies between the $n_\rho = 5$ and $n_\rho = 6$ simulations we studied here (see table \ref{table:parameters}).
+Nondimensionalizing this by $B_0 = (S_1/c_P) L^2 u_{\text{th}}^2 \rho_0$ with $u_{\text{th}} = c_s \sqrt{S_1/c_P}$, we find $B_\text{th} = \tilde{B}/B_0 = -3.57$, which lies between the $n_\rho = 5$ and $n_\rho = 6$ simulations we studied here (see table \ref{table:parameters}).
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{thermal_sun_comparison.pdf}
@@ -522,42 +525,39 @@ Nondimensionalizing this by $N = (S_1/c_P) L^2 u_{\text{th}}^2 \rho_0$ with $u_{
     \label{fig:thermal_sun_comparison} }
 \end{figure}
 
-Due to the numerous assumptions made in calculating $B$, we assume this estimate is only accurate to within a factor of two, and thus study thermals in the interval $[B_\ell, B_u] = 0.5B, 2B$.
+Because solar downflows likely break up into thermals of various sizes, we will examine the fate of thermals with dimensionless buoyancy in the interval $[B_\ell, B_u] = 0.5B_\text{th}, 2B_\text{th}$.
 Interpolating and extrapolating the data in Table \ref{table:parameters}, we use Eqns.~\ref{eqn:r_theory} \& \ref{eqn:theory_z} to calculate theoretical predictions for how thermals with these buoyancies would evolve over extended atmospheres like the solar convection zone.
 Using a simple solar interior model calculated using MESA \citep{paxton&all2011} to map the density profiles of our simulation domains onto the density profile of the Sun, we plot the evolution of thermals in our estimated interval in Fig. \ref{fig:thermal_sun_comparison}.
-In Fig. \ref{fig:thermal_sun_comparison}a\&b, we respectively show the evolution of these thermals' radii and velocities inside of the Sun, and compare their evolution to pure horizontal compression.
-We use the solar diffusivity models shown in \citet{brown2011} to estimate the timescale over which the thermal would diffuse its entropy signature ($\tau_\kappa = \chi/r^2$) and the thermal freefall timescale over 1 Mm ($\tau_{\text{ff}} = [1\,\text{Mm}]/w_{\text{th}}$).
+In Fig. \ref{fig:thermal_sun_comparison}a\&b, we show the evolution of these thermals' radii and velocities inside of the Sun, and compare their evolution to pure horizontal compression.
+We use the solar diffusivity models of \citet{brown2011} to estimate the timescale over which the thermal would diffuse its entropy signature ($\tau_\kappa = \chi/r^2$) and the thermal freefall timescale over 1 Mm ($\tau_{\text{ff}} = [1\,\text{Mm}]/w_{\text{th}}$).
 In Fig. \ref{fig:thermal_sun_comparison}c, we plot the ratio of these two timescales over the thermal's evolution.
 
-We find that our estimated bracket for solar thermal behavior is in the falling regime.
-These thermals experience radial compression with corresponding increases in velocity, but experience much less compression than a naive approximation based on the density stratification would suggest.
+We find that our estimated solar thermal is in the falling regime.
+These thermals experience radial compression with corresponding increases in velocity, but experience much less compression than a naive approximation based on the density stratification alone.
 Furthermore, throughout the thermal's fall, we find that $\tau_\kappa \gg \tau_{\text{ff}}$, and thus we do not expect the thermal to diffuse its entropic signature.
 We find a fractional diffusion rate over the thermal's transit of the solar convection zone of 
 $$
-\int_{R_\odot}^{0.7 R_\odot} \tau_\kappa^{-1} \frac{dR}{w_{th}} = [6.55, 1.57]\times 10^{-3}\,\text{for}\,[B_\ell, B_u].
+\int_{R_\odot}^{0.7 R_\odot} \tau_\kappa^{-1} \frac{dr}{w_{th}} = [6.55, 1.57]\times 10^{-3}\,\text{for}\,[B_\ell, B_u].
 $$
-We similarly estimate the amount of entropy that the thermal should lose due to viscous heating as 
-$$
-\frac{1}{(S_1)}\int_{R_\odot}^{0.7 R_\odot} \nu \frac{1}{\rho T}\frac{w_{th}^2}{r^2}\frac{dr}{w_{th}} = [1.17, 0.17] \times 10^{-4}\,\text{for}\,[B_\ell, B_u].
-$$
-In other words, throughout our bracketing interval, we estimate that the thermal loses less than 1\% of its entropic signature to diffusion, and approximately 0.01\% of its signature due to viscous heating.
-These estimates suggest that entropy rain in the form of thermals could feasibly transport the solar luminosity.
+Thus, the thermal loses less than 1\% of its entropic signature to diffusion.
+These estimates suggest that entropy rain could transport the solar luminosity.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION SECTION
 \section{Summary \& Conclusion}
 \label{sec:discussion}
 In this paper we developed a simple theory of the evolution of negatively buoyant vortex rings in stratified atmospheres.
-We showed that this theory predicts that dense thermals will experience less entrainment than boussinesq thermals due to increasing atmospheric density with depth.
-Similarly, we showed that these thermals experience less compression than would be expected due to pure atmosphreic compression of a neutral vortex ring.
-We performed 2D anelastic simulations of thermal evolution for varying degrees of stratification and showed that our parameterized theory describes the evolution of thermals in these systems remarkably well.
-Furthermore, we verified the validity of our anelastic simulations with select 3D fully compressible simulations of thermal evolution and found agreement to under 1\%.
-We noted that the evolution of dense thermals in stratified domains is complex, but can be classified into a near-Boussinesq ``stalling'' and a high-stratification ``falling'' regime.
-An estimate of the entropic nature of solar downflows suggests that thermals launched from the solar surface would exhibit behavior in the falling regime.
+This theory predicts that dense thermals experience less entrainment than Boussinesq thermals due to increasing atmospheric density with depth.
+Likewise, these thermals experience less compression than would be expected due to pure atmospheric compression of a neutrally buoyant vortex ring.
+We performed 2D anelastic \& 3D fully compressible simulations of thermal evolution in the laminar regime for varying degrees of stratification, and showed that our parameterized theory describes the evolution of thermals in these systems remarkably well.
+We found excellent agreement between the 2D \& 3D simulations.
+The evolution of dense thermals in stratified domains is complex, but can be classified into a near-Boussinesq ``stalling'' and a high-stratification ``falling'' regime.
+We estimate that solar downflows would fall into this latter regime.
 
-The ``Entropy rain'' hypothesis states that narrow downflows can transport the luminosity of the Sun via enthalpy fluxes.
+The ``entropy rain'' hypothesis states that narrow downflows can transport the luminosity of the Sun via enthalpy fluxes.
 If the rain stalls near the surface or its entropy diffuses away before it hits the bottom, then it cannot transport the flux.
-We find that with our more accurate model for thermal propagation, solar thermals should maintain their entropy all the way to the base of the convection zone, and entropy rain is a possible mechanism for transporting the solar luminosity.
+We find that with our more accurate model for thermal propagation, solar thermals should maintain their entropy all the way to the base of the convection zone.
+Hence, entropy rain is a possible mechanism for transporting the solar luminosity.
 
 $\,$\newline$\,$
 \begin{acknowledgements}
@@ -602,9 +602,9 @@ We calculate the streamfunction of the velocity field as in \citet{romps&all2015
 \end{equation}
 using vertical velocity data, $w$, in a 2D domain which radially spans $r = [0, L_r]$ and vertically spans the same depth as the simulation domain.
 For our 2D simulations, this is simply the output of the simulations.
-For our 3D simulations, we assume that the vortex ring is azimuthally symmetric, and it is thus fine to use the vertical velocity data in the $y = 0$ plane at values of $x \geq 0$.
+For our 3D simulations, we assume that the vortex ring is azimuthally symmetric, and thus use the vertical velocity data in the $y = 0$ plane at values of $x \geq 0$.
 We solve Eqn.~\ref{eqn:thermal_tracker} with the boundary condition that $\psi = 0$ at $r = 0$. 
-The contour defined by $\psi = 0$ from this solution is taken to be the contour bounding the thermal, $\mathcal{C}$.
+The contour $\psi = 0$ is taken to be the contour bounding the thermal, $\mathcal{C}$.
 
 \section{Table of Simulations}
 \label{appendix:table}
@@ -635,8 +635,7 @@ The Python scripts used to perform all simulations and analysis in this work are
 2	 	& 		256			& 1024			& 34    	&	0.1	\\
 \enddata																																															
 \tablecomments{
-The density stratification in density scale heights, $n_\rho$, is used throughout this work and can be easily seen in numerous figures.
-Our 2D sims have a simulation coefficient resolution of nr x nz, and our 3D sims have a coefficient resolution of nx x ny x nz.
+Our 2D sims have spectral mode resolution of nr x nz, and our 3D sims have spectral mode resolution of nx x ny x nz.
 We evolve our simulations from initial conditions until $t_{\text{evolution}}$ dimensionless freefall times have passed.
 We use a CFL to determine the appropriate size of our timestep at each timestep in our simulation, and the CFL safety factor decreases with increasing stratification.
 Our 2D sims use the RK443 timestepper and our 3D sims use the SBDF2 timestepper, resulting in vastly different safety factor sizes in 2D and 3D.
