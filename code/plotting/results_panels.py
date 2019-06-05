@@ -1,7 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 matplotlib.rcParams['font.family'] = 'DejaVu Serif'
-matplotlib.rcParams['mathtext.fontset'] = 'custom'
+matplotlib.rcParams['mathtext.fontset'] = 'dejavuserif'
 matplotlib.rcParams['mathtext.rm'] = 'DejaVu Serif'
 matplotlib.rcParams['mathtext.it'] = 'DejaVu Serif:italic'
 matplotlib.rcParams['mathtext.bf'] = 'DejaVu Serif:bold'
@@ -19,9 +19,9 @@ CASES = [0.1, 0.5, 1, 2, 3, 4, 5, 6]
 ROOT_DIR='../'#good_2D_runs/z_bot_zero/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
-CASES_3D = [0.5, 1, 2]
-AR_3D    = [0.5, 0.4, 0.35]
-THREED_DIR = '../good_3D_runs/'
+CASES_3D = [0.1, 0.5, 1, 2]
+AR_3D    = [0.5, 0.5, 0.5, 0.5]
+THREED_DIR = '../'
 DIRS_3D=['{:s}FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho{}_aspect{}/'.format(THREED_DIR,nrho, ar) for nrho, ar in zip(CASES_3D, AR_3D)] 
 dict_3D = {}
 for i in range(len(CASES_3D)):
@@ -33,7 +33,7 @@ gs = gridspec.GridSpec(1000, 1000)
 fig = plt.figure(figsize=(width, height*2))
 cax = plt.subplot(gs.new_subplotspec((30,   0), 50, 1000))
 ax1 = plt.subplot(gs.new_subplotspec((100,  0), 380, 1000))
-ax2 = plt.subplot(gs.new_subplotspec((620,  0), 380, 1000))
+ax2 = plt.subplot(gs.new_subplotspec((600,  0), 400, 1000))
 
 norm = matplotlib.colors.Normalize(vmin=0.8, vmax=len(CASES))
 sm   = plt.cm.ScalarMappable(cmap='viridis_r', norm=norm)
@@ -85,8 +85,13 @@ ax1.plot([100, 101], [100, 101], lw=0, marker='+', c='k', markersize=2, label='3
 ax1.legend(loc='lower right', frameon=False, fontsize=8, handletextpad=0)
 
 cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(1, len(CASES)+1, len(CASES)+1)-0.5, ticks=np.arange(len(CASES)+1))
+cb.solids.set_rasterized(True)
 cax.xaxis.set_ticks_position('top')
 cax.xaxis.set_ticklabels(CASES)
 cb.set_label(r'$n_\rho$', labelpad=-40)
 
+ax1.text(0.5, 18.5, 'a', fontsize=12)
+ax2.text(0.2, 0.225, 'b', fontsize=12)
+
 fig.savefig('results_panels.png', dpi=300, bbox_inches='tight')
+fig.savefig('results_panels.pdf', dpi=600, bbox_inches='tight')

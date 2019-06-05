@@ -1,8 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 matplotlib.rcParams['font.family'] = 'DejaVu Serif'
-#matplotlib.rcParams['text.usetex'] = True
-matplotlib.rcParams['mathtext.fontset'] = 'custom'
+matplotlib.rcParams['mathtext.fontset'] = 'dejavuserif'
 matplotlib.rcParams['mathtext.rm'] = 'DejaVu Serif'
 matplotlib.rcParams['mathtext.it'] = 'DejaVu Serif:italic'
 matplotlib.rcParams['mathtext.bf'] = 'DejaVu Serif:bold'
@@ -60,18 +59,18 @@ for i, direc in enumerate(DIRS):
     good = S < 0.5*S.min()
     good[:10] = True
     V0 = V/r**3
-    for j, x, y in zip(range(3), (d, d, d), (Gam/Gamma0, S/B0, V0/f0)):
+    for j, x, y in zip(range(3), (d, d, d), (S/B0, Gam/Gamma0, V0/f0)):
         axs[j].plot(x[good], y[good], lw=0.75, c=color)
 
-axs[0].set_ylim(0.25, 1.1)
-axs[1].set_ylim(0.25, 1.1)
+axs[0].set_ylim(0.75, 1.1)
+axs[1].set_ylim(0.75, 1.1)
 axs[2].set_ylim(0.75, 1.1)
 
 for i in (0, 1, 2):
     axs[i].set_xlim(2, 20)
 axs[2].set_ylabel('w')
-axs[0].set_ylabel(r'$\Gamma/\Gamma_{\mathrm{th}}$')
-axs[1].set_ylabel(r'$B/B_{\mathrm{th}}$')
+axs[0].set_ylabel(r'$B/B_{\mathrm{th}}$')
+axs[1].set_ylabel(r'$\Gamma/\Gamma_{\mathrm{th}}$')
 axs[2].set_ylabel(r'$\mathcal{V}/(mr^3)$')
 axs[2].set_xlabel('Depth')
 
@@ -83,10 +82,16 @@ axs[0].tick_params(labelbottom=False)
 axs[1].tick_params(labelbottom=False)
 
 cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(1, len(CASES)+1, len(CASES)+1)-0.5, ticks=np.arange(len(CASES)+1))
+cb.solids.set_rasterized(True)
 cax.xaxis.set_ticks_position('top')
 cax.xaxis.set_ticklabels(CASES)
 cb.set_label(r'$n_\rho$', labelpad=-35)
 
+axs[0].text(19, 1.03, 'a', fontsize=12)
+axs[1].text(19, 1.03, 'b', fontsize=12)
+axs[2].text(19, 1.03, 'c', fontsize=12)
+
 
 
 fig.savefig('constants.png', dpi=300, bbox_inches='tight')
+fig.savefig('constants.pdf', dpi=600, bbox_inches='tight')

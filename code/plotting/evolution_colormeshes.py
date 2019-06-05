@@ -1,7 +1,7 @@
 import matplotlib
 matplotlib.use('Agg')
 matplotlib.rcParams['font.family'] = 'DejaVu Serif'
-#matplotlib.rcParams['mathtext.fontset'] = 'custom'
+matplotlib.rcParams['mathtext.fontset'] = 'dejavuserif'
 matplotlib.rcParams['mathtext.rm'] = 'DejaVu Serif'
 matplotlib.rcParams['mathtext.it'] = 'DejaVu Serif:italic'
 matplotlib.rcParams['mathtext.bf'] = 'DejaVu Serif:bold'

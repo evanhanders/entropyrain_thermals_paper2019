@@ -265,6 +265,7 @@ class ThermalPostProcessor():
             w   = f['tasks']['w'].value  * self.L_factor/self.t_factor
             u   = f['tasks']['u'].value  * self.L_factor/self.t_factor
             V   = f['tasks']['V'].value  / self.t_factor
+            p   = f['tasks']['p'].value * (self.L_factor/self.t_factor)**2
             r   = f['scales']['r']['1.0'].value * self.L_factor 
             z   = f['scales']['z']['1.0'].value * self.L_factor 
             rr, zz = np.meshgrid(r, z)
@@ -273,6 +274,7 @@ class ThermalPostProcessor():
             w   = f['tasks']['w y mid'].value * self.L_factor/self.t_factor
             u   = f['tasks']['u y mid'].value * self.L_factor/self.t_factor
             V   = f['tasks']['vorticity y mid'].value / self.t_factor
+            p = None
             x = f['scales']['x']['1.0'].value * self.L_factor 
             r = x[x >= 0]
             r_ind = (x >= 0).flatten()
@@ -283,7 +285,7 @@ class ThermalPostProcessor():
             z  = f['scales']['z']['1.0'].value * self.L_factor 
             zz, rr = np.meshgrid(z, r)
         f.close()
-        return r, z, rr, zz, s1, w, u, V
+        return r, z, rr, zz, s1, w, u, V,p
 
 
     def calculate_contour(self, iterative=False):
@@ -305,7 +307,7 @@ class ThermalPostProcessor():
 
         for filenum, fn in enumerate(self.files):
             #Read entropy, density, velocity, vorticity
-            r, z, rr, zz, s1, w, u, V = self.read_file(fn)
+            r, z, rr, zz, s1, w, u, V, p = self.read_file(fn)
 
             if filenum == 0:
                 integrator = DedalusIntegrator(len(r), len(z), self.Lr, self.Lz, self.grad_T_ad, self.m_ad, r_cheby=True, twoD=self.twoD)
@@ -437,7 +439,7 @@ class ThermalPostProcessor():
             #First, get some basic info about the thermal
             for filenum, fn in enumerate(self.files):
                 #Read entropy, density, velocity, vorticity
-                r, z, rr, zz, s1, w, u, V = self.read_file(fn)
+                r, z, rr, zz, s1, w, u, V, p = self.read_file(fn)
 
                 if filenum == 0:
                     integrator = DedalusIntegrator(len(r), len(z), self.Lr, self.Lz, self.grad_T_ad, self.m_ad, r_cheby=self.twoD, twoD=self.twoD)
@@ -594,7 +596,7 @@ class ThermalPostProcessor():
         count = 0
         for filenum, fn in enumerate(self.files):
             #Read entropy, density, velocity, vorticity
-            r, z, rr, zz, s1, w, u, V = self.read_file(fn)
+            r, z, rr, zz, s1, w, u, V, p = self.read_file(fn)
             f    = h5py.File(self.prof_files[filenum], 'r')
             time = f['scales']['sim_time'].value
             f.close()
@@ -651,6 +653,8 @@ class ThermalPostProcessor():
                         integrator.fd1['g'][zz > contour_top] = 1.*values[zz > contour_top]
                     elif 'full_' in name:
                         integrator.fd1['g'] = values
+                    elif 'dz(' in name:
+                        continue
                     else:
                         integrator.fd1['g'][therm_mask] = 1.*values[therm_mask]
                     integs[name][count-1] = integrator.full_integrate()
@@ -702,12 +706,11 @@ class ThermalPostProcessor():
         """
         if os.path.exists('{:s}/fit_file.h5'.format(self.full_out_dir)):
             c_f = h5py.File('{:s}/fit_file.h5'.format(self.full_out_dir), 'r')
-            z_cb = c_f['z_cb'].value
-            radius = c_f['vortex_radius'].value
-            height = c_f['vortex_height'].value
+            radius = c_f['fit_r'].value
+            height = c_f['fit_z'].value
             c_f.close()
         else:
-            radius, height, z_cb = np.zeros_like(self.times), np.zeros_like(self.times), np.zeros_like(self.times)
+            radius, height = np.zeros_like(self.times), np.zeros_like(self.times)
         if os.path.exists('{:s}/contour_file.h5'.format(self.full_out_dir)):
             c_f = h5py.File('{:s}/contour_file.h5'.format(self.full_out_dir), 'r')
             contours = c_f['contours'].value
@@ -716,7 +719,7 @@ class ThermalPostProcessor():
             contours = None 
 
 
-        fig = plt.figure(figsize=(7, 6))
+        fig = plt.figure(figsize=(10, 5))
         ax1 = fig.add_subplot(1,4,1)
         ax2 = fig.add_subplot(1,4,2)
         ax3 = fig.add_subplot(1,4,3)
@@ -732,7 +735,7 @@ class ThermalPostProcessor():
 
         for fn, fp in zip(self.files, self.prof_files):
             #Read entropy, density, velocity, vorticity
-            r, z, rr, zz, s1, w, u, V = self.read_file(fn)
+            r, z, rr, zz, s1, w, u, V, p = self.read_file(fn)
             f    = h5py.File(fp, 'r')
             time = f['scales']['sim_time'].value
             f.close()
@@ -758,20 +761,26 @@ class ThermalPostProcessor():
                     contour_top = z.max()
                 good_contour = (z >= contour_bottom)*(z <= contour_top)
 
+                T0 = 1 + self.grad_T_ad*(zz - 20)
                 for j, info in enumerate(zip(axs, caxs, [s1[i,:,:], w[i,:,:], u[i,:,:], V[i,:,:]], ['s1', 'w', 'u', r'$\omega$'])):
                     ax, cax, fd, title = info
-                    maxv = np.sort(np.abs(fd).flatten())[int(0.998*len(fd.flatten()))]
+#                    maxv = np.sort(np.abs(fd).flatten())[int(0.998*len(fd.flatten()))]
+                    maxv = np.abs(fd).max()
                     cmesh = ax.pcolormesh(rr, zz, fd, cmap='RdBu_r', vmin=-maxv, vmax=maxv)
+                    if j == 3:
+                        cmesh = ax.pcolormesh(-rr, zz, -fd, cmap='RdBu_r', vmin=-maxv, vmax=maxv)
+                    else:
+                        cmesh = ax.pcolormesh(-rr, zz, fd, cmap='RdBu_r', vmin=-maxv, vmax=maxv)
                     cbar = fig.colorbar(cmesh, cax=cax, orientation="horizontal", ticks=[-maxv*.75,0,maxv*.75])
                     cax.set_xticklabels(['', r'$\pm{:.2e}$'.format(maxv), ''])
                     cax.xaxis.set_ticks_position('none')
                     cax.set_title(title)
-                    ax.set_xlim(0, 0.25*self.Lz)
+                    ax.set_xlim(-0.25*self.Lz, 0.25*self.Lz)
                     ax.set_ylim(0, self.Lz)
-                    ax.axhline(z_cb[count-1], lw=0.5, c='k', ls='--')
                     ax.scatter(radius[count-1], height[count-1], color='black', s=2)
+                    ax.scatter(-radius[count-1], height[count-1], color='black', s=2)
                     ax.plot(contour[good_contour], z[good_contour], c='k', lw=0.5)
-                    ax.axhline(contour_top, c='grey', lw=0.5)
+                    ax.plot(-contour[good_contour], z[good_contour], c='k', lw=0.5)
                     if j > 0: ax.set_yticks([])
 
                 plt.suptitle('sim_time = {:.4e}'.format(self.times[count-1]))

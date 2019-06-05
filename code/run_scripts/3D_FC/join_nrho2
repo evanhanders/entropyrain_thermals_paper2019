@@ -6,7 +6,7 @@
 #PBS -q normal
 
 N=60
-DIR=./FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho2_aspect0.5/
+DIR=./FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho2_aspect0.5_restarted_1024x256x256_pre_shutdown/
 
 
 date
