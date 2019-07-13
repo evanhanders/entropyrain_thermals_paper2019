@@ -1,13 +1,12 @@
 #PBS -S /bin/bash
 #PBS -N join_3D_re6e2_nrho2
 #PBS -l select=3:ncpus=24:mpiprocs=24:model=has
-#PBS -l walltime=3:00:00
+#PBS -l walltime=5:00:00
 #PBS -j oe
 #PBS -q normal
 
 N=60
 DIR=./FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho2_aspect0.5/
-
 
 date
 mpiexec_mpt -n $N ~/.python3 join_data.py       $DIR  > join.nrho2.$PBS_JOBID.txt

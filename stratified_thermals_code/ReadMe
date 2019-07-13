@@ -12,6 +12,7 @@ AN_2D_thermal.py (for running 2D, anelastic, azimuthally symmetric thermal sims)
 FC_3D_thermal.py (for running 3D, fully compressible thermal sims)
 thermal_analysis.py (for post-processing thermal simulations)
 join_data.py (for joining output data from 3D FC runs)
+dedalus.cfg (dedalus configuration options)
 
 Inside of the logic/ directory, the driving logic for 3D sims and post-processing can be found:
 
@@ -36,3 +37,9 @@ System requirements:
 This code must be run using python3 on a computer with the open-source
 Dedalus pseudospectral framework installed. See http://dedalus-project.org/
 for more information.
+
+WARNING: As of May 27, 2019, (changeset 1151), the tip version of Dedalus breaks when running the 3D, fully compressible equations on distributed processor meshes.
+In order to run 3D thermals, go to your dedalus directory, and revert to changeset 1150 by typing "hg up 1150".
+To go back to the tip version, simply type "hg up tip".
+This is a known bug, and its progress can be tracked online in the Dedalus issue tracker: https://bitbucket.org/dedalus-project/dedalus/issues/64/nccs-cause-strange-mpi-crashes-after
+Version 1150 of dedalus has a bug in reading config options, but the inclusion of the dedalus.cfg file in this zip directory circumvents this error.
