@@ -94,7 +94,7 @@ plt.ylim(5e-2, 1e2)
 
 
 ax.text(14, 52, r'$f \propto d^2\,\mathrm{(LJ19)}$', rotation=12)
-ax.text(11.5, 1.2, r'$\mathrm{simulation}\,(N_\rho=3)$', rotation=-2)
+ax.text(11.5, 1.2, r'$\mathrm{simulation}\,(n_\rho=3)$', rotation=-2)
 ax.text(14, 2.2e-1, r'$f \propto \rho^{-1}\,\mathrm{(B16)}$', rotation=-7)
 
 fig.savefig('overview_fig.png', dpi=300, bbox_inches='tight')

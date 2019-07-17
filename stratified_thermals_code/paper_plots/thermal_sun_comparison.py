@@ -39,9 +39,8 @@ def theory_dT_dt(t, B0, Gamma0, f, chi, beta, t_off, T0, grad_T_ad=-1, m_ad=1.5)
     return C0*this_T**(m_ad/2)/np.sqrt(t + t_off)
 
 def read_solar_profiles():
-    mesa_data = np.genfromtxt('sun_4.5gyr.data', skip_header=6, usecols=(2, 4, 9)) #logR (in Rsun units), logRho (g/cm^3), csound (cm/s)
-    csound = mesa_data[:,2]*cm2Mm
-    mesa_data = 10**(mesa_data[:,:-1])
+    mesa_data = np.genfromtxt('sun_4.5gyr.data', skip_header=6, usecols=(2, 4)) #logR (in Rsun units), logRho (g/cm^3)
+    mesa_data = 10**(mesa_data)
     radius    = mesa_data[:,0]*Rsun2Mm
     density    = mesa_data[:,1]*(cm2Mm)**(-3)
 
@@ -67,13 +66,12 @@ def read_solar_profiles():
     radii *= Rsun2Mm
 
     rho2r = interp1d(density, radius, bounds_error=False, fill_value='extrapolate')
-    r2cs = interp1d(radius, csound, bounds_error=False, fill_value='extrapolate')
     r2chi = interp1d(radii, chi, bounds_error=False, fill_value='extrapolate')
     r2nu  = interp1d(radii, nu, bounds_error=False, fill_value='extrapolate')
 
-    return rho2r, r2chi, r2nu, r2cs
+    return rho2r, r2chi, r2nu
 
-rho2r, r2chi, r2nu, r2cs = read_solar_profiles()
+rho2r, r2chi, r2nu = read_solar_profiles()
 
 
 
@@ -193,12 +191,10 @@ plt.fill_between(x_values/(Rsun2Mm), lower_y_values, upper_y_values, color='blac
 #plot actual velocity measurements
 for i in range(2):
     plt.plot(solar_radii[i]/(Rsun2Mm), w_outs[i]*(u_th/w_outs[i][0]), c='k', lw=0.5*(i+1))
-plt.plot(solar_radii[i]/Rsun2Mm, r2cs(solar_radii[i]), c='k', lw=1, dashes=(5,1,2,1))
-ax.text(0.69, 3e-1, r'$c_s$', rotation=-3)
 
 #Make plot pretty
 plt.xlim(0.68, 0.995)
-plt.ylim(1e-3, 5e-1)
+plt.ylim(1e-3, 1e-1)
 plt.yscale('log')
 plt.ylabel(r'$w_{\mathrm{th}}$ (Mm/s)')
 
@@ -214,7 +210,6 @@ for i in range(2):
 
     tau_kappa = r_outs[i]*(L/2/r_outs[i][0])**2/chi
     tau_ff    = -r_outs[i]/(w_outs[i]*u_th)
-    tau_ff_200    = -200/(w_outs[i]*u_th)
 #    tau_ff    = -1/(w_outs[i]*u_th)
     tau_ratios.append(tau_kappa/tau_ff)
 

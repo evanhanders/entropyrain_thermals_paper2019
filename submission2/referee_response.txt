@@ -1,0 +1,121 @@
+Dear Aimee,
+
+We thank you and the anonymous referee for taking the time to consider and review our manuscript, "Entropy Rain: Dilution and Compression of Thermals in Stratified Domains".
+
+In addition to the changes suggested in the referee report (and which we describe inline with the report below), we have made the following small changes to the manuscript as a result of discussions with colleagues:
+1. We have computed a 3D, fully compressible simulation at n_rho = 3 and included its results in all relevant figures. We additionally recomputed our 3D, nrho = 2 simulation with a higher horizontal coefficient resolution.
+2. We have added a line showing the sound speed to Figure 6, middle panel.
+3. Throughout the manuscript, n_rho is now capital N_rho, to avoid confusion with n_ad.
+4. Minor clarifications throughout the manuscript, all of which are bolded.
+
+Best wishes,
+Evan Anders, Daniel Lecoanet, and Ben Brown
+
+----------------------------------------------------------
+RESPONSE TO REFEREE REPORT
+----------------------------------------------------------
+
+""" 
+The authors analyze the entropy rain scenario by developing an analytic
+theory and performing simulations in the presence of negative buoyancy
+of the downflow. This is a nice piece of work that should be published,
+and I have only relatively minor suggestions for possible improvement.
+"""
+
+We thank the referee for taking the time to review our paper and for their useful suggestions to help improve the clarity of the manuscript.
+We hope that the changes we have made to address the referees concerns, described below, are sufficient to clear up any points of confusion.
+
+"""
+1. The paper is arranged in such a way that subsequent simulation
+results are used in quite some detail both in the introduction and in
+the discussion of the model. If the authors want to keep it this way,
+some additional clarifications should be given in several places (e.g.,
+in the captions to Figs. 1-3, and in the text where they refer to these
+figures.) Otherwise, details such as nrho=3, the size of the domain,
+and other details of Fig.3 remain puzzling. Regarding Fig.2, one could
+well imagine that it is just a sketch, but it is actually a simulation
+result, right? If so, what are the times in the two panels? Another
+option would be a rearrangement and to present the simulations first.
+"""
+
+We have elected to keep the overall presentation of the paper the same, but have added explicit callouts throughout the text to inform the reader that they are looking at simulation data in Figs 2 & 3.
+See figure captions, the first sentences of section 2.1, and callouts to Fig 3 in section 2.3.
+
+"""
+2. Some quantities are not defined explicitly. This should be avoided,
+even though the symbols follow standard convention (e.g., rho). It might
+also be good to give a name to quantities such as t_off, when they are
+first introduced. In the case of t_off, it appears first on page 3 in
+Sect.2.3, and only at the end of Sect.2.4 it is called temporal offset.
+"""
+
+We have tried to explicitly define all parameters throughout the paper (rho in the sct. 1; u and g in 2.2; t_off, B_th, Gamma_th, m in 2.3, grad_ad in 2.4, and we redefine N_rho in 3.1 as its callout in 2.1 is far enough away from here that it can be forgotten).
+
+"""
+3. The expression detainment seems to be used in meteorology, but is
+maybe new in astrophysics, where one talks in other contexts about
+stripping or even ram pressure stripping. Maybe some comments could
+be useful.
+"""
+
+We have added a few words to key the reader in on the concept of detrainment shortly before eqn 7.
+
+"""
+4. When B_th is first introduced in Sect.2.3, it is not clear to me in
+which way it is different from just B that was used in the previous
+section 2.2. Only in the second paragraph it seems to become clear
+that this is because of detainment. Again, some text earlier on could
+be helpful.
+"""
+
+We removed the first sentence of sct. 2.3 and have defined B_th and Gamma_th more clearly following eqns. 7 and 8, respectively.
+
+"""
+5. nabla_ad is sometimes put in parenthesis. In Eq.(10) one could imagine
+that the authors would like to avoid an impression that it could be
+an operator (in which case it could be put at the end of (z-L), but in
+Eq.(15) it seems really unnecessary.
+"""
+
+We have removed these parenthesis and moved nabla_ad to the end of (z-L_z) in eqn. 10.
+
+"""
+6. In Eq.(14), should there not be a term in the viscosity expression
+that is related to the derivative of the density?
+"""
+
+Due to our formulation of diffusivities (kappa = rho*chi = constant in space and time, mu = rho*nu = constant in space and time), the gradient terms are explicitly zero in our formulation.
+
+"""
+7. At the end of Sect.3.4, it becomes clear that periodic boundary
+conditions are used in the vertical direction. It comes as a surprise
+and it is unclear why this is done.
+"""
+
+We have added a paragraph explaining the reasoning behind this choice in section 3.4.
+
+"""
+8. In the caption to Fig.4, I'd add "(AN)" and "(FC)" after anelastic
+and fully compressible. The differences are indeed quite small. Maybe
+it would be good to emphasize that the author mean 2D Cartesian and
+not 2D cylindrical, if that is indeed the case. 2D Cartesian implies a
+very different width of vortices, so it is amazing that this does not
+matter. Given that AN and FC are changed at the same time as 2D and 3D,
+it is not clear what is caused by what. I agree, the differences are
+small, but a comment might be useful. Is 3-D AN harder, or what?
+"""
+
+We have added (AN) and (FC) to the captions of figures 4 and 5.
+Furthermore, we have added some additional text to 3.1, as it seems that it was unclear that the 3D simulations are in azimuthally symmetric cylindrical domains, while the 3D simulations are in cartesian domains.
+Essentially, the 2D simulations are the limit in which a description of the thermal is easily derivable, and the 3D simulations are the "truth," and we wanted to compare those two.
+
+"""
+9. Except for general remarks in the introduction, nothing is said about
+the enthalpy flux that is accomplished by one plume. It can obviously
+not be modeled by a superadiabatic gradient, but maybe some quantitative
+statements can be made regarding some of the assumptions made in B16.
+"""
+
+The focus of this work is entrainment, as suggested by the title, and entropy rain was merely the context in which we sought to apply this knowledge.
+While interesting, descriptions of the flux carried by one of these thermals, especially propagated to the solar context, is outside of the remit of this manuscript.
+We do not believe that this can be treated in a satisfying way in a short paragraph or two, and an aside of more length than that which does not address our original hypothesis seems out of place.

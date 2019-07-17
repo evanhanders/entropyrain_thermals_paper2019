@@ -1,0 +1,32 @@
+#PBS -S /bin/bash
+#PBS -N FC_thermal_KapMu_Re6e2_nrho0.5_bro
+#PBS -l select=74:ncpus=28:mpiprocs=28:model=bro
+#PBS -l walltime=8:00:00
+#PBS -j oe
+#PBS -q normal
+
+cd $PBS_O_WORKDIR
+
+RE=6e2
+EPS=1.00e-4
+dedalus_dir=./
+
+date
+mpiexec_mpt -n 2048 ~/.python3 FC_3D_thermal.py \
+        --nz=512 \
+        --nx=256 \
+        --ny=256 \
+        --mesh=64,32 \
+        --Re=$RE \
+        --epsilon=$EPS \
+        --run_time_buoy=45 \
+        --run_time=7.9 \
+        --n_rho=0.5 \
+        --aspect=0.5 \
+        --safety_factor=0.15 \
+        --SBDF2 \
+        --label=bro \
+        > $dedalus_dir/out.3D.nrho0.5.Re$RE.Eps$EPS.$PBS_JOBID
+
+date
+
