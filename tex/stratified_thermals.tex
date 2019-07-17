@@ -385,20 +385,18 @@ We pick perturbations that are in pressure equilibrium,
 We simulate the thermals using the  Dedalus\footnote{\url{http://dedalus-project.org/}} pseudospectral framework \citep{burns&all2016, burns&all2019}.
 The 2D simulations use an implicit-explicit (IMEX), third-order, four-stage Runge-Kutta timestepping scheme RK443 \citep{ascher&all1997}, and the 3D simulations use the second-order semi-implicit backward differentiation formulation SBDF2 \citep{wang&ruuth2008}.
 
-The 2D simulation domain is the direct product of a Fourier basis $(z \in [-L_z/4, L_z])$ and a Chebyshev basis $(r \in [0, L_r])$.
+The 2D simulation domain is \textbf{periodic in the z-direction with $z \in [-L_z/4, L_z]$ and the radial direction spans $r \in [0, L_r]$}.
 The boundary conditions are $\partial_r S_1 = w = (\grad\times\bm{u})_\phi = 0$ at $r = L_r$, and the regularity of the equations automatically impose $u = \partial_r(w) = \partial_r(S_1) = 0$ at $r = 0$.
-The 3D simulation domain is the direct product of Fourier bases in the horizontal directions ($x, y \in [-L_r, L_r]$) and a Chebyshev basis ($z \in [0, L_z]$).
+The 3D simulation domain is \textbf{periodic in the horizontal directions ($x, y \in [-L_r, L_r]$) and vertically spans $z \in [0, L_z]$}.
 We impose impenetrable, stress free, fixed-temperature boundary conditions at the upper and lower boundaries.
 In all of our simulations we specify $L_z = 20$ and $L_r = 5$.
 We extend our 2D simulation domains to $z = -L_z/4$ because those simulations are vertically periodic.
 This extension allows us to study the full transit of the thermal above $z = 0$ and terminate the simulation before it begins to wrap through the bottom of the periodic domain.
 
 \textbf{
-Dedalus currently allows for the direct specification of general boundaries in one direction.
-In the case of our 2D simulations, this direction must be the radial direction in order to capture the singularity at $r = 0$.
-While Dedalus can expand fields in terms of sine or cosine bases (as in \LJ), the mixed parities of terms such as the viscous heating term in the fully compressible or anelastic equations rules out a simple specification in these equation sets.
-We have therefore chosen to use periodic Fourier bases in the vertical direction of our simulations, and end the simulations before the thermal can interact with those boundaries.
-Remarkably, the results of these simulations vary only minimally from our 3D simulations, as we will show in the next section, and the vertical boundaries do not meaningfully affect the evolution of the thermal.
+In our 2D simulations, we represent the radial direction with Chebyshev polynomials so that we can include geometric factors in ours equations and capture the singularity at $r = 0$.
+We then assume the z direction is periodic to make the calculations more efficient, and we end the simulations before the thermal can interact with the vertical periodic boundaries.
+Remarkably, the results of these simulations vary only minimally from our 3D simulations, as we will show in the next section, indicating that the vertical periodicity and the different side boundaries (cylinder vs. cube) do not influcence the thermal properties.
 }
 
 All of the code used to perform the simulations in this work can be found online in the supplementary materials in a Zenodo repository \citep{supp_andersetall2019} \textbf{at \dataset[10.5281/zenodo.3311894]{https://doi.org/10.5281/zenodo.3311894}}.
@@ -651,7 +649,7 @@ We therefore truncate the data from that simulation at a depth of 15, which corr
 0.5 	& 		256			& 512			& 45 		&	0.15	\\
 1	 	& 		256			& 512			& 41	 	&	0.15	\\
 2	 	& 		\textbf{384}			& 1024			& 34    	&	0.1	\\
-\textbf{3}	 	& 		\textbf{512}			& \textbf{2048}			& \textbf{25}    	&	\textbf{0.15}	\\
+\textbf{3}	 	& 		\textbf{384}			& \textbf{2048}			& \textbf{25}    	&	\textbf{0.15}	\\
 \enddata																																															
 \tablecomments{
 Our 2D sims have spectral mode resolution of nr x nz, and our 3D sims have spectral mode resolution of nx x ny x nz.

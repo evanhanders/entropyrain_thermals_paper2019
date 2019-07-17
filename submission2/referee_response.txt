@@ -1,12 +1,7 @@
-Dear Aimee,
+Dear Dr. Norton,
 
 We thank you and the anonymous referee for taking the time to consider and review our manuscript, "Entropy Rain: Dilution and Compression of Thermals in Stratified Domains".
-
-In addition to the changes suggested in the referee report (and which we describe inline with the report below), we have made the following small changes to the manuscript as a result of discussions with colleagues:
-1. We have computed a 3D, fully compressible simulation at n_rho = 3 and included its results in all relevant figures. We additionally recomputed our 3D, nrho = 2 simulation with a higher horizontal coefficient resolution.
-2. We have added a line showing the sound speed to Figure 6, middle panel.
-3. Throughout the manuscript, n_rho is now capital N_rho, to avoid confusion with n_ad.
-4. Minor clarifications throughout the manuscript, all of which are bolded.
+We include below our changes to the manuscript, including inline responses to the full referee report.
 
 Best wishes,
 Evan Anders, Daniel Lecoanet, and Ben Brown
@@ -14,6 +9,12 @@ Evan Anders, Daniel Lecoanet, and Ben Brown
 ----------------------------------------------------------
 RESPONSE TO REFEREE REPORT
 ----------------------------------------------------------
+
+In addition to the changes suggested in the referee report (which we describe inline below), we have made the following small changes to the manuscript as a result of discussions with colleagues:
+1. We have computed a 3D, fully compressible simulation at n_rho = 3 and included its results in all relevant figures. We additionally recomputed our 3D, nrho = 2 simulation with a higher horizontal coefficient resolution.
+2. We have added a line showing the sound speed to velocity panel of Figure 6.
+3. Throughout the manuscript, n_rho is now capital N_rho, to avoid confusion with n_ad.
+4. Minor clarifications throughout the manuscript, all of which are bolded.
 
 """ 
 The authors analyze the entropy rain scenario by developing an analytic
@@ -84,7 +85,7 @@ We have removed these parenthesis and moved nabla_ad to the end of (z-L_z) in eq
 that is related to the derivative of the density?
 """
 
-Due to our formulation of diffusivities (kappa = rho*chi = constant in space and time, mu = rho*nu = constant in space and time), the gradient terms are explicitly zero in our formulation.
+Due to our formulation of diffusivities (kappa = rho*chi = constant in space and time, mu = rho*nu = constant in space and time), the gradients of density cancel with the gradients of nu and/or chi.
 
 """
 7. At the end of Sect.3.4, it becomes clear that periodic boundary
@@ -107,7 +108,6 @@ small, but a comment might be useful. Is 3-D AN harder, or what?
 
 We have added (AN) and (FC) to the captions of figures 4 and 5.
 Furthermore, we have added some additional text to 3.1, as it seems that it was unclear that the 3D simulations are in azimuthally symmetric cylindrical domains, while the 3D simulations are in cartesian domains.
-Essentially, the 2D simulations are the limit in which a description of the thermal is easily derivable, and the 3D simulations are the "truth," and we wanted to compare those two.
 
 """
 9. Except for general remarks in the introduction, nothing is said about
