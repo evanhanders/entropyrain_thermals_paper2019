@@ -77,6 +77,8 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     volumes      = output_file['int_vol'].value
     area         = output_file['int_area'].value
     radius       = output_file['radius'].value
+    avg_ke_flux  = output_file['int_ke_flux'].value/volumes
+    avg_enth_flux  = output_file['int_enth_flux'].value/volumes
     output_file.close()
 
     cb_file           = h5py.File('{:s}/z_cb_file.h5'.format(post.full_out_dir), 'r')
@@ -98,7 +100,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     for i in range(contours.shape[0]):
         if not (contours[i,-1] != 0)*(contours[i,-2]==0):
             thermal_found[i] = True
-    good = thermal_found
+    good = thermal_found*(height > 0.25*post.Lz)
 
     #Find Rz based on contour 
     Rz = np.zeros_like(times)
@@ -118,7 +120,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
 
     #cb fit
     depth = post.Lz - height
-    fit_t = (height < 0.65*post.Lz)*(height > 0.1*post.Lz)
+    fit_t = (height < 0.65*post.Lz)*(height > 0.25*post.Lz)
     fit_t[0] = False
     found_therm = False
     therm_done  = False
@@ -305,6 +307,17 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     fig.savefig('{:s}/w_v_z.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
 
 
+    logger.info('plotting fluxes')
+    fig = plt.figure()
+
+    plt.plot(d_measured, avg_ke_flux, c='b')
+    plt.plot(d_measured, avg_enth_flux, c='r')
+    plt.plot(d_measured, avg_enth_flux + avg_ke_flux, c='k')
+    plt.xlabel('depth')
+    plt.ylabel('avg flux')
+    plt.savefig('{:s}/fluxes_v_depth.png'.format(post.full_out_dir), bbox_inches='tight', dpi=200)
+
+
     f = h5py.File('{:s}/fit_file.h5'.format(post.full_out_dir), 'w')
     f['B0']       = fit_B0
     f['Gamma0']   = fit_Gamma0
@@ -334,6 +347,7 @@ def post_process(root_dir, plot=False, get_contour=True, analyze=True, out_dir='
     f['w_measured'] = w_measured
     f['w_theory'] = w_theory
     f.close()
+
     
 
 

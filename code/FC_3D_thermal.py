@@ -189,7 +189,7 @@ flow.add_property("vol_avg(rho_fluc*phi)", name='PE_fluc')
 flow.add_property("vel_rms*L/nu", name='Re')
 flow.add_property("Ma_rms", name='Ma')
 flow.add_property("integ(rho_full*s1)", name='integ_s')
-flow.add_property("((dz(T_full)/T_full)**2 - (dz(T0)/T0)**2)", name='dissipation') # good for seeing if the solution isn't resolved.
+flow.add_property("((dz(T_full)/T_full)**2 + (dx(T_full)/T_full)**2 + (dy(T_full)/T_full)**2 - (dz(T0)/T0)**2)", name='dissipation') # good for seeing if the solution isn't resolved.
 
 ################################################
 # CFL and sim stop conditions

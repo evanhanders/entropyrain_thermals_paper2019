@@ -19,8 +19,8 @@ CASES = [0.1, 0.5, 1, 2, 3, 4, 5, 6]
 ROOT_DIR='../'#good_2D_runs/z_bot_zero/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
-CASES_3D = [0.1, 0.5, 1, 2]
-AR_3D    = [0.5, 0.5, 0.5, 0.5]
+CASES_3D = [0.1, 0.5, 1, 2, 3]
+AR_3D    = [0.5, 0.5, 0.5, 0.5, 0.5]
 THREED_DIR = '../'
 DIRS_3D=['{:s}FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho{}_aspect{}/'.format(THREED_DIR,nrho, ar) for nrho, ar in zip(CASES_3D, AR_3D)] 
 dict_3D = {}
@@ -60,6 +60,8 @@ for i, direc in enumerate(DIRS):
                 x_3D, y_3D     = f_3Dt['times'].value, f_3D['d_measured'].value
             elif j == 1:
                 x_3D, y_3D     = f_3D['d_measured'].value[2:-2], -f_3D['w_measured'].value
+            if CASES[i] == 3:
+                x_3D, y_3D = x_3D[:-15], y_3D[:-15]
             f_3D.close()
             f_3Dt.close()
             ax.plot(x_3D[:], y_3D[:], marker='+', lw=0, markersize=2, markeredgecolor='k', markeredgewidth=0.5)
@@ -88,7 +90,7 @@ cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(
 cb.solids.set_rasterized(True)
 cax.xaxis.set_ticks_position('top')
 cax.xaxis.set_ticklabels(CASES)
-cb.set_label(r'$n_\rho$', labelpad=-40)
+cb.set_label(r'$N_\rho$', labelpad=-40)
 
 #ax1.text(0.5, 18.5, 'a', fontsize=12)
 #ax2.text(0.2, 0.225, 'b', fontsize=12)

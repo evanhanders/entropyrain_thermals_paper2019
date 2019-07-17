@@ -16,8 +16,8 @@ from scipy.interpolate import interp1d
 
 NRUNS=8
 
-aspect = [0.25, 0.25, 0.25, 0.25]
-CASES = [0.1, 0.5, 1, 2]
+aspect = [0.25, 0.25, 0.25, 0.25, 0.25]
+CASES = [0.1, 0.5, 1, 2, 3]
 ROOT_DIR='../'#good_2D_runs/z_bot_zero/'
 DIRS=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES, aspect)] 
 
@@ -26,8 +26,8 @@ CASES_2D = [0.1, 0.5, 1, 2, 3, 4, 5, 6]
 color_dir = [1, 2, 3, 4, 5, 6, 7, 8]
 DIRS_2D=['{:s}AN_2D_thermal_nrho{}_Re6e2_Pr1_aspect{}_Lz20/'.format(ROOT_DIR, nrho, ar) for nrho, ar in zip(CASES_2D, aspect_2D)] 
 
-CASES_3D = [0.1, 0.5, 1, 2]
-AR_3D    = [0.5, 0.5, 0.5, 0.5]
+CASES_3D = [0.1, 0.5, 1, 2, 3]
+AR_3D    = [0.5, 0.5, 0.5, 0.5, 0.5]
 THREED_DIR = '../'
 DIRS_3D=['{:s}FC_3D_thermal_Re6e2_Pr1_eps1.00e-4_nrho{}_aspect{}/'.format(THREED_DIR,nrho, ar) for nrho, ar in zip(CASES_3D, AR_3D)] 
 dict_3D = {}
@@ -74,6 +74,9 @@ for i, direc in enumerate(DIRS):
     t3, d3, r3  = f_3D['times'].value, 20 - f_3D['vortex_height'].value, f_3D['vortex_radius'].value
     f.close()
     f_3D.close()
+
+    if CASES[i] == 3:
+        t3, d3, r3 = t3[:-15], d3[:-15], r3[:-15]
 
 
     color = sm.to_rgba(i+1)
@@ -130,7 +133,7 @@ cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(
 cb.solids.set_rasterized(True)
 cax.xaxis.set_ticks_position('top')
 cax.xaxis.set_ticklabels([0.1, 0.5, 1, 2, 3, 4, 5, 6])
-cb.set_label(r'$n_\rho$', labelpad=-30)
+cb.set_label(r'$N_\rho$', labelpad=-30)
 
 
 #axs[0].text(2.25, 0.21, 'a', fontsize=10)

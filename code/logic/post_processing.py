@@ -577,6 +577,8 @@ class ThermalPostProcessor():
                             'int_rho_s1_above', 
                             'int_u', 
                             'int_area', 
+                            'int_ke_flux',
+                            'int_enth_flux',
                             'max_s1_therm',
                             'torus_vol',
                             'full_impulse',
@@ -632,6 +634,8 @@ class ThermalPostProcessor():
                             'int_s1' : 2*np.pi*s1[i,:]*integrator.r, 
                             'int_mass' : 2*np.pi*integrator.rho0['g']*integrator.r, 
                             'int_ke' :  2*np.pi*integrator.rho0['g']*w[i,:]**2*integrator.r / 2, 
+                            'int_ke_flux' : 2*np.pi*integrator.rho0['g']*(u[i,:] + w[i,:])**2*w[i,:] * integrator.r / 2,
+                            'int_enth_flux' : 2*np.pi*integrator.r * (integrator.rho0['g']*w[i,:]*(integrator.T0['g']*s1[i,:] - self.g*integrator.z)),
                             'int_mom' : 2*np.pi*integrator.rho0['g']*w[i,:]*integrator.r, 
                             'int_pe' : 2*np.pi*s1[i,:]*integrator.rho0['g']*self.g*-1*integrator.z*integrator.r,
                             'int_impulse' : np.pi*integrator.rho0['g']*V[i,:]*integrator.r**2,
@@ -736,7 +740,7 @@ class ThermalPostProcessor():
         for fn, fp in zip(self.files, self.prof_files):
             #Read entropy, density, velocity, vorticity
             r, z, rr, zz, s1, w, u, V, p = self.read_file(fn)
-            f    = h5py.File(fp, 'r')
+            f    = h5py.File(fn, 'r')
             time = f['scales']['sim_time'].value
             f.close()
             

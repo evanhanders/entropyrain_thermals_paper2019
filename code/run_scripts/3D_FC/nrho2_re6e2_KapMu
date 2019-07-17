@@ -7,6 +7,8 @@
 
 cd $PBS_O_WORKDIR
 
+export PYTHONPATH=/home1/eanders/dedalus_new/src/thermals_dedalus:$PYTHONPATH
+
 RE=6e2
 EPS=1.00e-4
 dedalus_dir=./
@@ -19,12 +21,13 @@ mpiexec_mpt -n 8192 ~/.python3 FC_3D_thermal.py \
         --mesh=64,128 \
         --Re=$RE \
         --epsilon=$EPS \
-        --run_time_buoy=10 \
+        --run_time_buoy=34 \
         --run_time=23.9 \
         --n_rho=2 \
         --aspect=0.5 \
         --safety_factor=0.1 \
         --SBDF2 \
+        --label=1024x384x384 \
         > $dedalus_dir/out.3D.nrho2.Re$RE.Eps$EPS.$PBS_JOBID
 
 date
