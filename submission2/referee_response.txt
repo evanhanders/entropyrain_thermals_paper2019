@@ -116,6 +116,5 @@ not be modeled by a superadiabatic gradient, but maybe some quantitative
 statements can be made regarding some of the assumptions made in B16.
 """
 
-The focus of this work is entrainment, as suggested by the title, and entropy rain was merely the context in which we sought to apply this knowledge.
-While interesting, descriptions of the flux carried by one of these thermals, especially propagated to the solar context, is outside of the remit of this manuscript.
-We do not believe that this can be treated in a satisfying way in a short paragraph or two, and an aside of more length than that which does not address our original hypothesis seems out of place.
+We have added two panels to Figure 6 which explore the enthalpy flux achieved by a thermal, and the filling factor required to carry the solar luminosity.
+An accompanying discussion has been added at the end of section 5.

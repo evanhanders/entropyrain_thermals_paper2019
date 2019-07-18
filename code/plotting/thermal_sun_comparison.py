@@ -7,12 +7,18 @@ matplotlib.rcParams['mathtext.rm'] = 'DejaVu Serif'
 matplotlib.rcParams['mathtext.it'] = 'DejaVu Serif:italic'
 matplotlib.rcParams['mathtext.bf'] = 'DejaVu Serif:bold'
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 from scipy.interpolate import interp1d
 
 
 cm2Mm = 1e-8 #Mm / cm
 Rsun2cm = 6.957e10 #cm / Rsun
 Rsun2Mm = 6.957e2 #Mm / Rsun
+
+gs = gridspec.GridSpec(1000, 1000)
+fig = plt.figure(figsize=(3.25, 7))
+
+
 
 
 def theory_C(B0, Gamma0, f, chi, beta, grad_T_ad=-1):
@@ -166,8 +172,8 @@ for Buoy in (B_nondim/2, 2*B_nondim):
 
 
 fig = plt.figure(figsize=(3.25, 6))
-ax = fig.add_subplot(4,1,1)
-axs = [ax]
+#######################################################AX1
+ax = plt.subplot(gs.new_subplotspec((0,  0), 200, 1000))
 
 #Plot radius grey band
 x_values = rho_outs[0]*(rho_top/rho_outs[0][0])
@@ -186,8 +192,8 @@ for i in range(2):
     plt.plot(solar_radii[i]/(Rsun2Mm), solar_therm_radii[i], c='k', lw=0.5*(i+1))
 
 plt.plot(solar_radii[0]/(Rsun2Mm), (L/2)/(rho_outs[0]/rho_outs[0][0])**(1./2), c='k', lw=2)
-ax.text(0.69, 8e-5, r'$r \propto \rho^{-1/2}$', rotation=3)
-ax.text(0.69, 7e-3, 'thermals', rotation=2.5)
+ax.text(0.69, 1e-4, r'$r \propto \rho^{-1/2}$', rotation=3)
+ax.text(0.69, 8e-3, 'thermals', rotation=2)
 
 #Make plot pretty
 plt.xlim(0.68, 0.995)
@@ -195,8 +201,8 @@ plt.yscale('log')
 plt.ylim(1e-5, 1e-1)
 plt.ylabel(r'$r_{\mathrm{th}}$ (Mm)')
 
-ax = fig.add_subplot(4,1,2)
-axs += [ax]
+#######################################################AX2
+ax = plt.subplot(gs.new_subplotspec((200,  0), 200, 1000))
 #Plot radius grey band
 x_values = solar_radii[0] 
 upper_y_values = w_outs[0]*(u_th/w_outs[0][0])
@@ -209,19 +215,18 @@ for i in range(2):
     solar_therm_w.append(w_outs[i]*(u_th/w_outs[i][0]))
     plt.plot(solar_radii[i]/(Rsun2Mm), solar_therm_w[i], c='k', lw=0.5*(i+1))
 plt.plot(solar_radii[i]/Rsun2Mm, r2cs(solar_radii[i]), c='k', lw=1, dashes=(5,1,2,1))
-ax.text(0.69, 3e-1, r'$c_s$', rotation=-3)
+ax.text(0.69, 3.5e-1, r'$c_s$', rotation=-3)
 
 #Make plot pretty
 plt.xlim(0.68, 0.995)
-plt.ylim(1e-3, 5e-1)
+plt.ylim(1e-3, 7e-1)
 plt.yscale('log')
 plt.ylabel(r'$w_{\mathrm{th}}$ (Mm/s)')
 
 
-ax = fig.add_subplot(4,1,3)
-axs += [ax]
+#######################################################AX3
+ax = plt.subplot(gs.new_subplotspec((400,  0), 200, 1000))
 
-#Plot grey band
 tau_ratios = []
 for i in range(2):
     chi    = r2chi(solar_radii[i])
@@ -241,6 +246,7 @@ for i in range(2):
     print('VH / (S1/cp): {:.4e}'.format(np.sum(viscous_heating[good[:-1]]/(R_approx*2.5)/S1_over_cp)))
 
 
+#Plot grey band
 x_values = solar_radii[0] 
 upper_y_values = tau_ratios[0]
 lower_y_values = interp1d(solar_radii[1], tau_ratios[1])(x_values)
@@ -253,11 +259,12 @@ plt.yscale('log')
 plt.ylabel(r'$\tau_\kappa/\tau_{\mathrm{ff}}$')
 plt.xlabel(r'radius $(R_{\odot})$')
 #plt.legend(loc='best', fontsize=9, frameon=False)
-axs[2].set_ylim(3e5, 3e8)
+plt.ylim(3e5, 3e8)
 
 
-ax = fig.add_subplot(4,1,4)
-
+#######################################################AX4
+ax = plt.subplot(gs.new_subplotspec((600,  0), 200, 1000))
+L_enth_fracs = []
 for i in range(2):
     solar_T = T_outs[i]*(T0/T_outs[i][0])
     V = fits_outs[i][-3]*(solar_therm_radii[i]/cm2Mm)**3
@@ -268,21 +275,50 @@ for i in range(2):
     B = (fits_outs[i][3]*nondim/cm2Mm)
     sfluc = B / (rho*V*g_over_Cp)
 
-    F_ke = 0.5*rho*w**3*cross_area
-    F_enth = rho*solar_T*sfluc*w*cross_area
+#    L_ke = 0.5*rho*w**3*cross_area
+    L_enth = rho*solar_T*sfluc*w*cross_area
+    L_enth_fracs.append(L_enth/3.84e33)
 
+#Plot grey band
+x_values = solar_radii[0] 
+upper_y_values = L_enth_fracs[0]
+lower_y_values = interp1d(solar_radii[1], L_enth_fracs[1])(x_values)
+plt.fill_between(x_values/Rsun2Mm, lower_y_values, upper_y_values, color='black', alpha=0.4, rasterized=True)
+for i in range(2):
+    plt.plot(solar_radii[i]/(Rsun2Mm), L_enth_fracs[i], c='k', lw=0.5*(i+1))
 
-    plt.axhline(3.84e33, c='k')
-    plt.plot(solar_radii[i]/(Rsun2Mm), F_enth, c='k', lw=0.5*(i+1))
-    plt.plot(solar_radii[i]/(Rsun2Mm), -F_ke, c='b', lw=0.5*(i+1))
-    for r, rth, ln_rho, Fe, Fk in zip(solar_radii[i]/Rsun2Mm, solar_therm_radii[i]/Rsun2Mm, np.log(solar_rhos[i]/rho_top), F_enth, F_ke):
-        if r > 0.68:         print(r, rth, ln_rho, Fe+Fk)
-#    plt.plot(solar_radii[i]/(Rsun2Mm), -(F_ke), c='b', lw=0.5*(i+1))
 
 plt.xlim(0.68, 0.995)
+plt.ylim(1e-10, 1e-4)
 plt.yscale('log')
-plt.ylabel(r'Flux')
+plt.ylabel(r'$L_{\mathrm{enth, th}}/L_{\odot}$')
+
+
+#######################################################AX4
+ax = plt.subplot(gs.new_subplotspec((800,  0), 200, 1000))
+f_thermals = []
+for i in range(2):
+    cross_area = np.pi*solar_therm_radii[i]**2
+    surf_area  = 4*np.pi*solar_radii[i]**2
+    N_thermals = L_enth_fracs[i]**(-1)
+    A_thermals = N_thermals*cross_area
+    f_thermals.append(A_thermals/surf_area)
+
+#Plot grey band
+x_values = solar_radii[0] 
+upper_y_values = f_thermals[0]
+lower_y_values = interp1d(solar_radii[1], f_thermals[1])(x_values)
+plt.fill_between(x_values/Rsun2Mm, lower_y_values, upper_y_values, color='black', alpha=0.4, rasterized=True)
+for i in range(2):
+    plt.plot(solar_radii[i]/Rsun2Mm, f_thermals[i], c='k', lw=0.5*(i+1))
+
+
+
+plt.xlim(0.68, 0.995)
+plt.ylim(1e-7, 1e0)
+plt.yscale('log')
 plt.xlabel(r'radius $(R_{\odot})$')
+plt.ylabel(r'$f_{\mathrm{th}}$')
 
 
 

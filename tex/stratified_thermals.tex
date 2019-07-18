@@ -102,7 +102,9 @@ We thus study the entropy rain hypothesis by investigating the evolution of indi
 Thermals in the Boussinesq limit have been well studied in the laboratory for decades \citep[see e.g.][]{morton&all1956, scorer1957}, and more recently through Direct Numerical Simulation \citep[DNS,][]{lecoanet&jeevanjee2018}. 
 These studies find that thermals expand radially and decelerate as they propagate.
 Such a deceleration may cause the thermals to move so slowly they would diffuse away their entropy perturbation before reaching the bottom of the solar convection zone.
-However, this past work does not include the effects of density stratification.
+\textbf{\citet{brandenburg&hazlehurst2001} found that hot, buoyant thermals in stratified domains behave qualitatively similar to Boussinesq thermals.
+However, we are not aware of past work which carefully examines the effects of stratification on \emph{negatively} buoyant thermals.
+}
 
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{overview_fig.pdf}
@@ -528,19 +530,22 @@ Nondimensionalizing this by $B_0 = (S_1/c_P) L^2 u_{\text{th}}^2 \rho_0$ with $u
 \begin{figure}[t!]
     \includegraphics[width=\columnwidth]{thermal_sun_comparison.pdf}
     \caption{
-	(top) Bounds on the evolution of the radii of entropy rain in the Sun are shown and compared to what the radii would be under purely horizontal compression.
-	(middle) The corresponding range of velocities of solar-like thermals are shown. 
-	(bottom) Shown is the estimated range of the ratio of the thermal diffusion timescale normalized by the freefall timescale over the thermal radial length scale.
+	(First panel) Bounds on the evolution of the radii of entropy rain in the Sun are shown and compared to what the radii would be under purely horizontal compression.
+	(Second panel) The corresponding range of velocities of solar-like thermals are shown. 
+	(Third panel) Shown is the estimated range of the ratio of the thermal diffusion timescale normalized by the freefall timescale over the thermal radial length scale.
 	Diffusivities are calculated using the realistic solar-like diffusion profiles of \citet{brown2011}.
+	\textbf{
+	(Fourth panel) An estimate of the luminosity of these thermals, normalized by the solar luminosity, is shown.
+	(Fifth panel) An estimate of the filling factor of thermals required to carry the solar luminosity.}
     \label{fig:thermal_sun_comparison} }
 \end{figure}
 
 Because solar downflows likely break up into thermals of various sizes, we will examine the fate of thermals with dimensionless buoyancy in the interval $[B_\ell, B_u] = 0.5B_\text{th}, 2B_\text{th}$.
 Interpolating and extrapolating the data in Table \ref{table:parameters}, we use Eqns.~\ref{eqn:r_theory} \& \ref{eqn:theory_z} to calculate theoretical predictions for how thermals with these buoyancies would evolve over extended atmospheres like the solar convection zone.
 Using a simple solar interior model calculated using MESA \citep{paxton&all2011} to map the density profiles of our simulation domains onto the density profile of the Sun, we plot the evolution of thermals in our estimated interval in Fig. \ref{fig:thermal_sun_comparison}.
-In the top and middle panels of Fig. \ref{fig:thermal_sun_comparison}, we show the evolution of these thermals' radii and velocities inside of the Sun, and compare their evolution to pure horizontal compression.
+In the first and second panels of Fig. \ref{fig:thermal_sun_comparison}, we show the evolution of these thermals' radii and velocities inside of the Sun, and compare their evolution to pure horizontal compression.
 We use the solar diffusivity models of \citet{brown2011} to estimate the timescale over which the thermal would diffuse its entropy signature ($\tau_\kappa = \chi/r_{\text{th}}^2$) and the thermal freefall timescale over its own radial length scale ($\tau_{\text{ff}} = r_{\text{th}}/w_{\text{th}}$).
-In the bottom panel of Fig. \ref{fig:thermal_sun_comparison}, we plot the ratio of these two timescales over the thermal's evolution.
+In the third panel of Fig. \ref{fig:thermal_sun_comparison}, we plot the ratio of these two timescales over the thermal's evolution.
 
 We find that our estimated solar thermal is in the falling regime.
 These thermals experience radial compression with corresponding increases in velocity, but experience much less compression than a naive approximation based on the density stratification alone.
@@ -551,7 +556,32 @@ $$
 \int_{R_\odot}^{0.7 R_\odot} \tau_\kappa^{-1} \frac{dr}{w_{th}} = [6.55, 1.57]\times 10^{-3}\,\text{for}\,[B_\ell, B_u].
 $$
 Thus, the thermal loses less than 1\% of its entropic signature to diffusion.
-These estimates suggest that entropy rain could transport the solar luminosity.
+
+\textbf{
+We now briefly estimate the enthalpy flux carried by a thermal.
+Following \citet{brandenburg2016}, we estimate the enthalpy flux of the thermal as $F_{\text{enth}} = \rho_0(z_th) T_0(z_th) w_{\text{th}} S_{1,\text{th}}$.
+We estimate the thermal's entropic signature as $S_{1, th} = B_{\text{th}}/(\rho_0(z_{\text{th}}) V_{\text{th}} g/c_P)$, where the thermal volume is $V_{\text{th}} = m r_{\text{th}}^3$.
+We take $\rho_0(z_{\text{th}})$, $T_0(z_{\text{th}})$, and $g/c_P$ from our solar MESA model at the depth of the thermal over its evolution.
+We take $r_{\text{th}}$ and $w_{\text{th}}$ to be the thermal radius and velocity shown in the first and second panels of Fig.~\ref{fig:thermal_sun_comparison}.
+We find $m$ from the data in Table \ref{table:parameters} in the same manner as we found $B_{\text{th}}$ for these solar thermals.
+To estimate the total luminosity carried by one thermal, we calculate $L_{\text{enth, th}} = \pi r_{\text{th}}^2 F_{\text{enth}}$, and we plot this value as a function of depth, normalized by the solar luminosity, in panel 4 of Fig.~\ref{fig:thermal_sun_comparison}.
+}
+
+
+\textbf{
+From our estimate of the luminosity carried by one thermal, we estimate the filling factor of downward propagating thermals required to carry the solar luminosity through their enthalpy flux.
+We calculate $f_{\text{th}} = (L_{\odot}/L_{\text{enth, th}}) (\pi r_{\text{th}}^2)/(4\pi R^2)$, where $R$ is the thermal's radial distance form the center of the Sun.
+We plot the $f_{\text{th}}$ in panel 5 of Fig.~\ref{fig:thermal_sun_comparison}.
+The filling factor of thermals required to carry $L_\odot$ at the solar surface is greater than unity; this is unsurprising, as we know that solar surface convection carries the solar luminosity through the combined effects of upflows and downflows.
+A few percentage of the solar radius beneath the photosphere, $f_{th}$ drops to a very modest $10^{-4}$, and by the base of the solar convection zone approaches $10^{-7}$.
+These estimates suggest that even if a large fraction of the thermals launched from the solar surface break apart due to turbulence, this mechanism could still efficiently carry the solar luminosity deep in the convection zone.
+}
+
+\textbf{
+While these estimates suggest that entropy rain could effectively transport the solar luminosity, we will briefly note that our handling of the enthalpy flux here ignores the contributions of the kinetic energy flux, potential energy flux, and viscous flux.
+While we expect the last of these to be inconsequential, the kinetic energy flux (which transports luminosity inwards) and the potential energy flux (which transports luminosity outwards) may be large.
+A more thorough examination of these fluxes are outside of the scope of this work, but due to the promising nature of our results found here for the entropy rain hypothesis, such work seems promising.
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% CONCLUSION SECTION
@@ -573,7 +603,7 @@ Hence, entropy rain is a possible mechanism for transporting the solar luminosit
 $\,$\newline$\,$
 \begin{acknowledgements}
 We'd like to thank Brett McKim and Nadir Jeevanjee for discussions about thermals and the laminar entrainment picture.
-\textbf{We'd like to further thank Nadir Jeevanjee, Jeremy Goodman, and the anonymous referee whose careful comments greatly improved the scientific quality and clarity of this manuscript.}
+\textbf{We'd like to further thank Nadir Jeevanjee, Axel Brandenburg, Jeremy Goodman, and the anonymous referee whose careful comments greatly improved the scientific quality and clarity of this manuscript.}
 This work was supported by NASA Headquarters under the NASA Earth and Space Science Fellowship Program -- Grant 80NSSC18K1199.
 This work was additionally supported by NASA LWS grant NNX16AC92G and by the National Science Foundation under grant No.~1616538. 
 DL is supported by Princeton Center for Theoretical Science and Lyman Spitzer Jr.~postdoctoral fellowships.
