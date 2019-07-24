@@ -214,8 +214,8 @@ solar_therm_w = []
 for i in range(2):
     solar_therm_w.append(w_outs[i]*(u_th/w_outs[i][0]))
     plt.plot(solar_radii[i]/(Rsun2Mm), solar_therm_w[i], c='k', lw=0.5*(i+1))
-plt.plot(solar_radii[i]/Rsun2Mm, r2cs(solar_radii[i]), c='k', lw=1, dashes=(5,1,2,1))
-ax.text(0.69, 3.5e-1, r'$c_s$', rotation=-3)
+plt.plot(solar_radii[i]/Rsun2Mm, r2cs(solar_radii[i]), c='k', lw=2)#1, dashes=(5,1,2,1))
+ax.text(0.69, 3.25e-1, r'$c_s$', rotation=-3)
 
 #Make plot pretty
 plt.xlim(0.68, 0.995)
