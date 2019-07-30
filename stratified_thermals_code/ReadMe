@@ -24,9 +24,12 @@ logic/output.py (Specifies output tasks of 3D simulations)
 logic/post_processing.py (Function definitions for post-processing)
 logic/thermal.py (Specifies thermal initial conditions)
 
-We note that the form of the fully compressible equations that we solve in the code is slightly different from the one presented in our paper. 
-The code implementation is nondimensionalized on the temperature gradient length scale at the top of the atmosphere and the isothermal sound crossing timescale of that unit length.
-The script post_processing.py appropriately scales all outputs from the 3D simulations into the form presented in our paper and into a form that is directly comparable to the 2D sims.
+In our code and the simulations presented in the paper, we solved the FC equations using the same nondimensionalization used in Anders & Brown 2017.
+This code implementation is nondimensionalized on the temperature gradient length scale at the top of the atmosphere and the isothermal sound crossing timescale of that unit length.
+The script logic/post_processing.py appropriately scales all outputs from the 3D simulations into the form presented in our paper and into a form that is directly comparable to the 2D sims.
+
+An implementation of the 3D FC equations in Dedalus code which uses the nondimensionalization that appears in Anders, Lecoanet, & Brown 2019 can be found in the nondim_FC_stratified_thermals/ directory.
+The 'nondim_FC_3D_thermal.py' drives the code there in the same manner as FC_3D_thermal.py.
 
 For details on how to run simulations, we have included sample simulation job scripts in the run_scripts/ folder for the NASA Pleiades supercomputer.
 
@@ -34,12 +37,7 @@ We further include the driving scripts used to make the figures in our paper in 
 
 -----
 System requirements:
-This code must be run using python3 on a computer with the open-source
-Dedalus pseudospectral framework installed. See http://dedalus-project.org/
-for more information.
-
-WARNING: As of May 27, 2019, (changeset 1151), the tip version of Dedalus breaks when running the 3D, fully compressible equations on distributed processor meshes.
-In order to run 3D thermals, go to your dedalus directory, and revert to changeset 1150 by typing "hg up 1150".
-To go back to the tip version, simply type "hg up tip".
-This is a known bug, and its progress can be tracked online in the Dedalus issue tracker: https://bitbucket.org/dedalus-project/dedalus/issues/64/nccs-cause-strange-mpi-crashes-after
-Version 1150 of dedalus has a bug in reading config options, but the inclusion of the dedalus.cfg file in this zip directory circumvents this error.
+This code must be run using python3 on a computer with the open-source Dedalus pseudospectral framework installed. 
+See http://dedalus-project.org/ for more information.
+All code in this directory should run on commit 1b36cc8 of Dedalus, committed by Keaton Burns on July 25, 2019.
+Some prior versions of Dedalus may crash when attempting to run the 3D simulations due to a bug in caching nonconstant coefficients: https://bitbucket.org/dedalus-project/dedalus/issues/64/nccs-cause-strange-mpi-crashes-after

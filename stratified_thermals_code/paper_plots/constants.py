@@ -85,7 +85,7 @@ cb = plt.colorbar(sm, cax=cax, orientation='horizontal', boundaries=np.linspace(
 cb.solids.set_rasterized(True)
 cax.xaxis.set_ticks_position('top')
 cax.xaxis.set_ticklabels(CASES)
-cb.set_label(r'$n_\rho$', labelpad=-35)
+cb.set_label(r'$N_\rho$', labelpad=-35)
 
 #axs[0].text(19, 1.03, 'a', fontsize=12)
 #axs[1].text(19, 1.03, 'b', fontsize=12)
